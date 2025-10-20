@@ -1,13 +1,38 @@
-// Add this component temporarily during development
+import { useState, useEffect } from 'react';
+
 export default function ViewportIndicator() {
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // Set initial dimensions
+    updateDimensions();
+
+    // Update on resize
+    window.addEventListener('resize', updateDimensions);
+
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  const getBreakpoint = () => {
+    if (dimensions.width < 640) return 'XS';
+    if (dimensions.width < 768) return 'SM';
+    if (dimensions.width < 1024) return 'MD';
+    if (dimensions.width < 1280) return 'LG';
+    if (dimensions.width < 1536) return 'XL';
+    return '2XL';
+  };
+
   return (
-    <div className="fixed bottom-4 right-4 bg-black text-white px-3 py-1 text-xs font-mono rounded z-50">
-      <span className="sm:hidden">XS (&lt;640px)</span>
-      <span className="hidden sm:inline md:hidden">SM (≥640px)</span>
-      <span className="hidden md:inline lg:hidden">MD (≥768px)</span>
-      <span className="hidden lg:inline xl:hidden">LG (≥1024px)</span>
-      <span className="hidden xl:inline 2xl:hidden">XL (≥1280px)</span>
-      <span className="hidden 2xl:inline">2XL (≥1536px)</span>
+    <div className="fixed bottom-4 right-4 bg-black text-white px-3 py-2 text-xs font-mono rounded z-50 shadow-lg">
+      <div className="font-bold mb-1">{getBreakpoint()}</div>
+      <div>{dimensions.width} × {dimensions.height}px</div>
     </div>
   );
 }

@@ -1,79 +1,84 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/layout/Header';
 import Hero from '@/components/layout/Hero';
 import Bio from '@/components/layout/Bio';
 import ViewportIndicator from '@/components/layout/ViewportIndicator';
+import { brandShowcases, DEFAULT_CURSOR_COLOR, DEFAULT_CURSOR_STROKE } from '@/data/brandShowcases';
+import { darkenColor } from '@/utils/colorUtils';
+import { useBrandRotation } from '@/hooks/useBrandRotation';
+import { useCursorPosition } from '@/hooks/useCursorPosition';
+import MoreBio from '@/components/layout/MoreBio';
+import Footer from '@/components/layout/Footer';
+import AudioVisualizer from '@/components/spotify/AudioVisualizer';
+import { MarqueeText } from '@/components/ui/MarqueeText';
 
 
 
-// Brand showcase data - centralized for both Header and Hero
-export const brandShowcases = [
-  {
-    id: 'tripadvisor',
-    brandName: 'Tripadvisor',
-    tagline: 'Every type of traveler, every type of trip',
-    chips: ['BRAND IDENTITY DESIGN', 'TRAVEL BRAND'],
-    textColor: '#F4D9CA',
-    everdannLogo: '/logos/logo-tripadvisor-full.svg',
-    //backgroundImage: '/backgrounds/tripadvisor-bg.png',
-    logoVariant: 'tripadvisor'
-  },
-  //Add more brands here as you develop them
-  {
-    id: 'jael',
-    brandName: 'Jael',
-    tagline: 'Confidence tailored in every stitch',
-    chips: ['BRAND IDENTITY DESIGN', 'FASHION BRAND'],
-    textColor: '#EDCAF4',
-    everdannLogo: '/logos/everdann-jael-full.svg',
-    //backgroundImage: '/backgrounds/jael-bg.png',
-    logoVariant: 'jael'
-  },
-
-  {
-    id: 'conces',
-    brandName: 'CONCES',
-    tagline: 'Christ at the core of every innovation',
-    chips: ['BRAND IDENTITY DESIGN', 'ORGANIZATION'],
-    textColor: '#B8FB3C',
-    everdannLogo: '/logos/everdann-conces-full.svg',
-    //backgroundImage: '/backgrounds/conces-bg.png',
-    logoVariant: 'conces'
-  },
-];
+// Dynamic import to prevent hydration issues
+const SmoothCursor = dynamic(
+  () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
+  { ssr: false }
+);
 
 export default function Home() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Custom hooks for cleaner logic
+  const { currentIndex, setCurrentIndex, isTransitioning } = useBrandRotation({ 
+    totalBrands: brandShowcases.length,
+    intervalDuration: 7000,
+    fadeDuration: 400 
+  });
+  const cursorInHeroHeader = useCursorPosition();
+  
   const currentBrand = brandShowcases[currentIndex];
 
-  // Auto-rotate brands every 5 seconds
-  useEffect(() => {
-    // Only rotate if there's more than one brand
-    if (brandShowcases.length <= 1) return;
+  // Determine cursor colors based on section and mobile menu state
+  const cursorFillColor = isMobileMenuOpen 
+    ? DEFAULT_CURSOR_COLOR 
+    : (cursorInHeroHeader ? currentBrand.cursorColor : DEFAULT_CURSOR_COLOR);
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % brandShowcases.length);
-    }, 5000);
+  const cursorStrokeColor = isMobileMenuOpen 
+    ? DEFAULT_CURSOR_STROKE 
+    : (cursorInHeroHeader ? darkenColor(currentBrand.cursorColor) : DEFAULT_CURSOR_STROKE);
 
-    return () => clearInterval(interval);
-  }, []);
+
+
+
+
 
   return (
     <main>
-      {/* Pass current brand to Header */}
-      <Header currentBrand={currentBrand.logoVariant} />
+      {/* SmoothCursor with dynamic colors */}
+      <SmoothCursor 
+        cursorColor={cursorFillColor}
+        cursorStrokeColor={cursorStrokeColor}
+      />
       
-      {/* Pass current brand state to Hero */}
+      {/* Header with current brand theme */}
+      <Header 
+        currentBrand={currentBrand.logoVariant}
+        onMobileMenuToggle={setIsMobileMenuOpen}
+      />
+      
+      {/* Hero with brand showcase rotation */}
       <Hero 
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
         brandShowcases={brandShowcases}
+        isTransitioning={isTransitioning}
       />
 
-      <Bio/>
-      <ViewportIndicator/>
+      <Bio />
+      
+      <MoreBio />
+      
+      <Footer />
+      
+      <ViewportIndicator />
     </main>
   );
 }

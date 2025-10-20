@@ -12,3 +12,13 @@ export const sohneMono = localFont({
   variable: '--font-sohne-mono',
   display: 'swap',
 });
+
+export const dotted = localFont({
+  src: [
+    {
+      path: './fonts/dotted.woff2',
+    },
+  ],
+  variable: '--font-dotted',
+  display: 'swap',
+});

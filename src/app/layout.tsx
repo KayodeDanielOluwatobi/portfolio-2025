@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter, Outfit, Poppins, DM_Sans } from 'next/font/google'
+import { Space_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-provider'
-
+import { SmoothCursor } from '@/components/layout/SmoothCursor'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
-
 
 export const poppins = Poppins({
   subsets: ["latin"],
@@ -22,9 +22,15 @@ const departureMono = localFont({
 
 const dm_sans = DM_Sans({
   subsets: ['latin'],
-  weight: 'variable', // Choose the weights you need
+  weight: 'variable',
   variable: '--font-dm-sans',
 });
+
+const spaceMono = Space_Mono({
+  subsets: ['latin'],
+  weight: '400', // Space Mono only comes in 400 and 700
+  variable: '--font-space-mono',
+})
 
 const sohnemono1 = localFont({
   src: './fonts/sohnemono1.woff2',
@@ -34,6 +40,11 @@ const sohnemono1 = localFont({
 const sohnemono2 = localFont({
   src: './fonts/sohnemono2.woff2',
   variable: '--font-sohne-mono-2'
+})
+
+const dotted = localFont({
+  src: './fonts/dotted.woff2',
+  variable: '--font-dotted'
 })
 
 export const metadata: Metadata = {
@@ -48,13 +59,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${dm_sans.variable} ${outfit.variable} ${poppins.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable} antialiased`}>
+      <body className={`${inter.variable} ${dm_sans.variable} ${dotted.variable} ${outfit.variable} ${poppins.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable} ${spaceMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
+          {/* Global SmoothCursor - available on all pages */}
+          {/* <SmoothCursor cursorColor="#FFFFFF" cursorStrokeColor="#000000" /> */}
           {children}
         </ThemeProvider>
       </body>

@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface BrandShowcase {
   id: string;
@@ -10,6 +12,7 @@ interface BrandShowcase {
   textColor: string;
   everdannLogo: string;
   backgroundImage: string;
+  backgroundColor: string;
   logoVariant: string;
 }
 
@@ -17,9 +20,10 @@ interface HeroSectionProps {
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
   brandShowcases: BrandShowcase[];
+  isTransitioning: boolean;
 }
 
-// Helper function to convert hex to RGB
+// Helper functions remain the same...
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result ? {
@@ -29,7 +33,6 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   } : null;
 }
 
-// Helper function to convert RGB to HSL
 function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
   r /= 255;
   g /= 255;
@@ -54,7 +57,6 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
   return { h: h * 360, s: s * 100, l: l * 100 };
 }
 
-// Helper function to convert HSL to RGB
 function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
   h = h / 360;
   s = s / 100;
@@ -88,13 +90,9 @@ function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: n
   };
 }
 
-// Helper function to create a darker version of a color with better contrast
 function darkenColor(color: string): string {
-  console.log('Input color:', color);
-  
   let hex = color.replace('#', '').replace('0x', '');
   
-  // Handle hex format
   if (hex.length === 6 || hex.length === 3) {
     if (hex.length === 3) {
       hex = hex.split('').map(char => char + char).join('');
@@ -105,9 +103,7 @@ function darkenColor(color: string): string {
     
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
     
-    // Reduce lightness to 30% for much darker color with better contrast
-    hsl.l = 20;
-    // Increase saturation for more vibrant dark color
+    hsl.l = 15;
     hsl.s = Math.min(100, hsl.s + 10);
     
     const darkRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
@@ -118,11 +114,9 @@ function darkenColor(color: string): string {
       })
       .join('')}`;
     
-    console.log('Darkened hex result:', result);
     return result;
   }
   
-  console.log('Could not darken color, returning original:', color);
   return color;
 }
 
@@ -130,20 +124,102 @@ function darkenColor(color: string): string {
 export default function Hero({ 
   currentIndex, 
   setCurrentIndex, 
-  brandShowcases 
+  brandShowcases,
+  isTransitioning 
 }: HeroSectionProps) {
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const currentBrand = brandShowcases[currentIndex];
 
+  // Preload ALL background images and logos on mount
+  useEffect(() => {
+    const imagesToPreload: string[] = [];
+    
+    // Collect all unique images
+    brandShowcases.forEach(brand => {
+      if (brand.backgroundImage) imagesToPreload.push(brand.backgroundImage);
+      if (brand.everdannLogo) imagesToPreload.push(brand.everdannLogo);
+    });
+
+    // Remove duplicates
+    const uniqueImages = [...new Set(imagesToPreload)];
+
+    // Preload all images
+    Promise.all(
+      uniqueImages.map(url => {
+        return new Promise((resolve, reject) => {
+          const img = new window.Image();
+          img.onload = resolve;
+          img.onerror = resolve; // Still resolve on error to not block
+          img.src = url;
+        });
+      })
+    ).then(() => {
+      setImagesPreloaded(true);
+    });
+  }, [brandShowcases]);
+
+  // Preload next and previous images when index changes
+  useEffect(() => {
+    if (!imagesPreloaded) return;
+
+    const nextIndex = (currentIndex + 1) % brandShowcases.length;
+    const prevIndex = (currentIndex - 1 + brandShowcases.length) % brandShowcases.length;
+
+    // Preload adjacent images for instant transitions
+    [nextIndex, prevIndex].forEach(index => {
+      const brand = brandShowcases[index];
+      if (brand.backgroundImage) {
+        const img = new window.Image();
+        img.src = brand.backgroundImage;
+      }
+    });
+  }, [currentIndex, brandShowcases, imagesPreloaded]);
+
+  // Show loading state while preloading
+  if (!imagesPreloaded) {
+    return (
+      <div 
+        className="relative w-full overflow-hidden flex items-center justify-center"
+        style={{ 
+          height: 'calc(100vh + 8px)',
+          minHeight: '600px',
+          maxHeight: '1080px',
+          backgroundColor: currentBrand.backgroundColor,
+        }}
+      >
+        <div className="text-white text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: 'calc(100vh + 8px)' }}>
+    <motion.div 
+      className="
+        relative w-full overflow-hidden 
+        h-[95vh] 
+        md:h-[calc(100vh+8px)] 
+        min-h-[600px] 
+        max-h-[1080px]
+      "
+      animate={{ backgroundColor: currentBrand.backgroundColor }}
+      transition={{ duration: 0.5 }}
+      data-cursor-brand={brandShowcases[currentIndex].id}
+    >
       <div className="absolute inset-0">
-        {/* Background image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${currentBrand.backgroundImage})`,
-          }}
-        />
+        {/* Background images with AnimatePresence for smooth crossfade */}
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentIndex}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${currentBrand.backgroundImage})`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
 
         {/* Optional dark overlay for better text readability */}
         <div className="absolute inset-0 bg-black/20" />
@@ -152,7 +228,7 @@ export default function Hero({
         <div className="relative h-full container mx-auto max-w-none px-8 flex flex-col justify-end pb-12 pt-32">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-end">
             {/* Left: everdann designs SVG - hidden on mobile, visible on desktop */}
-            <div className="hidden md:block relative w-full max-w-sm aspect-[2.53/1] translate-y-5">
+            <div className="invisible relative w-full max-w-sm aspect-[2.53/1] translate-y-5">
               <Image
                 src={currentBrand.everdannLogo}
                 alt="everdann designs"
@@ -162,75 +238,66 @@ export default function Hero({
               />
             </div>
 
-            {/* Right: Brand info - left aligned on mobile, padded on desktop */}
-            <div className="space-y-4 pl-0 md:pl-16">
-              <h2 
-                className="text-5xl md:text-6xl lg:text-6xl font-light -translate-y-17 leading-tight"
-                style={{ color: currentBrand.textColor }}
+            {/* Right: Brand info with AnimatePresence */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                className="space-y-4 pl-0 md:pl-16"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                {currentBrand.brandName}
-              </h2>
-              
-              <p 
-                className="text-2xl md:text-2xl lg:text-3xl font-extralight -translate-y-17 leading-tight"
-                style={{ color: currentBrand.textColor }}
-              >
-                {currentBrand.tagline}
-              </p>
+                <h2 
+                  className="text-5xl md:text-6xl lg:text-6xl font-light -translate-y-17 leading-tight line-clamp-2"
+                  style={{ 
+                    color: currentBrand.textColor
+                  }}
+                >
+                  {currentBrand.brandName}
+                </h2>
+                
+                <p 
+                  className="text-2xl md:text-2xl lg:text-3xl font-extralight -translate-y-17 leading-tight"
+                  style={{ color: currentBrand.textColor }}
+                >
+                  {currentBrand.tagline}
+                </p>
 
-              {/* Chips - Alternating filled and bordered */}
-              <div className="flex flex-wrap gap-3 pt-4">
-                {currentBrand.chips.map((chip, index) => {
-                  const isFilled = index % 2 === 0; // Even indices: filled, Odd: bordered
+                {/* Chips - Alternating filled and bordered */}
+                <div className="flex flex-wrap gap-3 pt-4">
+                  {currentBrand.chips.map((chip, index) => {
+                    const isFilled = index % 2 === 0;
 
-                  return (
-                    <span
-                      key={chip}
-                      className="px-4 py-1 rounded-full text-xs font-mono-2 tracking-wider transition-all flex items-center justify-center"
-                      style={{
-                        ...(isFilled
-                          ? {
-                              color: darkenColor(currentBrand.textColor),
-                              backgroundColor: currentBrand.textColor,
-                              border: 'none',
-                            }
-                          : {
-                              color: currentBrand.textColor,
-                              backgroundColor: 'transparent',
-                              border: `2px solid ${currentBrand.textColor}`,
-                            }
-                        )
-                      }}
-                    >
-                      {chip}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
+                    return (
+                      <span
+                        key={chip}
+                        className="px-4 rounded-full text-xs font-sohne-mono-2 tracking-wider transition-all flex items-center justify-center py-[6px] md:py-1"
+                        style={{
+                          ...(isFilled
+                            ? {
+                                color: darkenColor(currentBrand.textColor),
+                                backgroundColor: currentBrand.textColor,
+                                border: 'none',
+                              }
+                            : {
+                                color: currentBrand.textColor,
+                                backgroundColor: 'transparent',
+                                border: `2px solid ${currentBrand.textColor}`,
+                              }
+                          )
+                        }}
+                      >
+                        {chip}
+                      </span>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-
-        {/* Progress indicators
-        {brandShowcases.length > 1 && (
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
-            {brandShowcases.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className="w-2 h-2 rounded-full transition-all duration-300"
-                style={{
-                  backgroundColor: currentIndex === index 
-                    ? currentBrand.textColor 
-                    : `${currentBrand.textColor}40`,
-                  width: currentIndex === index ? '32px' : '8px'
-                }}
-                aria-label={`Go to brand ${index + 1}`}
-              />
-            ))}
-          </div>
-        )} */}
       </div>
-    </div>
+    </motion.div>
   );
 }
