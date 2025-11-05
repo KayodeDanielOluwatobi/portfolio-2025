@@ -1,0 +1,186 @@
+[
+  {
+    "id": 1,
+    "title": "Linkedinflyer",
+    "slug": "linkedinflyer",
+    "media": "/socials/DOC-20250519-WA0051.avif",
+    "type": "image",
+    "order": 1
+  },
+  {
+    "id": 2,
+    "title": "Campaign",
+    "slug": "campaign",
+    "media": "/socials/campaign.jpg",
+    "type": "image",
+    "order": 7
+  },
+  {
+    "id": 3,
+    "title": "MarOs",
+    "slug": "maros",
+    "media": "/socials/maros.jpg",
+    "type": "image",
+    "order": 5
+  },
+  {
+    "id": 4,
+    "title": "Unideals",
+    "slug": "unideals",
+    "media": "/socials/unidelas.jpg",
+    "type": "image",
+    "order": 4
+  },
+  {
+    "id": 5,
+    "title": "Chocolate Puff",
+    "slug": "chocolatepuff",
+    "media": "/socials/puff.jpg",
+    "type": "image",
+    "order": 4
+  },
+  {
+    "id": 6,
+    "title": "Folu",
+    "slug": "folu",
+    "media": "/socials/folu.jpg",
+    "type": "image",
+    "order": 6
+  },
+  {
+    "id": 7,
+    "title": "Christmas 2024",
+    "slug": "christmas2024",
+    "media": "/socials/christmas.jpg",
+    "type": "image",
+    "order": 8
+  },
+  {
+    "id": 8,
+    "title": "Day16",
+    "slug": "examcountdown-2025",
+    "media": "/socials/16.jpg",
+    "type": "image",
+    "order": 2
+  },
+  {
+    "id": 9,
+    "title": "Unideals-Feb",
+    "slug": "unidealsfeb",
+    "media": "/socials/unifeb.jpg",
+    "type": "image",
+    "order": 9
+  },
+  {
+    "id": 10,
+    "title": "daelflyer",
+    "slug": "daelflyer",
+    "media": "/socials/dael.jpg",
+    "type": "image",
+    "order": 10
+  },
+  {
+    "id": 11,
+    "title": "ChefDan",
+    "slug": "chefdan",
+    "media": "/socials/convoc.jpg",
+    "type": "image",
+    "order": 11
+  },
+  {
+    "id": 12,
+    "title": "Letter To The Young Woman",
+    "slug": "Letter To The Young Woman",
+    "media": "/socials/lttyw.jpg",
+    "type": "image",
+    "order": 12
+  },
+  {
+    "id": 13,
+    "title": "KashFox",
+    "slug": "kashfox",
+    "media": "/socials/kashfox.jpg",
+    "type": "image",
+    "order": 13
+  },
+  {
+    "id": 14,
+    "title": "Hangeul",
+    "slug": "hangeul",
+    "media": "/socials/hangeul.jpg",
+    "type": "image",
+    "order": 14
+  },
+  {
+    "id": 15,
+    "title": "Bootclass",
+    "slug": "bootclass",
+    "media": "/socials/boot1.jpg",
+    "type": "image",
+    "order": 15
+  },
+  {
+    "id": 16,
+    "title": "Bluegine",
+    "slug": "bluegine",
+    "media": "/socials/bluegine.jpg",
+    "type": "image",
+    "order": 16
+  },
+  {
+    "id": 17,
+    "title": "day40",
+    "slug": "examcountdown-2025",
+    "media": "/socials/day40.jpg",
+    "type": "image",
+    "order": 17
+  },
+  {
+    "id": 18,
+    "title": "Afrolens",
+    "slug": "afrolens",
+    "media": "/socials/afrolens.jpg",
+    "type": "image",
+    "order": 18
+  },
+  {
+    "id": 19,
+    "title": "Bootclass",
+    "slug": "bootclass",
+    "media": "/socials/boot2.jpg",
+    "type": "image",
+    "order": 19
+  },
+  {
+    "id": 20,
+    "title": "Bluegine",
+    "slug": "bluegine",
+    "media": "/socials/carl.jpg",
+    "type": "image",
+    "order": 20
+  },
+  {
+    "id": 21,
+    "title": "Letter To The Young Woman",
+    "slug": "Letter To The Young Woman",
+    "media": "/socials/lttyw1.jpg",
+    "type": "image",
+    "order": 21
+  },
+  {
+    "id": 22,
+    "title": "MarOs",
+    "slug": "maros",
+    "media": "/socials/maros-april.jpg",
+    "type": "image",
+    "order": 22
+  },
+  {
+    "id": 23,
+    "title": "Academic Recharge Station",
+    "slug": "Academic Recharge Station",
+    "media": "/socials/ars.avif",
+    "type": "image",
+    "order": 6
+  }
+]

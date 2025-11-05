@@ -1,34 +1,36 @@
+// src/components/Bio.tsx (or your file path)
 'use client'
 
-import Link from 'next/link';
+import AnimatedUnderlineLink from '@/components/ui/AnimatedUnderlineLink'; // Adjust this path if your component is elsewhere
 
 export default function Bio() {
   return (
     <section className="w-full bg-black">
-      <div className="container max-w-none mx-auto px-8 pt-32">
-        <div className="grid grid-cols-12">
-          <p className="col-span-12 md:col-span-11 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-light text-white" style={{ lineHeight: '1.29' }}>
-            I’m Daniel, a multidisciplinary designer passionate about building{' '}
-            <Link 
-              href="/" 
-              className="underline decoration-2 hover:opacity-70 transition-opacity underline-offset-4 sm:underline-offset-[6px] md:underline-offset-[7px]"
+      <div className="container max-w-none mx-auto px-8 pb-8 pt-32">
+        <div className="grid grid-cols-12 md:uppercase">
+          <p className="col-span-12 md:col-span-12 text-xl sm:text-2xl md:text-3xl lg:text-4xl text-left md:text-justify font-regular md:font-space text-white" style={{ lineHeight: '1.30' }}>
+            I’m Daniel..., a frontend engineer and a multidisciplinary designer passionate about building{' '}
+            {/* 2. Replace Link with AnimatedUnderlineLink */}
+            <AnimatedUnderlineLink
+              href="/"
+              // The default underline styles from the component will apply
             >
               brands
-            </Link>{' '}
+            </AnimatedUnderlineLink>{' '}
             that stand out,{' '}
-            <Link 
-              href="/socials" 
-              className="underline decoration-2 hover:opacity-70 transition-opacity underline-offset-4 sm:underline-offset-[6px] md:underline-offset-[7px]"
+            {/* 3. Replace Link with AnimatedUnderlineLink */}
+            <AnimatedUnderlineLink
+              href="/socials"
             >
               socials
-            </Link>{' '}
+            </AnimatedUnderlineLink>{' '}
             that engage and <span className="whitespace-nowrap">spirit-led</span>{' '}
-            <Link 
-              href="/church-media" 
-              className="underline decoration-2 hover:opacity-70 transition-opacity underline-offset-4 sm:underline-offset-[6px] md:underline-offset-[7px]"
+            {/* 4. Replace Link with AnimatedUnderlineLink */}
+            <AnimatedUnderlineLink
+              href="/church-media"
             >
               church media
-            </Link>{' '}
+            </AnimatedUnderlineLink>{' '}
             that uplift. Let's team up!
           </p>
         </div>

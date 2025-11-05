@@ -1,8 +1,14 @@
-import { useState, useEffect } from 'react';
-// import {Skeleton} from "@heroui/skeleton"; // <-- Removed HeroUI
-import Skeleton from '@mui/material/Skeleton'; // <-- Added MUI Skeleton
-import { getWeatherIcon, isDayTime } from '@/utils/weatherIconMap';
+// src/components/widgets/WeatherWidget.tsx
 
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Squircle } from '@squircle-js/react';
+import { getWeatherIcon, isDayTime } from '@/utils/weatherIconMap';
+import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
+import {MarqueeText} from '@/components/ui/MarqueeText';
+
+// ... (Interfaces and helper functions are identical) ...
 interface WeatherData {
   temperature: number;
   feelsLike: number;
@@ -19,12 +25,21 @@ interface WeatherData {
 interface WeatherWidgetProps {
   city: string;
   country: string;
-  countryCode: string; // e.g., "NG", "KR"
+  countryCode: string;
   showCelsius?: boolean;
+  size?: 'small' | 'medium' | 'large' | number;
+  width?: number;
+  height?: number;
+  cornerRadius?: number;
+  cornerSmoothing?: number;
   className?: string;
 }
 
-// Get timezone abbreviation
+const getHourColor = (hour: number): string => {
+  const hue = (hour * 59) % 360;
+  return `hsl(${hue}, 100%, 50%)`;
+};
+
 const getTimezoneAbbr = (city: string): string => {
   const timezones: { [key: string]: string } = {
     'Lagos': 'WAT',
@@ -37,18 +52,50 @@ const getTimezoneAbbr = (city: string): string => {
   return timezones[city] || 'UTC';
 };
 
+const getSizeWidth = (size: 'small' | 'medium' | 'large' | number): number => {
+  if (typeof size === 'number') return size;
+  
+  const sizes = {
+    small: 280,
+    medium: 380,
+    large: 480,
+  };
+  return sizes[size];
+};
+
+
 export default function WeatherWidget({ 
   city, 
   country, 
   countryCode,
   showCelsius = true,
+  size = 'medium',
+  width,
+  height,
+  cornerRadius = 30,
+  cornerSmoothing = 0.7,
   className = ''
 }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentTime, setCurrentTime] = useState<{ hour: string; minute: string }>({ hour: '00', minute: '00' });
   const [loading, setLoading] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+  const [loaderProgress, setLoaderProgress] = useState(0);
 
-  // Fetch weather data
+  const finalWidth = width || getSizeWidth(size);
+  const finalHeight = height || finalWidth;
+
+  // ... (All your useEffect hooks are identical) ...
+  useEffect(() => {
+    if (loading && !fadeOut) {
+      const interval = setInterval(() => {
+        setLoaderProgress((prev) => (prev >= 100 ? 0 : prev + 2));
+      }, 50);
+      
+      return () => clearInterval(interval);
+    }
+  }, [loading, fadeOut]);
+
   useEffect(() => {
     const fetchWeather = async () => {
       try {
@@ -56,38 +103,36 @@ export default function WeatherWidget({
         if (!response.ok) throw new Error('Failed to fetch weather');
         const data = await response.json();
         setWeather(data);
-      } catch (error) {
-        console.error('Weather fetch error:', error);
-      } finally {
-        // We'll keep this false, but you can use the setTimeout trick for testing
-        //setLoading(false);
+        
+        setFadeOut(true);
         setTimeout(() => {
           setLoading(false);
-        }, 200000); // 2000ms = 2 seconds
+        }, 500);
+        
+      } catch (error) {
+        console.error('Weather fetch error:', error);
+        setLoading(false);
       }
     };
 
     fetchWeather();
-    // Refresh weather every 10 minutes
     const weatherInterval = setInterval(fetchWeather, 600000);
 
     return () => clearInterval(weatherInterval);
   }, [city, countryCode]);
 
-  // Update time every second
   useEffect(() => {
     const updateTime = () => {
       if (!weather) return;
 
-      // Calculate time with timezone offset
       const now = new Date();
       const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
       const localTime = new Date(utc + (weather.timezone * 1000));
 
-      // Format as 24hr time
       const hours = String(localTime.getHours()).padStart(2, '0');
       const minutes = String(localTime.getMinutes()).padStart(2, '0');
-      setCurrentTime(`${hours}:${minutes}`);
+      
+      setCurrentTime({ hour: hours, minute: minutes });
     };
 
     updateTime();
@@ -96,131 +141,189 @@ export default function WeatherWidget({
     return () => clearInterval(timeInterval);
   }, [weather]);
 
-// Skeleton loader
-  if (loading) {
-    // This `sxBase` object is now configured for DARK MODE.
-    const sxBase = {
-      // 1. The base color is now a very dark, transparent gray
-      bgcolor: 'rgba(255, 255, 255, 0.08)',
-      borderRadius: '8px',
 
-      // 2. We override the shimmer wave (the ::after pseudo-element)
-      '&::after': {
-        // 3. We change the default dark gradient to a LIGHT one
-        background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)',
-      }
-    };
+  const hourColor = currentTime.hour ? getHourColor(parseInt(currentTime.hour)) : 'hsl(0, 75%, 60%)';
 
-    return (
-      <div className={`bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-xl p-6 shadow-xl shadow-black/50 border border-white/5 ${className}`}>
-        
-        {/* Time + Timezone skeleton */}
-        {/* No changes needed to the components themselves */}
-        <div className="flex items-baseline gap-6 mb-6">
-          <Skeleton 
-            variant="rectangular" 
-            animation="wave" 
-            sx={{ ...sxBase, width: 128, height: 48 }} 
-          />
-          <Skeleton 
-            variant="rectangular" 
-            animation="wave" 
-            sx={{ ...sxBase, width: 80, height: 48 }} 
-          />
-        </div>
-
-        {/* Temperature + Icon/Condition skeleton */}
-        <div className="flex justify-between items-start mb-4">
-          <Skeleton 
-            variant="rectangular" 
-            animation="wave" 
-            sx={{ ...sxBase, width: 96, height: 64 }} 
-          />
-          <div className="flex items-center gap-3">
-            <Skeleton 
-              variant="circular" 
-              animation="wave" 
-              sx={{ ...sxBase, width: 40, height: 40 }} 
-            />
-            <Skeleton 
-              variant="rectangular" 
-              animation="wave" 
-              sx={{ ...sxBase, width: 96, height: 24 }} 
-            />
-          </div>
-        </div>
-
-        {/* H/L + Location skeleton */}
-        <div className="flex justify-between items-center">
-          <Skeleton 
-            variant="rectangular" 
-            animation="wave" 
-            sx={{ ...sxBase, width: 80, height: 20 }} 
-          />
-          <Skeleton 
-            variant="rectangular" 
-            animation="wave" 
-            sx={{ ...sxBase, width: 128, height: 20 }} 
-          />
-        </div>
-
-      </div>
-    );
-  }
-
-  if (!weather) {
-    return (
-      <div className={`bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-xl p-6 shadow-xl shadow-black/50 border border-white/5 ${className}`}>
-        <div className="text-white/50 text-center">Error loading weather</div>
-      </div>
-    );
-  }
-
-  const isDay = isDayTime(weather.icon);
-  const weatherIcon = getWeatherIcon(weather.weatherId, isDay, { size: 40, color: '#ffffff' });
+  const isDay = weather ? isDayTime(weather.icon) : true;
+  const weatherIcon = weather ? getWeatherIcon(weather.weatherId, isDay, { size: 29, color: '#ffffff' }) : null;
 
   return (
-    <div className={`bg-gradient-to-br from-zinc-900 to-zinc-800 rounded-xl p-6 shadow-xl shadow-black/50 border border-white/5 ${className}`}>
-      {/* Time and timezone - Spans full width */}
-      <div className="flex items-baseline gap-6 mb-6 border-b border-white/10 pb-4">
-        <span className="font-dotted text-5xl text-white tracking-[0.3em]">
-          {currentTime}
-        </span>
-        <span className="font-dotted text-5xl text-white/70 tracking-[0.3em]">
-          {getTimezoneAbbr(city)}
-        </span>
-      </div>
-
-      {/* Middle row: Temperature (left) + Icon/Condition (right) */}
-      <div className="flex justify-between items-start mb-4">
-        {/* Temperature - Bold, large */}
-        <div className="font-sans text-5xl font-bold text-white">
-          {weather.temperature}°{showCelsius ? 'C' : ''}
+    <Squircle
+      cornerRadius={cornerRadius}
+      cornerSmoothing={cornerSmoothing}
+      // ... (Squircle props are identical) ...
+      className={`relative overflow-hidden shadow-xl shadow-black/50 border-white/0 -mb-0 ${className}`}
+      style={{
+        width: `${finalWidth}px`,
+        height: `${finalHeight}px`,
+        background: 'linear-gradient(135deg, #000000 0%, #0a0a0f 100%)',
+      }}
+    >
+      
+      {/* ... (Loading animation is identical) ... */}
+      {loading && (
+        <div 
+          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-500 ${
+            fadeOut ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          <CircularWaveProgress 
+            progress={loaderProgress}
+            size={45}
+            trackWidth={4}
+            waveWidth={4}
+            trackColor="#6b7280"
+            waveColor="#e5e7eb"
+            waveAmplitude={2}
+            maxWaveFrequency={6}
+            undulationSpeed={2}
+            rotationSpeed={7}
+            edgeGap={20}
+            relaxationDuration={0}
+            className='opacity-30'
+          />
         </div>
+      )}
 
-        {/* Icon + Weather condition */}
-        <div className="flex items-center gap-3">
-          <div className="text-white">
-            {weatherIcon}
+      <div 
+        className={`h-full px-6 py-3 transition-opacity duration-500 ${
+          loading ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
+        <div className="grid grid-cols-2 gap-3 h-full">
+          
+          {/* LEFT COLUMN: Time & Timezone */}
+          <div className="flex flex-col justify-center items-start">
+            
+            {/* --- THIS IS THE FIX ---
+              This wrapper div ensures the *entire* time block
+              (including the negative margin) is centered vertically.
+            */}
+            <div style={{
+              transform: `translateY(${finalWidth * 0.01}px)`
+              }}
+            >
+
+              {/* Hour div (Your code is preserved) */}
+              <div 
+                className="font-array-regular tabular-nums tracking-tighter leading-none whitespace-nowrap relative"
+                style={{ 
+                  color: hourColor,
+                  fontSize: `${finalWidth * 0.26}px`,
+                  //transform: `translateY(${finalWidth * -0.01}px)`
+                }}
+              >
+                <div className="flex">
+                  <span style={{ 
+                    width: `${finalWidth * 0.14}px`, 
+                    textAlign: 'center' 
+                  }}>
+                    {currentTime.hour[0]}
+                  </span>
+                  <span style={{ 
+                    width: `${finalWidth * 0.14}px`, 
+                    textAlign: 'center'
+                  }}>
+                    {currentTime.hour[1]}
+                  </span>
+                </div>
+
+                {/* Your original (invisible) timezone code, preserved perfectly */}
+                {finalWidth <= 300 && (
+                  <div 
+                    className="absolute font-space tracking-wide"
+                    style={{ 
+                      color: hourColor,
+                      fontSize: `${finalWidth * 0.05}px`,
+                      top: `${finalWidth * 0.05}px`,
+                      right: `${finalWidth * -0.107}px`
+                    }}
+                  >
+                    {getTimezoneAbbr(city)}
+                  </div>
+                )}
+              </div>
+
+              {/* Minute div (Your code is preserved) */}
+              <div 
+                className="font-array-regular -tracking-[0.001em] tabular-nums leading-none text-white/100 whitespace-nowrap"
+                style={{ 
+                  fontSize: `${finalWidth * 0.26}px`,
+                  //marginTop: `${finalWidth * -0.045}px`,
+                  transform: `translateY(${finalWidth * -0.04}px)`
+                }}
+              >
+                <div className="text-white/90 flex">
+                  <span style={{ 
+                    width: `${finalWidth * 0.14}px`, 
+                    textAlign: 'center'
+                  }}>
+                    {currentTime.minute[0]}
+                  </span>
+                  <span style={{ 
+                    width: `${finalWidth * 0.15}px`, 
+                    textAlign: 'center'
+                  }}>
+                    {currentTime.minute[1]}
+                  </span>
+                </div>
+              </div>
+
+            </div> {/* --- END OF THE WRAPPER DIV --- */}
           </div>
-          <span className="font-mono text-sm text-white uppercase">
-            {weather.description}
-          </span>
+
+          <div className="flex flex-col overflow-hidden justify-center items-end" style={{ gap: `${finalWidth * 0.02}px` }}>
+            
+            {/* Group 1: Icon + Description */}
+            <div className="flex items-center gap-0.5 flex-shrink-0 w-full justify-end" style={{ fontSize: `${finalWidth * 0.032}px` }}>
+              <div className="text-white opacity-70 flex-shrink-0">
+                {weatherIcon}
+              </div>
+              <div className="max-w-[calc(100%-28px)] overflow-hidden">
+                <MarqueeText 
+                  text={weather?.description || 'Loading...'}
+                  className="font-space text-white/70 uppercase tracking-wider"
+                  style={{ fontSize: `${finalWidth * 0.032}px` }}
+                  speed={10}
+                  gap={18}
+                />
+              </div>
+            </div>
+
+            {/* Group 2: Temperature */}
+            <div 
+              className="font-sans font-bold text-white/80 leading-none whitespace-nowrap"
+              style={{ fontSize: `${finalWidth * 0.16}px` }}
+            >
+              {weather?.temperature}°{showCelsius ? 'C' : ''}
+            </div>
+
+            {/* Group 3: H/L and City/Country */}
+            <div className="flex flex-col items-end" style={{ width: '100%' }}>
+              <div 
+                className="font-space text-white/70 uppercase tracking-wider whitespace-nowrap"
+                style={{ fontSize: `${finalWidth * 0.038}px` }}
+              >
+                H:{weather?.high}° L:{weather?.low}°
+              </div>
+              <div 
+                className="font-space text-white/50 uppercase tracking-wider overflow-hidden"
+                style={{ 
+                  fontSize: `${finalWidth * 0.032}px`,
+                  maxWidth: '100%',
+                  minWidth: 0,
+                }}
+              >
+                <MarqueeText 
+                  text={`${city}, ${country}`}
+                  speed={10}
+                  gap={18}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Bottom row: H/L (left) + Location (right) */}
-      <div className="flex justify-between items-center">
-        {/* High/Low temps */}
-        <div className="font-mono text-sm text-white/70 uppercase">
-          H:{weather.high}  L:{weather.low}
-        </div>
-
-        {/* City, Country */}
-        <div className="font-mono text-xs text-white/60 uppercase">
-          {city}, {country}
-        </div>
-      </div>
-    </div>
+    </Squircle>
   );
 }

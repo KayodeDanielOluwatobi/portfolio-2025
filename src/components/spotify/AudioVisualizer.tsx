@@ -13,39 +13,28 @@ interface FrequencyFrame {
 }
 
 interface AudioVisualizerProps {
-  // Pattern Configuration
   barCount?: number;
   pulsePattern?: PulsePattern;
   useSequentialPatterns?: boolean;
   sequenceId?: number | string;
-
-  // Visual Configuration
   barWidth?: number;
   barSpacing?: number;
   maxHeight?: number;
   containerHeight?: number;
   containerWidth?: string;
-
-  // Color Configuration
   barColor?: string;
-
-  // Animation Configuration
   animationSpeed?: number;
   restHeight?: number;
-
-  // Frequency Data (optional)
   frequencyData?: FrequencyFrame[];
-  currentProgressMs?: number; // Spotify progress in milliseconds
-
-  // Styling
+  currentProgressMs?: number;
   className?: string;
+  staggerAmount?: number;
+  decayFactor?: number;
 }
 
-// Constants
-const FRAME_TIMING_MS = 11.6; // From librosa: hop_length / sr = 512 / 44100
+const FRAME_TIMING_MS = 11.6;
 const MAX_BARS = 20;
 
-// Hash function for sequential patterns
 function hashCode(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -56,7 +45,6 @@ function hashCode(str: string): number {
   return Math.abs(hash);
 }
 
-// Get pattern from sequence
 function getPatternFromSequence(sequenceId?: number | string): PulsePattern {
   const patterns: PulsePattern[] = ['wave', 'mirror', 'random', 'bounce', 'uniform'];
 
@@ -68,16 +56,14 @@ function getPatternFromSequence(sequenceId?: number | string): PulsePattern {
   return patterns[index % patterns.length];
 }
 
-// Split bars among frequency bands dynamically
 function splitBarsAmongFrequencies(barCount: number): {
   bass: number;
   mid: number;
   treble: number;
 } {
-  // Golden ratio distribution (humans hear bass better)
-  const bassRatio = 0.45; // 45% to bass
-  const midRatio = 0.35; // 35% to mid
-  const trebleRatio = 0.20; // 20% to treble
+  const bassRatio = 0.45;
+  const midRatio = 0.35;
+  const trebleRatio = 0.20;
 
   const bassBars = Math.max(1, Math.round(barCount * bassRatio));
   const midBars = Math.max(1, Math.round(barCount * midRatio));
@@ -86,7 +72,6 @@ function splitBarsAmongFrequencies(barCount: number): {
   return { bass: bassBars, mid: midBars, treble: trebleBars };
 }
 
-// Get max frequencies from entire dataset (for normalization)
 function getMaxFrequencies(frequencyData: FrequencyFrame[]): {
   bass: number;
   mid: number;
@@ -102,7 +87,6 @@ function getMaxFrequencies(frequencyData: FrequencyFrame[]): {
     maxTreble = Math.max(maxTreble, frame.treble);
   });
 
-  // Fallback to 1 if all zeros
   return {
     bass: maxBass || 1,
     mid: maxMid || 1,
@@ -110,26 +94,27 @@ function getMaxFrequencies(frequencyData: FrequencyFrame[]): {
   };
 }
 
-// Normalize frequency value to 0-1 range
 function normalizeFrequency(value: number, max: number): number {
   if (max === 0) return 0;
   const normalized = value / max;
   return Math.max(0, Math.min(normalized, 1));
 }
 
-// Map frequency data to bar heights
+// Map frequency data to bar heights with staggering and decay effect
 function mapFrequencyToBars(
   frequencyData: FrequencyFrame,
   barCount: number,
   maxHeight: number,
   restHeight: number,
-  maxFrequencies: { bass: number; mid: number; treble: number }
+  maxFrequencies: { bass: number; mid: number; treble: number },
+  previousHeights: number[] = [],
+  decayFactor: number = 0.15,
+  staggerAmount: number = 0.3
 ): number[] {
   const { bass: bassBars, mid: midBars, treble: trebleBars } = splitBarsAmongFrequencies(
     barCount
   );
 
-  // Normalize frequencies
   const bassNorm = normalizeFrequency(frequencyData.bass, maxFrequencies.bass);
   const midNorm = normalizeFrequency(frequencyData.mid, maxFrequencies.mid);
   const trebleNorm = normalizeFrequency(frequencyData.treble, maxFrequencies.treble);
@@ -137,24 +122,42 @@ function mapFrequencyToBars(
   const heights: number[] = [];
   let barIndex = 0;
 
+  // Helper function to apply staggering and decay
+  const applyStaggeringAndDecay = (
+    frequencyNorm: number,
+    barIndexInGroup: number,
+    totalBarsInGroup: number,
+    globalBarIndex: number
+  ): number => {
+    // Staggering: vary each bar slightly based on position
+    const staggerVariation = (1 - staggerAmount / 2) + (barIndexInGroup / Math.max(1, totalBarsInGroup - 1)) * staggerAmount;
+    const staggeredHeight = restHeight + (frequencyNorm * staggerVariation) * maxHeight;
+
+    // Decay/lag effect: blend with previous height for smooth interpolation
+    const previousHeight = previousHeights[globalBarIndex] || staggeredHeight;
+    const decayedHeight = previousHeight * decayFactor + staggeredHeight * (1 - decayFactor);
+
+    return Math.max(restHeight, Math.min(decayedHeight, maxHeight + restHeight));
+  };
+
   // Bass bars
   for (let i = 0; i < bassBars; i++) {
-    const height = restHeight + bassNorm * maxHeight;
-    heights.push(Math.max(restHeight, Math.min(height, maxHeight + restHeight)));
+    const height = applyStaggeringAndDecay(bassNorm, i, bassBars, barIndex);
+    heights.push(height);
     barIndex++;
   }
 
   // Mid bars
   for (let i = 0; i < midBars; i++) {
-    const height = restHeight + midNorm * maxHeight;
-    heights.push(Math.max(restHeight, Math.min(height, maxHeight + restHeight)));
+    const height = applyStaggeringAndDecay(midNorm, i, midBars, barIndex);
+    heights.push(height);
     barIndex++;
   }
 
   // Treble bars
   for (let i = 0; i < trebleBars; i++) {
-    const height = restHeight + trebleNorm * maxHeight;
-    heights.push(Math.max(restHeight, Math.min(height, maxHeight + restHeight)));
+    const height = applyStaggeringAndDecay(trebleNorm, i, trebleBars, barIndex);
+    heights.push(height);
     barIndex++;
   }
 
@@ -162,43 +165,33 @@ function mapFrequencyToBars(
 }
 
 const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
-  // Pattern
   barCount = 8,
   pulsePattern = 'mirror',
   useSequentialPatterns = false,
   sequenceId,
-
-  // Visual
   barWidth = 4,
   barSpacing = 4,
   maxHeight = 80,
   containerHeight = 100,
-  containerWidth = '100%',
-
-  // Color
+  containerWidth = undefined,
   barColor = '#1DB954',
-
-  // Animation
   animationSpeed = 1,
   restHeight = 2,
-
-  // Frequency data
   frequencyData,
   currentProgressMs = 0,
-
-  // Styling
   className = '',
+  staggerAmount = 0.3,
+  decayFactor = 0.15,
 }) => {
   const controls = Array.from({ length: MAX_BARS }, () => useAnimationControls());
   const frameRef = useRef<number>();
   const startTimeRef = useRef<number>(Date.now());
+  const previousHeightsRef = useRef<number[]>([]);
 
-  // Determine final pattern
   const finalPattern = useSequentialPatterns
     ? getPatternFromSequence(sequenceId)
     : pulsePattern;
 
-  // Pre-calculate max frequencies for normalization (memoized)
   const maxFrequencies = useMemo(() => {
     if (frequencyData && frequencyData.length > 0) {
       return getMaxFrequencies(frequencyData);
@@ -206,7 +199,6 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     return { bass: 1, mid: 1, treble: 1 };
   }, [frequencyData]);
 
-  // Calculate current frame index from progress
   const currentFrameIndex = useMemo(() => {
     if (!frequencyData || frequencyData.length === 0) return 0;
     const index = Math.floor(currentProgressMs / FRAME_TIMING_MS);
@@ -214,16 +206,17 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   }, [currentProgressMs, frequencyData]);
 
   useEffect(() => {
-    startTimeRef.current = Date.now(); // Reset start time on mount
+    startTimeRef.current = Date.now();
     
     const animateBars = () => {
       const elapsedTime = (Date.now() - startTimeRef.current) / 1000;
       const hasFrequencyData = frequencyData && frequencyData.length > 0;
 
+      const newHeights: number[] = [];
+
       controls.slice(0, barCount).forEach((control, index) => {
         let height = restHeight;
 
-        // If frequency data exists, use it
         if (hasFrequencyData) {
           const frameData = frequencyData![currentFrameIndex];
           if (frameData) {
@@ -232,12 +225,14 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
               barCount,
               maxHeight,
               restHeight,
-              maxFrequencies
+              maxFrequencies,
+              previousHeightsRef.current,
+              decayFactor,
+              staggerAmount
             );
             height = heights[index] || restHeight;
           }
         } else {
-          // Fallback to sine wave patterns
           const baseFreq = 0.005 * animationSpeed;
 
           switch (finalPattern) {
@@ -282,15 +277,17 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
           }
         }
 
-        // Clamp height
         height = Math.max(restHeight, Math.min(height, maxHeight + restHeight));
+        newHeights.push(height);
 
-        // Animate to new height
         control.start({
           height,
           transition: { duration: 0.1, ease: 'easeOut' },
         });
       });
+
+      // Store heights for next frame's decay calculation
+      previousHeightsRef.current = newHeights;
 
       frameRef.current = requestAnimationFrame(animateBars);
     };
@@ -313,12 +310,15 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     maxFrequencies,
   ]);
 
+  // Calculate dynamic width based on bars, barWidth, and barSpacing
+  const dynamicWidth = containerWidth || `${barCount * barWidth + (barCount - 1) * barSpacing}px`;
+
   return (
     <div
-      className={`flex items-center justify-center ${className}`}
+      className={`flex items-center justify-start w-fit ${className}`}
       style={{
         height: `${containerHeight}px`,
-        width: containerWidth,
+        width: dynamicWidth,
       }}
     >
       {Array.from({ length: barCount }).map((_, index) => (
@@ -340,3 +340,5 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
 };
 
 export default AudioVisualizer;
+
+

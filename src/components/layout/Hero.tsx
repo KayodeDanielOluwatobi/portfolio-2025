@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 
 interface BrandShowcase {
   id: string;
@@ -128,6 +129,7 @@ export default function Hero({
   isTransitioning 
 }: HeroSectionProps) {
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
+  const [loaderProgress, setLoaderProgress] = useState(0);
   const currentBrand = brandShowcases[currentIndex];
 
   // Preload ALL background images and logos on mount
@@ -143,13 +145,22 @@ export default function Hero({
     // Remove duplicates
     const uniqueImages = [...new Set(imagesToPreload)];
 
-    // Preload all images
+    // Preload all images with progress
+    let loadedCount = 0;
     Promise.all(
       uniqueImages.map(url => {
         return new Promise((resolve, reject) => {
           const img = new window.Image();
-          img.onload = resolve;
-          img.onerror = resolve; // Still resolve on error to not block
+          img.onload = () => {
+            loadedCount++;
+            setLoaderProgress(Math.round((loadedCount / uniqueImages.length) * 100));
+            resolve(null);
+          };
+          img.onerror = () => {
+            loadedCount++;
+            setLoaderProgress(Math.round((loadedCount / uniqueImages.length) * 100));
+            resolve(null);
+          };
           img.src = url;
         });
       })
@@ -187,7 +198,19 @@ export default function Hero({
           backgroundColor: currentBrand.backgroundColor,
         }}
       >
-        <div className="text-white text-lg">Loading...</div>
+        <CircularWaveProgress className='opacity-50'
+          progress={loaderProgress}
+          size={70}
+          trackWidth={5}
+          waveWidth={6}
+          trackColor="#475569"
+          waveColor="#cbd5e1"
+          waveAmplitude={3}
+          maxWaveFrequency={6}
+          undulationSpeed={2}
+          rotationSpeed={0}
+          edgeGap={20}
+        />
       </div>
     );
   }
@@ -196,8 +219,8 @@ export default function Hero({
     <motion.div 
       className="
         relative w-full overflow-hidden 
-        h-[95vh] 
-        md:h-[calc(100vh+8px)] 
+        h-[85vh] 
+        md:h-[calc(95vh-0px)] 
         min-h-[600px] 
         max-h-[1080px]
       "
@@ -222,7 +245,7 @@ export default function Hero({
         </AnimatePresence>
 
         {/* Optional dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-black/30" />
 
         {/* Content container */}
         <div className="relative h-full container mx-auto max-w-none px-8 flex flex-col justify-end pb-12 pt-32">
@@ -258,7 +281,7 @@ export default function Hero({
                 </h2>
                 
                 <p 
-                  className="text-2xl md:text-2xl lg:text-3xl font-extralight -translate-y-17 leading-tight"
+                  className="whitespace-pre-line text-2xl md:text-2xl lg:text-3xl font-extralight -translate-y-17 leading-tight"
                   style={{ color: currentBrand.textColor }}
                 >
                   {currentBrand.tagline}
@@ -272,7 +295,7 @@ export default function Hero({
                     return (
                       <span
                         key={chip}
-                        className="px-4 rounded-full text-xs font-sohne-mono-2 tracking-wider transition-all flex items-center justify-center py-[6px] md:py-1"
+                        className="px-4 rounded-full text-xs font-space font-bold tracking-wider transition-all flex items-center justify-center py-[6px] md:py-1"
                         style={{
                           ...(isFilled
                             ? {

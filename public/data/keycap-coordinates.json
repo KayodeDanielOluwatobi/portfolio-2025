@@ -1,0 +1,137 @@
+[
+  {
+    "name": "Space",
+    "tool": "Space",
+    "link": "#",
+    "x": 34,
+    "y": 280,
+    "width": 239,
+    "height": 108
+  },
+  {
+    "name": "Gemini",
+    "tool": "Gemini",
+    "link": "https://gemini.google.com",
+    "x": 281,
+    "y": 282,
+    "width": 109,
+    "height": 106
+  },
+  {
+    "name": "Spline",
+    "tool": "Spline",
+    "link": "https://spline.design",
+    "x": 459,
+    "y": 161,
+    "width": 109,
+    "height": 112
+  },
+  {
+    "name": "Affinity",
+    "tool": "Affinity",
+    "link": "https://affinity.serif.com",
+    "x": 340,
+    "y": 158,
+    "width": 109,
+    "height": 112
+  },
+  {
+    "name": "Figma",
+    "tool": "Figma",
+    "link": "https://figma.com",
+    "x": 223,
+    "y": 162,
+    "width": 106,
+    "height": 108
+  },
+  {
+    "name": "Shift",
+    "tool": "Shift",
+    "link": "#",
+    "x": 35,
+    "y": 157,
+    "width": 177,
+    "height": 113
+  },
+  {
+    "name": "Id",
+    "tool": "InDesign",
+    "link": "#",
+    "x": 628,
+    "y": 43,
+    "width": 105,
+    "height": 108
+  },
+  {
+    "name": "Ai",
+    "tool": "Illustrator",
+    "link": "https://adobe.com/illustrator",
+    "x": 509,
+    "y": 40,
+    "width": 107,
+    "height": 111
+  },
+  {
+    "name": "Ae",
+    "tool": "After Effects",
+    "link": "https://adobe.com/aftereffects",
+    "x": 271,
+    "y": 43,
+    "width": 108,
+    "height": 109
+  },
+  {
+    "name": "Ps",
+    "tool": "Photoshop",
+    "link": "https://adobe.com/photoshop",
+    "x": 149,
+    "y": 42,
+    "width": 111,
+    "height": 108
+  },
+  {
+    "name": "Pr",
+    "tool": "Premiere Pro",
+    "link": "https://adobe.com/premiere",
+    "x": 390,
+    "y": 42,
+    "width": 110,
+    "height": 110
+  },
+  {
+    "name": "Esc",
+    "tool": "Escape",
+    "link": "#",
+    "x": 35,
+    "y": 44,
+    "width": 108,
+    "height": 110
+  },
+  {
+    "name": "ChatGPT",
+    "tool": "ChatGPT",
+    "link": "https://chatgpt.com",
+    "x": 401,
+    "y": 279,
+    "width": 110,
+    "height": 109
+  },
+  {
+    "name": "Enter",
+    "tool": "Enter",
+    "link": "#",
+    "x": 580,
+    "y": 160,
+    "width": 155,
+    "height": 227
+  },
+  {
+    "name": "Enter",
+    "tool": "Enter",
+    "link": "#",
+    "x": 523,
+    "y": 280,
+    "width": 107,
+    "height": 110
+  }
+]

@@ -14,6 +14,15 @@ import MoreBio from '@/components/layout/MoreBio';
 import Footer from '@/components/layout/Footer';
 import AudioVisualizer from '@/components/spotify/AudioVisualizer';
 import { MarqueeText } from '@/components/ui/MarqueeText';
+import FeaturedBrands from '@/components/layout/FeaturedBrands';
+import FeaturedSocials from '@/components/layout/FeaturedSocials';
+import FeaturedChurch from '@/components/layout/FeaturedChurch';
+import KeycapMapper from '@/components/ui/KeyCaps';
+//import WatchfaceWidget from '@/components/ui/WatchFaceWidget';
+import Footer2 from '@/components/layout/Footer2';
+import Bottom from '@/components/layout/Bottom';
+import FakeLoader from '@/components/layout/FakeLoader';
+import ImageDisplay from '@/components/layout/ImageDisplay';
 
 
 
@@ -53,10 +62,10 @@ export default function Home() {
   return (
     <main>
       {/* SmoothCursor with dynamic colors */}
-      <SmoothCursor 
+      {/* <SmoothCursor 
         cursorColor={cursorFillColor}
         cursorStrokeColor={cursorStrokeColor}
-      />
+      /> */}
       
       {/* Header with current brand theme */}
       <Header 
@@ -73,10 +82,33 @@ export default function Home() {
       />
 
       <Bio />
+
+      <ImageDisplay />
       
       <MoreBio />
+
+      <FeaturedBrands />
+
+      <FeaturedSocials />
+
+      <FeaturedChurch />
+
+
+      {/* design stack */}
+      <KeycapMapper />  
+       
       
-      <Footer />
+      
+      
+
+      {/* <Bio /><Bio /><Bio /> */}
+
+            
+      {/* <Footer /> */}
+
+      <Footer2 />
+
+      <Bottom />
       
       <ViewportIndicator />
     </main>

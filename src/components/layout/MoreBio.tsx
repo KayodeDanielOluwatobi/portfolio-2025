@@ -32,7 +32,7 @@ export default function MoreBio() {
           
           {/* First text - columns 7-9 on desktop */}
           <div className="space-y-4 md:col-span-3">
-            <p className="text-xs md:text-xs lg:text-xs font-extralight tracking-wider leading-tight">
+            <p className="text-xs md:text-xs lg:text-xs text-justify font-extralight tracking-wider leading-tight">
               Every swipe, every scroll is an opportunity to make someone stop and feel something. 
               I approach design like a storyteller obsessed with details, crafting visuals 
               that actually connect.
@@ -41,7 +41,7 @@ export default function MoreBio() {
           
           {/* Second text - columns 10-12 on desktop */}
           <div className="space-y-4 md:col-span-3">
-            <p className="text-xs md:text-xs lg:text-xs font-extralight leading-tight tracking-wider">
+            <p className="text-xs md:text-xs lg:text-xs text-justify font-extralight leading-tight tracking-wider">
               What drives me most is purpose-driven work. 
               I'm drawn to projects where design becomes a bridge 
               between intention and impact, between a brand's heartbeat 

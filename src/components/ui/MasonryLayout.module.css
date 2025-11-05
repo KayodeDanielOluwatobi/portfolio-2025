@@ -1,0 +1,49 @@
+.masonry {
+  width: 100%;
+  /* default column-count & gap are applied inline from component props */
+}
+
+/* direct children (the masonry items) */
+.masonry > * {
+  display: inline-block; /* required for proper column placement and to avoid full-width stacking */
+  width: 100%;
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(28px);
+  /* keep no animation by default; animation triggered by .show */
+  will-change: transform, opacity;
+}
+
+/* show class triggers the drop animation */
+.show {
+  animation-name: dropIn;
+  animation-duration: 520ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
+}
+
+/* keyframes for falling effect */
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* responsive helpers — you can override column count inline, but keep these as fallbacks */
+@media (max-width: 1280px) {
+  .masonry {
+    /* nothing forced here; component sets the columnCount inline */
+  }
+}
+
+@media (max-width: 768px) {
+  .masonry > * {
+    margin-bottom: 1rem;
+  }
+}

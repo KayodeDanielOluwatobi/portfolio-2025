@@ -1,0 +1,258 @@
+[
+  {
+    "id": 1,
+    "title": "Academic Recharge Station",
+    "slug": "Academic Recharge Station",
+    "media": "/church/ars.avif",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 2,
+    "title": "Day39",
+    "slug": "examcountdown-2025",
+    "media": "/church/39.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 3,
+    "title": "5G Covenant",
+    "slug": "5gcovenant",
+    "media": "/church/5g.jpg",
+    "type": "image",
+    "order": 11
+  },
+  {
+    "id": 4,
+    "title": "Exam Declaration 2024",
+    "slug": "examdeclaration-2024",
+    "media": "/church/9.avif",
+    "type": "image",
+    "order": 14
+  },
+  {
+    "id": 5,
+    "title": "Thursday Revival Hour",
+    "slug": "trets",
+    "media": "/church/trets-1.avif",
+    "type": "image",
+    "order": 10
+  },
+  {
+    "id": 6,
+    "title": "Sunday Worship Service_01",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss1.avif",
+    "type": "image",
+    "order": 3
+  },
+  {
+    "id": 7,
+    "title": "Sunday Worship Service_02",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss2.avif",
+    "type": "image",
+    "order": 9
+  },
+  {
+    "id": 8,
+    "title": "Sunday Worship Service_03",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss3.avif",
+    "type": "image",
+    "order": 2
+  },
+  {
+    "id": 9,
+    "title": "Poster-01",
+    "slug": "posters",
+    "media": "/church/poster-01.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 10,
+    "title": "By My God",
+    "slug": "ByMyGod",
+    "media": "/church/bmG.jpg",
+    "type": "image",
+    "order": 10
+  },
+  {
+    "id": 11,
+    "title": "Grades and Gigs",
+    "slug": "g&g",
+    "media": "/church/D.avif",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 12,
+    "title": "Poster-02",
+    "slug": "posters",
+    "media": "/church/poster-02.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 13,
+    "title": "Day29",
+    "slug": "examcountdown-2025",
+    "media": "/church/day29.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 14,
+    "title": "Grades and Gigs",
+    "slug": "g&g",
+    "media": "/church/g&g.avif",
+    "type": "image",
+    "order": 4
+  },
+  {
+    "id": 15,
+    "title": "Focus",
+    "slug": "focus",
+    "media": "/church/focus-01.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 16,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/HADEI HALLEL FLYER.avif",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 17,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/hh2.jpg",
+    "type": "image",
+    "order": 17
+  },
+  {
+    "id": 18,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/hh3.jpg",
+    "type": "image",
+    "order": 11
+  },
+  {
+    "id": 19,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/hh4.avif",
+    "type": "image",
+    "order": 2
+  },
+  {
+    "id": 20,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/hhd.jpg",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 21,
+    "title": "FYB",
+    "slug": "FYB",
+    "media": "/church/fybdom.avif",
+    "type": "image",
+    "order": 5
+  },
+  {
+    "id": 22,
+    "title": "Sunday Worship Service_04",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss4.avif",
+    "type": "image",
+    "order": 7
+  },
+  {
+    "id": 23,
+    "title": "HADEI HALLEL",
+    "slug": "hadeihallel",
+    "media": "/church/HADEI_HALLEL_FLYER_V1.gif",
+    "type": "gif",
+    "order": null
+  },
+  {
+    "id": 24,
+    "title": "Sunday Worship Service_05",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss5.avif",
+    "type": "image",
+    "order": 8
+  },
+  {
+    "id": 25,
+    "title": "Sunday Worship Service_06",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss6.avif",
+    "type": "image",
+    "order": 8
+  },
+  {
+    "id": 26,
+    "title": "Sunday Worship Service_07",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss7.avif",
+    "type": "image",
+    "order": 26
+  },
+  {
+    "id": 27,
+    "title": "Sunday Worship Service_08",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss8.avif",
+    "type": "image",
+    "order": 27
+  },
+  {
+    "id": 28,
+    "title": "Sunday Worship Service_09",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss9.avif",
+    "type": "image",
+    "order": null
+  },
+  {
+    "id": 29,
+    "title": "Sunday Worship Service_10",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss10.avif",
+    "type": "image",
+    "order": 6
+  },
+  {
+    "id": 30,
+    "title": "Sunday Worship Service_11",
+    "slug": "Sunday Worship Service",
+    "media": "/church/ss11.avif",
+    "type": "image",
+    "order": 30
+  },
+  {
+    "id": 31,
+    "title": "Focus",
+    "slug": "focus",
+    "media": "/church/focuscarousel.jpg",
+    "type": "image",
+    "order": 31
+  },
+  {
+    "id": 32,
+    "title": "Grades and Gigs",
+    "slug": "g&g",
+    "media": "/church/g&g-02.avif",
+    "type": "image",
+    "order": 28
+  }
+]

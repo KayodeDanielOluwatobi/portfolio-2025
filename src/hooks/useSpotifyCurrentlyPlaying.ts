@@ -1,3 +1,6 @@
+// src/hooks/useSpotifyCurrentlyPlaying.ts
+
+
 import { useEffect, useState } from 'react';
 
 interface SpotifyTrack {

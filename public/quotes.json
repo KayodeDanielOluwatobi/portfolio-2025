@@ -1,0 +1,397 @@
+[
+  {
+    "quote": "Design is not just what it looks like and feels like. Design is how it works.",
+    "author": "Steve Jobs",
+    "tag": "design"
+  },
+  {
+    "quote": "Good design is obvious. Great design is transparent.",
+    "author": "Joe Sparano",
+    "tag": "design"
+  },
+  {
+    "quote": "Simplicity is the ultimate sophistication.",
+    "author": "Leonardo da Vinci",
+    "tag": "design"
+  },
+  {
+    "quote": "Design is thinking made visual.",
+    "author": "Saul Bass",
+    "tag": "design"
+  },
+  {
+    "quote": "There are three responses to a piece of design – yes, no, and WOW! Wow is the one to aim for.",
+    "author": "Milton Glaser",
+    "tag": "design"
+  },
+  {
+    "quote": "The details are not the details. They make the design.",
+    "author": "Charles Eames",
+    "tag": "design"
+  },
+  {
+    "quote": "Design adds value faster than it adds costs.",
+    "author": "Joel Spolsky",
+    "tag": "design"
+  },
+  {
+    "quote": "Make it simple, but significant.",
+    "author": "Don Draper",
+    "tag": "design"
+  },
+  {
+    "quote": "Design is intelligence made visible.",
+    "author": "Alina Wheeler",
+    "tag": "design"
+  },
+  {
+    "quote": "Good design is good business.",
+    "author": "Thomas J. Watson Jr.",
+    "tag": "design"
+  },
+  {
+    "quote": "Styles come and go. Good design is a language, not a style.",
+    "author": "Massimo Vignelli",
+    "tag": "design"
+  },
+  {
+    "quote": "The only way to do great work is to love what you do.",
+    "author": "Steve Jobs",
+    "tag": "motivational"
+  },
+  {
+    "quote": "Your time is limited, don't waste it living someone else's life.",
+    "author": "Steve Jobs",
+    "tag": "motivational"
+  },
+  {
+    "quote": "The future belongs to those who believe in the beauty of their dreams.",
+    "author": "Eleanor Roosevelt",
+    "tag": "motivational"
+  },
+  {
+    "quote": "It does not matter how slowly you go as long as you do not stop.",
+    "author": "Confucius",
+    "tag": "motivational"
+  },
+  {
+    "quote": "Believe you can and you're halfway there.",
+    "author": "Theodore Roosevelt",
+    "tag": "motivational"
+  },
+  {
+    "quote": "The best way to predict the future is to create it.",
+    "author": "Peter Drucker",
+    "tag": "motivational"
+  },
+  {
+    "quote": "You miss 100% of the shots you don't take.",
+    "author": "Wayne Gretzky",
+    "tag": "motivational"
+  },
+  {
+    "quote": "Strive not to be a success, but rather to be of value.",
+    "author": "Albert Einstein",
+    "tag": "motivational"
+  },
+  {
+    "quote": "The secret of getting ahead is getting started.",
+    "author": "Mark Twain",
+    "tag": "motivational"
+  },
+  {
+    "quote": "Don't watch the clock; do what it does. Keep going.",
+    "author": "Sam Levenson",
+    "tag": "motivational"
+  },
+  {
+    "quote": "Everything you’ve ever wanted is on the other side of fear.",
+    "author": "George Addair",
+    "tag": "motivational"
+  },
+  {
+    "quote": "The advance of technology is based on making it fit in so that you don't even notice it, so it's part of everyday life.",
+    "author": "Bill Gates",
+    "tag": "technology"
+  },
+  {
+    "quote": "Technology is anything that wasn’t around when you were born.",
+    "author": "Alan Kay",
+    "tag": "technology"
+  },
+  {
+    "quote": "Any sufficiently advanced technology is indistinguishable from magic.",
+    "author": "Arthur C. Clarke",
+    "tag": "technology"
+  },
+  {
+    "quote": "It's not a faith in technology. It's faith in people.",
+    "author": "Steve Jobs",
+    "tag": "technology"
+  },
+  {
+    "quote": "Technology is a useful servant but a dangerous master.",
+    "author": "Christian Lous Lange",
+    "tag": "technology"
+  },
+  {
+    "quote": "The Web as I envisaged it, we have not seen it yet. The future is still so much bigger than the past.",
+    "author": "Tim Berners-Lee",
+    "tag": "technology"
+  },
+  {
+    "quote": "Code is like humor. When you have to explain it, it’s bad.",
+    "author": "Cory House",
+    "tag": "technology"
+  },
+  {
+    "quote": "The real problem is not whether machines think but whether men do.",
+    "author": "B.F. Skinner",
+    "tag": "technology"
+  },
+  {
+    "quote": "Technology, like art, is a soaring exercise of the human imagination.",
+    "author": "Daniel Bell",
+    "tag": "technology"
+  },
+  {
+    "quote": "First we build the tools, then they build us.",
+    "author": "Marshall McLuhan",
+    "tag": "technology"
+  },
+  {
+    "quote": "The Internet is becoming the town square for the global village of tomorrow.",
+    "author": "Bill Gates",
+    "tag": "technology"
+  },
+  {
+    "quote": "The good thing about science is that it's true whether or not you believe in it.",
+    "author": "Neil deGrasse Tyson",
+    "tag": "science"
+  },
+  {
+    "quote": "Science is a way of thinking much more than it is a body of knowledge.",
+    "author": "Carl Sagan",
+    "tag": "science"
+  },
+  {
+    "quote": "Somewhere, something incredible is waiting to be known.",
+    "author": "Carl Sagan",
+    "tag": "science"
+  },
+  {
+    "quote": "The important thing is to not stop questioning. Curiosity has its own reason for existing.",
+    "author": "Albert Einstein",
+    "tag": "science"
+  },
+  {
+    "quote": "We are all connected; To each other, biologically. To the earth, chemically. To the rest of the universe atomistically.",
+    "author": "Neil deGrasse Tyson",
+    "tag": "science"
+  },
+  {
+    "quote": "Science and everyday life cannot and should not be separated.",
+    "author": "Rosalind Franklin",
+    "tag": "science"
+  },
+  {
+    "quote": "Research is what I'm doing when I don't know what I'm doing.",
+    "author": "Wernher von Braun",
+    "tag": "science"
+  },
+  {
+    "quote": "Equipped with his five senses, man explores the universe around him and calls the adventure Science.",
+    "author": "Edwin Hubble",
+    "tag": "science"
+  },
+  {
+    "quote": "Nothing in life is to be feared, it is only to be understood. Now is the time to understand more, so that we may fear less.",
+    "author": "Marie Curie",
+    "tag": "science"
+  },
+  {
+    "quote": "Science is the great antidote to the poison of enthusiasm and superstition.",
+    "author": "Adam Smith",
+    "tag": "science"
+  },
+  {
+    "quote": "In science, 'fact' can only mean 'confirmed to such a degree that it would be perverse to withhold provisional assent.'",
+    "author": "Stephen Jay Gould",
+    "tag": "science"
+  },
+  {
+    "quote": "If you can't explain it simply, you don't understand it well enough.",
+    "author": "Albert Einstein",
+    "tag": "physics"
+  },
+  {
+    "quote": "Energy cannot be created or destroyed, it can only be changed from one form to another.",
+    "author": "Albert Einstein",
+    "tag": "physics"
+  },
+  {
+    "quote": "Not only is the universe stranger than we imagine, it is stranger than we can imagine.",
+    "author": "Werner Heisenberg",
+    "tag": "physics"
+  },
+  {
+    "quote": "For every action, there is an equal and opposite reaction.",
+    "author": "Isaac Newton",
+    "tag": "physics"
+  },
+  {
+    "quote": "If I have seen further it is by standing on the shoulders of Giants.",
+    "author": "Isaac Newton",
+    "tag": "physics"
+  },
+  {
+    "quote": "The universe is under no obligation to make sense to you.",
+    "author": "Neil deGrasse Tyson",
+    "tag": "physics"
+  },
+  {
+    "quote": "Physics is like sex: sure, it may give some practical results, but that's not why we do it.",
+    "author": "Richard Feynman",
+    "tag": "physics"
+  },
+  {
+    "quote": "The first principle is that you must not fool yourself – and you are the easiest person to fool.",
+    "author": "Richard Feynman",
+    "tag": "physics"
+  },
+  {
+    "quote": "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe.",
+    "author": "Albert Einstein",
+    "tag": "physics"
+  },
+  {
+    "quote": "What we observe is not nature itself, but nature exposed to our method of questioning.",
+    "author": "Werner Heisenberg",
+    "tag": "physics"
+  },
+  {
+    "quote": "Everything is theoretically impossible, until it is done.",
+    "author": "Robert A. Heinlein",
+    "tag": "physics"
+  },
+  {
+    "quote": "The nitrogen in our DNA, the calcium in our teeth, the iron in our blood, the carbon in our apple pies were made in the interiors of collapsing stars. We are made of starstuff.",
+    "author": "Carl Sagan",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "Look up at the stars and not down at your feet. Try to make sense of what you see, and wonder about what makes the universe exist. Be curious.",
+    "author": "Stephen Hawking",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "Astronomy compels the soul to look upwards and leads us from this world to another.",
+    "author": "Plato",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "Space is big. You just won't believe how vastly, hugely, mind-bogglingly big it is.",
+    "author": "Douglas Adams",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "We are just an advanced breed of monkeys on a minor planet of a very average star. But we can understand the Universe. That makes us something very special.",
+    "author": "Stephen Hawking",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "I don't know what I may appear to the world, but to myself I seem to have been only like a boy playing on the seashore...whilst the great ocean of truth lay all undiscovered before me.",
+    "author": "Isaac Newton",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "The Earth is the cradle of humanity, but mankind cannot stay in the cradle forever.",
+    "author": "Konstantin Tsiolkovsky",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "That's one small step for a man, one giant leap for mankind.",
+    "author": "Neil Armstrong",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "The universe is a pretty big place. If it's just us, seems like an awful waste of space.",
+    "author": "Carl Sagan",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "We are a way for the cosmos to know itself.",
+    "author": "Carl Sagan",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "The cosmos is within us. We are made of star-stuff. We are a way for the universe to know itself.",
+    "author": "Carl Sagan",
+    "tag": "astronomy"
+  },
+  {
+    "quote": "For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.",
+    "author": "John 3:16",
+    "tag": "christian"
+  },
+  {
+    "quote": "I can do all things through Christ who strengthens me.",
+    "author": "Philippians 4:13",
+    "tag": "christian"
+  },
+  {
+    "quote": "The Lord is my shepherd; I shall not want.",
+    "author": "Psalm 23:1",
+    "tag": "christian"
+  },
+  {
+    "quote": "For we walk by faith, not by sight.",
+    "author": "2 Corinthians 5:7",
+    "tag": "christian"
+  },
+  {
+    "quote": "Trust in the Lord with all your heart, and do not lean on your own understanding.",
+    "author": "Proverbs 3:5",
+    "tag": "christian"
+  },
+  {
+    "quote": "In the beginning was the Word, and the Word was with God, and the Word was God.",
+    "author": "John 1:1",
+    "tag": "christian"
+  },
+  {
+    "quote": "Be still, and know that I am God.",
+    "author": "Psalm 46:10",
+    "tag": "christian"
+  },
+  {
+    "quote": "God has not given us a spirit of fear, but of power and of love and of a sound mind.",
+    "author": "2 Timothy 1:7",
+    "tag": "christian"
+  },
+  {
+    "quote": "Faith is the assurance of things hoped for, the conviction of things not seen.",
+    "author": "Hebrews 11:1",
+    "tag": "christian"
+  },
+  {
+    "quote": "He has made everything beautiful in its time.",
+    "author": "Ecclesiastes 3:11",
+    "tag": "christian"
+  },
+  {
+    "quote": "Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God.",
+    "author": "Philippians 4:6",
+    "tag": "christian"
+  },
+  {
+    "quote": "Love is patient, love is kind. It does not envy, it does not boast, it is not proud.",
+    "author": "1 Corinthians 13:4",
+    "tag": "christian"
+  },
+  {
+    "quote": "The soul is the same in all living creatures, although the body of each is different.",
+    "author": "Hippocrates",
+    "tag": "spiritual"
+  }
+]

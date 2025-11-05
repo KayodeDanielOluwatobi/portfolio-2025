@@ -8,7 +8,7 @@ interface UseBrandRotationProps {
 
 export function useBrandRotation({ 
   totalBrands, 
-  intervalDuration = 7000,
+  intervalDuration = 10000,
   fadeDuration = 500 // Match Framer Motion duration
 }: UseBrandRotationProps) {
   const [currentIndex, setCurrentIndex] = useState(0);

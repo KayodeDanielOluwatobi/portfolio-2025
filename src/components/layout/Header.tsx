@@ -43,12 +43,20 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
       menuIcon: '/menubrands/conces-menu.svg',
     },
 
-    bose: {
+    tympanium: {
       logo: '/logos/logo-bose.svg',
       textColor: '#8c4cf2',
       iconColor: '#8c4cf2',
       menuIcon: '/menubrands/bose-menu.svg',
     },
+
+    sampasend: {
+      logo: '/logos/logo-sampasend.svg',
+      textColor: '#e9f3ff',
+      iconColor: '#e9f3ff',
+      menuIcon: '/menubrands/sampasend-menu.svg',
+    },
+
   };
 
   const mobileBrandColor = '#00AF87';
@@ -58,7 +66,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
     : brandThemes.default;
 
   const navItems = [
-    { name: 'HOME', href: '/' },
+    //{ name: 'HOME', href: '/' },
     { name: 'WORK', href: '/test-visualizer' },
     { name: 'LAB', href: '/lab' },
     { name: 'ABOUT', href: '/about' },
@@ -294,7 +302,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
             <Link
               key={item.name}
               href={item.href}
-              className="hover:opacity-70 transition-opacity font-sohne-mono-1 text-[0.7rem] tracking-wider"
+              className="hover:opacity-85 transition-opacity font-space text-[0.8rem] tracking-wider"
               style={{ color: currentTheme.textColor }}
             >
               {item.name}
@@ -367,7 +375,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   <Link
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="text-2xl font-sohne-mono-1 tracking-wider hover:opacity-70 transition-opacity inline-block"
+                    className="text-2xl font-space tracking-wider text-white/70 hover:text-white/100 transition-opacity inline-block"
                   >
                     {item.name}
                   </Link>
@@ -384,13 +392,13 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
               className="px-6 pb-8 space-y-4"
             >
               {/* Contact Information - greyed out with hyperlinks */}
-              <div className="space-y-1 text-[13px] font-sohne-mono-1 tracking-wider opacity-30">
+              <div className="space-y-1 text-[13px] font-space tracking-wider text-white/30">
                 {/* Telephone */}
                 <div>
                   TEL:{' '}
                   <a 
                     href="tel:+2348100305171"
-                    className="hover:opacity-100 transition-opacity"
+                    className="text-white/30 hover:text-white/80 transition-colors duration-400"
                   >
                     (+234) 810 030 5171
                   </a>
@@ -400,8 +408,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                 <div>
                   EMAIL:{' '}
                   <a 
-                    href="mailto:everdanndesigns.com"
-                    className="hover:opacity-100 transition-opacity"
+                    href="mailto:everdanndesign@gmail.com"
+                    className="text-white/30 hover:text-white/80 transition-colors duration-400"
                   >
                     EVERDANNDESIGN@GMAIL.COM
                   </a>
@@ -417,7 +425,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={socialLinks[0].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    className="text-white/50 hover:text-white transition-colors duration-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -437,7 +445,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={socialLinks[1].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    className="text-white/50 hover:text-white transition-colors duration-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -457,7 +465,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={socialLinks[2].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    className="text-white/50 hover:text-white transition-colors duration-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -481,7 +489,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={socialLinks[3].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    className="text-white/50 hover:text-white transition-colors duration-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -501,7 +509,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     target="_blank" 
                     rel="noopener noreferrer"
                     aria-label={socialLinks[4].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    className="text-white/50 hover:text-white transition-colors duration-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -514,14 +522,14 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   </a>
                 )}
 
-                {/* Facebook Icon - Hidden for now */}
+                {/* Facebook Icon */}
                 {!socialLinks[5].hidden && (
                   <a 
-                    href={socialLinks[4].url} 
+                    href={socialLinks[5].url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    aria-label={socialLinks[4].ariaLabel}
-                    className="hover:opacity-70 transition-opacity"
+                    aria-label={socialLinks[5].ariaLabel}
+                    className="text-white/50 hover:text-white transition-colors duration-200"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

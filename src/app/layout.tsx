@@ -5,9 +5,13 @@ import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-provider'
 import { SmoothCursor } from '@/components/layout/SmoothCursor'
+import { array } from './fonts';
+
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
+
+
 
 export const poppins = Poppins({
   subsets: ["latin"],
@@ -19,6 +23,12 @@ const departureMono = localFont({
   src: './fonts/DepartureMono-Regular.woff2',
   variable: '--font-departure-mono'
 })
+
+const crux = localFont({
+  src: './fonts/crux.woff2',
+  variable: '--font-crux'
+})
+
 
 const dm_sans = DM_Sans({
   subsets: ['latin'],
@@ -59,7 +69,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${dm_sans.variable} ${dotted.variable} ${outfit.variable} ${poppins.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable} ${spaceMono.variable} antialiased`}>
+      <body className={`${inter.variable} ${dm_sans.variable} ${crux.variable} ${dotted.variable} ${outfit.variable} ${poppins.variable} ${array.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable} ${spaceMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -67,7 +77,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* Global SmoothCursor - available on all pages */}
-          {/* <SmoothCursor cursorColor="#FFFFFF" cursorStrokeColor="#000000" /> */}
+          {/* <SmoothCursor cursorColor="#FFFFFF" cursorStrokeColor="#000000" /> //this line causes double cursor effect */}
           {children}
         </ThemeProvider>
       </body>
