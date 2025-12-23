@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "title": "The Design of Everyday Things",
+    "author": "Don Norman",
+    "cover": "/books/design-everyday-things.jpg",
+    "category": "Design",
+    "progress": 75
+  },
+  {
+    "id": "2",
+    "title": "The Art of Electronics",
+    "author": "Paul Horowitz",
+    "cover": "/books/art-of-electronics.webp",
+    "category": "Electronics",
+    "progress": 30
+  },
+  {
+    "id": "3",
+    "title": "Mere Christianity",
+    "author": "C.S. Lewis",
+    "cover": "/books/mere-christianity.jpg",
+    "category": "Spiritual",
+    "progress": 100
+  },
+  {
+    "id": "4",
+    "title": "Practical Electronics for Inventors",
+    "author": "Paul Scherz",
+    "cover": "/books/practical-electronics.jpg",
+    "category": "Electrical Engineering",
+    "progress": 45
+  }
+]

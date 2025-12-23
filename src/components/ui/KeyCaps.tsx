@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
+import TextPressure from '@/components/TextPressure';
 
 interface Keycap {
   name: string;
@@ -50,18 +51,18 @@ const toolProgressOverrides: Record<string, number> = {
 };
 
 const keycapColors: Record<string, { track: string; wave: string }> = {
-  'Photoshop':    { track: '#003366', wave: '#31A8FF' },
-  'Illustrator':  { track: '#663D00', wave: '#FF9A00' },
-  'Premiere Pro': { track: '#3C1F4C', wave: '#9999FF' },
-  'After Effects':{ track: '#4D1F66', wave: '#D999FF' },
-  'InDesign':     { track: '#8C194F', wave: '#FF3366' },
-  'Be':           { track: '#aaaaaa', wave: '#ffffff' },
-  'Figma':        { track: '#05553A', wave: '#0ACF83' },
-  'Spline':       { track: '#4D2C99', wave: '#B388FF' },
-  'ChatGPT':      { track: '#288C78', wave: '#74AA9C' },
-  'Gemini':       { track: '#4A62A0', wave: '#8AB4F8' },
-  'Affinity':     { track: '#5E8C3A', wave: '#A8FF71' },
-  'default':      { track: '#555555', wave: '#cccccc' },
+  'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, // Pastel Blue
+  'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, // Pastel Apricot
+  'Premiere Pro':   { track: '#E3E3FF', wave: '#9999FF' }, // Pastel Lavender
+  'After Effects':  { track: '#F2D9FF', wave: '#D999FF' }, // Pastel Lilac
+  'InDesign':       { track: '#FFC2D1', wave: '#FF3366' }, // Pastel Rose
+  'Be':             { track: '#EAEAEA', wave: '#ffffff' }, // Light Gray (Contrast for white)
+  'Figma':          { track: '#C2F2E3', wave: '#0ACF83' }, // Pastel Mint
+  'Spline':         { track: '#EAD9FF', wave: '#B388FF' }, // Pastel Violet
+  'ChatGPT':        { track: '#D9EDE8', wave: '#74AA9C' }, // Pastel Sage
+  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8' }, // Pastel Sky
+  'Affinity':       { track: '#E4FFD1', wave: '#A8FF71' }, // Pastel Lime
+  'default':        { track: '#EEEEEE', wave: '#cccccc' }, // Lighter Gray
 };
 
 const getKeycapColor = (tool: string): { track: string; wave: string } => {
@@ -72,6 +73,8 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+
+
 export default function KeycapInteractive() {
   const [keycaps, setKeycaps] = useState<KeycapWithProficiency[]>([]);
   const [hoveredKeycap, setHoveredKeycap] = useState<string | null>(null);
@@ -81,6 +84,9 @@ export default function KeycapInteractive() {
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [imageScale, setImageScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
+
+  const [isMounted, setIsMounted] = useState(false);
+  const [pressureFontSize, setPressureFontSize] = useState(120); // Default to desktop size
 
   const OFFSET_X = -6;
   const OFFSET_Y = -15;
@@ -204,6 +210,28 @@ export default function KeycapInteractive() {
   }, []);
 
   useEffect(() => {
+        // This runs only on the client
+        setIsMounted(true); 
+    
+        const handleResize = () => {
+          const mobileSize = 50;    // <-- Set your desired mobile size
+          const desktopSize = 120;  // <-- Your 96*2 desktop size
+          const breakpoint = 521;   // Tailwind 'md' breakpoint
+    
+          // Set size based on window width
+          setPressureFontSize(
+            window.innerWidth < breakpoint ? mobileSize : desktopSize
+          );
+        };
+    
+        handleResize(); // Run once on mount
+        window.addEventListener('resize', handleResize); // Add listener
+    
+        // Cleanup listener on unmount
+        return () => window.removeEventListener('resize', handleResize);
+  }, []); // Empty array ensures this runs only once on mount
+
+  useEffect(() => {
     const calculateScale = () => {
       if (imgRef.current) {
         const originalWidth = 756;
@@ -216,6 +244,10 @@ export default function KeycapInteractive() {
     window.addEventListener('resize', calculateScale);
     return () => window.removeEventListener('resize', calculateScale);
   }, []);
+
+
+
+  
 
   const handleKeycapClick = (keycap: KeycapWithProficiency) => {
     if (keycap.name === 'Esc') {
@@ -243,10 +275,25 @@ export default function KeycapInteractive() {
       <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
         {/* Header */}
         <div className="mb-12">
-          <h2 className="pl-3 font-space text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase text-white/95 mb-4">
+          {/* <h2 className="pl-3 font-space text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase text-white/95 mb-4">
             My Design Stack
-          </h2>
-          <p className="text-white/60 pl-3 text-sm sm:text-base">
+          </h2> */}
+
+          <TextPressure className='ml-2 mb-8'
+                          text="MY DESIGN STACK"
+                          flex={false}
+                          alpha={false}
+                          stroke={false}
+                          width={true}
+                          weight={true}
+                          italic={true}
+                          textColor="#ffffff"
+                          strokeColor="#ff0000"
+                          minFontSize={36}
+                          fixedFontSize={pressureFontSize}
+            />
+
+          <p className="text-white/60 pl-2 md:pl-3 text-sm font-light sm:text-base">
             {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools and proficiency levels' : 'Hover over keycaps to explore my tools and proficiency levels'}
           </p>
         </div>

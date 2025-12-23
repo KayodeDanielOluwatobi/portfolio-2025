@@ -216,7 +216,7 @@ export default function SmoothWatchface({
             fill="none"
             stroke="#ffffff"
             strokeWidth="0.6"
-            opacity="0.1"
+            opacity="0.2"
           />
         </svg>
       </div>

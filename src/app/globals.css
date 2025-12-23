@@ -1,7 +1,12 @@
+/* globals.css */
+
+
 @import "tailwindcss";
 @custom-variant hover (&:hover);
 
 @theme inline {
+  --font-space: 'MonoblockPatch', var(--font-monoblock), var(--font-space-mono), monospace;
+  /* --font-space: var(--font-space-mono);   DANIEL, YOU DECIDED TO SWAP SPACE MONO FOR MONOBLOCK, THATS WHAT IS HAPPENING HERE*/
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-dm-sans);
@@ -10,8 +15,31 @@
   --font-nothing: var(--font-nothing);
   --font-array: var(--font-array);
   --font-crux: var(--font-crux);
-  --font-space: var(--font-space-mono);
-}  
+  
+  --font-goth: var(--font-special-gothic);
+  --font-din: var(--font-din);
+  --font-monoblock: var(--font-monoblock)
+
+} 
+
+
+@font-face {
+  font-family: 'MonoblockPatch';
+  /* Direct link to Space Mono Regular from Google */
+  src: url('https://fonts.gstatic.com/s/spacemono/v12/i7dPIFZifjKcF5tHCS8GS88.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  /* Target ONLY the problematic characters:
+     U+0040 (@)
+     U+00A9 (©)
+     U+00AE (®)
+     U+00C0-00FF (Accented characters like É, ñ, ü)
+  */
+  unicode-range: U+0040, U+00A9, U+00AE, U+00C0-00FF; 
+}
+
+
+
 
 :root {
   --background: #ffffff;
@@ -43,8 +71,20 @@ body {
   font-family: var(--font-inter);
 }
 
-.font-space {
+/* .font-space {
   font-family: var(--font-space-mono);
+} 
+!!!!FONT SWAPPING FROM SPACE MONO TO MONOBLOCK  */ 
+
+
+.font-space {
+  font-family: 'MonoblockPatch', var(--font-monoblock), monospace !important;
+}
+
+
+
+.font-din {
+  font-family: var(--font-din);
 }
 
 .font-outfit {
@@ -78,6 +118,36 @@ body {
 .font-nothing {
   font-family: var(--font-nothing);
 }
+
+
+
+/* Monoblock Font Weights */
+.font-monoblock {
+  font-family: var(--font-monoblock) !important;
+}
+
+.font-monoblock-regular {
+  font-family: var(--font-monoblock) !important;
+  font-weight: 400;
+}
+
+.font-monoblock-thin {
+  font-family: var(--font-monoblock) !important;
+  font-weight: 400;
+}
+
+.font-monoblock-light {
+  font-family: var(--font-monoblock) !important;
+  font-weight: 400;
+}
+
+.font-monoblock-bold {
+  font-family: var(--font-monoblock) !important;
+  font-weight: 400;
+}
+
+
+
 
 /* Array Font Weights */
 .font-array {
@@ -237,3 +307,37 @@ body {
             transform: translateY(-8px);
           }
         }
+
+
+
+
+/* Image Protection Styles */
+.image-protected::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  cursor: pointer;
+}
+
+/* Prevent image selection and dragging */
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+video {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

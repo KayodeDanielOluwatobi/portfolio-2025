@@ -1,0 +1,486 @@
+[
+  {
+    "id": 1,
+    "title": "Thursday Revival Hour",
+    "tagline": "Come Thirsty, Leave Renewed",
+    "media": "/church/trets-1.avif",
+    "slug": "trets",
+    "type": "image",
+    "tags": ["trets", "flyer"],
+    "brandColor": "#C51EF0"
+  },
+  {
+    "id": 2,
+    "title": "SWS  |  01",
+    "tagline": "Spirit . . . But Aesthetically",
+    "media": "/church/ss1.avif",
+    "slug": "ss1",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#FFD1DC" 
+  },
+  {
+    "id": 3,
+    "title": "SWS  |  02",
+    "tagline": "Crafted Under Covenant",
+    "media": "/church/ss3.avif",
+    "slug": "ss2",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#87CEEB"
+  },
+  {
+    "id": 4,
+    "title": "Grades and Gigs",
+    "tagline": "Balance The GPA And Payday",
+    "media": ["/church/g&g.avif",
+              "/church/g&g-1.avif",
+              "/church/g&g-02.avif"
+             ],
+    "slug": "g&g",
+    "type": "image",
+    "tags": ["program", "flyer"],
+    "brandColor": "#FFFACD" 
+  },
+  {
+    "id": 4,
+    "title": "Grades and Gigs Countdown",
+    "tagline": "You Gats Balance This Thing Bro",
+    "media": [
+      "/church/g&g.avif",
+      "/church/2.avif",
+      "/church/1.avif",
+      "/church/D.avif"
+    ],
+    "slug": "g&g",
+    "type": "image",
+    "tags": ["program", "flyer"],
+    "brandColor": "#FFFACD" 
+  },
+  {
+    "id": 5,
+    "title": "FYB  |  Dominant",
+    "tagline": "The Final Lap",
+    "media": "/church/fybdom.avif",
+    "slug": "fyb-dominant",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#FFB6C1" 
+  },
+  {
+    "id": 6,
+    "title": "Exam Declaration 2024",
+    "tagline": "Focused, Ready, Unstoppable",
+    "media": ["/church/111.avif",
+              "/church/8.avif",
+              "/church/9.avif",
+              "/church/11.avif"
+            ],
+    "slug": "examdeclaration-2024",
+    "type": "image",
+    "tags": ["countdown", "design"],
+    "brandColor": "#FF00FF"
+  },
+  {
+    "id": 7,
+    "title": "Hadei Hallel",
+    "tagline": "Sound That Lift The Spirit",
+    "media": "/church/HADEI HALLEL FLYER.avif",
+    "slug": "hadeihallel",
+    "type": "image",
+    "tags": ["praise night", "flyer"],
+    "brandColor": "#FFD1DC"
+  },
+  {
+    "id": 8,
+    "title": "Hadei Hallel Countdown",
+    "tagline": "Pure Hallel Vibes",
+    "media": [
+      "/church/hh4.avif",
+      "/church/hh3.jpg",
+      "/church/hh2.jpg",
+      "/church/hh1.jpg",
+      "/church/hhd.jpg"
+    ],
+    "slug": "hadeihallel",
+    "type": "image",
+    "tags": ["countdown", "flyer"],
+    "brandColor": "#FFD1DC"
+  },
+  {
+    "id": 9,
+    "title": "The Solid Rock",
+    "tagline": "Firm Footing, Fearless Heart",
+    "media": "/church/poster-01.jpg",
+    "slug": "posters",
+    "type": "image",
+    "tags": ["poster", "design"],
+    "brandColor": "#AEC6CF"
+  },
+  {
+    "id": 10,
+    "title": "Flee From Temptation",
+    "tagline": "Don't Even Think Twice",
+    "media": "/church/poster-02.jpg",
+    "slug": "posters",
+    "type": "image",
+    "tags": ["poster", "design"],
+    "brandColor": "#C1FFC1"
+  },
+  {
+    "id": 10,
+    "title": "Letter To The Young Woman",
+    "tagline": "Dear Queen in Progress...",
+    "media": [
+      "/church/llt0.avif",
+      "/church/llt01.avif",
+      "/church/llt02.avif",
+      "/church/llt03.avif",
+      "/church/llt04.avif",
+      "/church/llt05.avif",
+      "/church/llt06.avif",
+      "/church/llt07.avif"
+      
+    ],
+    "slug": "lettertotheyoungwoman",
+    "type": "image",
+    "tags": ["letter", "design"],
+    "brandColor": "#F7C6A6"
+  },
+  {
+    "id": 10,
+    "title": "Letter To The Young Woman",
+    "tagline": "Notes for the becoming woman",
+    "media": [
+      "/church/llt08.avif",
+      "/church/llt09.avif",
+      "/church/llt10.avif",
+      "/church/llt11.avif",
+      "/church/llt12.avif",
+      "/church/llt13.avif",
+      "/church/llt14.avif"
+      
+    ],
+    "slug": "lettertotheyoungwoman",
+    "type": "image",
+    "tags": ["letter", "design"],
+    "brandColor": "#FFC1DA"
+  },
+  {
+    "id": 10,
+    "title": "Letter To The Young Woman",
+    "tagline": "Read this before you bloom",
+    "media": [
+      "/church/llt15.avif",
+      "/church/llt16.avif",
+      "/church/llt17.avif",
+      "/church/llt18.avif",
+      "/church/llt19.avif",
+      "/church/llt20.avif",
+      "/church/llt21.avif",
+      "/church/llt22.avif",
+      "/church/llt23.avif",
+      "/church/llt24.avif"
+      
+    ],
+    "slug": "lettertotheyoungwoman",
+    "type": "image",
+    "tags": ["letter", "design"],
+    "brandColor": "#FFC1C7"
+  },
+  {
+    "id": 10,
+    "title": "Letter To The Young Woman",
+    "tagline": "For the woman finding her voice",
+    "media": [
+      "/church/llt25.avif",
+      "/church/llt26.avif",
+      "/church/llt27.avif",
+      "/church/llt28.avif",
+      "/church/llt29.avif",
+      "/church/llt30.avif"
+      
+    ],
+    "slug": "lettertotheyoungwoman",
+    "type": "image",
+    "tags": ["letter", "design"],
+    "brandColor": "#D9FF96"
+  },
+  {
+    "id": 11,
+    "title": "Power & Glory",
+    "tagline": "Power You Can Lean On",
+    "media": "/church/power.avif",
+    "slug": "powerandglory",
+    "type": "image",
+    "tags": ["night", "prayer"],
+    "brandColor": "#BF00FF"
+  },
+  {
+    "id": 12,
+    "title": "SWS  |  03",
+    "tagline": "The Power of Worship",
+    "media": "/church/ss4.avif",
+    "slug": "ss3",
+    "type": "image",
+    "tags": ["SWS", "flyer"],
+    "brandColor": "#FFC0CB"
+  },
+  {
+    "id": 12,
+    "title": "SWS  |  04",
+    "tagline": "Rough Textures, Real Devotion",
+    "media": "/church/ss11.avif",
+    "slug": "ss4",
+    "type": "image",
+    "tags": ["SWS", "flyer"],
+    "brandColor": "#D3D3D3"
+  },
+  {
+    "id": 13,
+    "title": "SWS  |  05",
+    "tagline": "Grit In The Design",
+    "media": "/church/ss8.avif",
+    "slug": "ss5",
+    "type": "image",
+    "tags": ["SWS", "flyer"],
+    "brandColor": "#F5F5DC"
+  },
+  {
+    "id": 14,
+    "title": "SWS  |  06",
+    "tagline": "Truth Told In Grunge",
+    "media": "/church/ss2.avif",
+    "slug": "ss6",
+    "type": "image",
+    "tags": ["SWS", "flyer"],
+    "brandColor": "#FAF9F6"
+  },
+  {
+    "id": 15,
+    "title": "SWS  |  07",
+    "tagline": "Faith Framed In Raw Texture",
+    "media": "/church/ss13.jpg",
+    "slug": "ss7",
+    "type": "image",
+    "tags": ["SWS", "flyer"],
+    "brandColor": "#FAF9F6"
+  },
+  {
+    "id": 16,
+    "title": "Focus Carousel*",
+    "tagline": "Tunnel Vision On The Divine",
+    "media": "/church/focuscarousel.jpg",
+    "slug": "focus",
+    "type": "image",
+    "tags": ["carousel", "design"],
+    "brandColor": "#89CFF0"
+  },
+  {
+    "id": 17,
+    "title": "Again . . . Focus",
+    "tagline": "Sharp Sight, Deeper Faith",
+    "media": ["/church/focus-01.jpg",
+              "/church/focus2.jpg",
+              "/church/focus3.jpg",
+              "/church/focus4.jpg",
+              "/church/focus5.jpg"
+            ],
+    "slug": "focus",
+    "type": "image",
+    "tags": ["carousel", "design"],
+    "brandColor": "#89CFF0"
+  },
+  {
+    "id": 18,
+    "title": "By My God",
+    "tagline": "Watch The Impossible Bend",
+    "media": "/church/bmG.jpg",
+    "slug": "ByMyGod",
+    "type": "image",
+    "tags": ["program", "design"],
+    "brandColor": "#FFB347"
+  },
+  {
+    "id": 19,
+    "title": "Pst. W.F Kumuyi",
+    "tagline": "A Legacy of Light",
+    "media": "/church/pstkumuyibd.jpg",
+    "slug": "pstkumuyibd",
+    "type": "image",
+    "tags": ["birthday", "design"],
+    "brandColor": "#D3D3D3"
+  },
+  {
+    "id": 20,
+    "title": "SWS  |  08",
+    "tagline": "Not Just Service, Experience",
+    "media": "/church/ss10.avif",
+    "slug": "ss8",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#FFDAC1"
+  },
+  {
+    "id": 21,
+    "title": "SWS  |  09",
+    "tagline": "Sealed. Secured. Supernatural",
+    "media": "/church/ss6.avif",
+    "slug": "ss9",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#FFDAC1"
+  },
+  {
+    "id": 22,
+    "title": "SWS  |  10",
+    "tagline": "Come Just As You Are",
+    "media": "/church/ss9.avif",
+    "slug": "ss10",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#F5F5DC"
+  },
+  {
+    "id": 23,
+    "title": "SWS  |  11",
+    "tagline": "One God. One Day. Every Nation",
+    "media": "/church/ss5.avif",
+    "slug": "ss11",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#FFDAC1"
+  },
+  {
+    "id": 24,
+    "title": "5G Covenant",
+    "tagline": "Heaven's Bandwidth: Always Full Bars",
+    "media": "/church/5g.jpg",
+    "slug": "5gcovenant",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#89CFF0"
+  },
+  {
+    "id": 25,
+    "title": "Academic Recharge Station",
+    "tagline": "Low Battery? Tap Into The Divine Charger",
+    "media": "/church/ars.avif",
+    "slug": "Academic Recharge Station",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#5FCAFA"
+  },
+  {
+    "id": 26,
+    "title": "SWS  |  12",
+    "tagline": "Sundays hit different here.",
+    "media": "/church/ss15.avif",
+    "slug": "ss12",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#C3B1E1" 
+  },
+  {
+    "id": 27,
+    "title": "SWS  |  13",
+    "tagline": "Connecting Continents Through Christ",
+    "media": "/church/ss7.avif",
+    "slug": "ss13",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#C1FFC1" 
+  },
+  {
+    "id": 28,
+    "title": "SWS  |  14",
+    "tagline": "Refuel, Refresh, Rejoice",
+    "media": "/church/ss12_temp.jpg",
+    "slug": "ss14",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#E20C72" 
+  },
+  {
+    "id": 29,
+    "title": "SWS  |  15",
+    "tagline": "Connection so real it leaves a mark.",
+    "media": "/church/ss14.jpg",
+    "slug": "ss15",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#D4C7D8" 
+  },
+  {
+    "id": 30,
+    "title": "SWS  |  16",
+    "tagline": "We saved you a seat.",
+    "media": "/church/ss16.jpg",
+    "slug": "ss15",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#00D54D" 
+  },
+  {
+    "id": 31,
+    "title": "The Outstretched Arm",
+    "tagline": "Grab hold. He's not letting go.",
+    "media": "/church/toa.avif",
+    "slug": "the-outstretched arm",
+    "type": "image",
+    "tags": ["night", "prayer"],
+    "brandColor": "#EBBD10" 
+  },
+  {
+    "id": 32,
+    "title": "SWS  |  17",
+    "tagline": "The Best Hour of Your Week Starts Here",
+    "media": "/church/ss0.avif",
+    "slug": "ss17",
+    "type": "image",
+    "tags": ["sws", "flyer"],
+    "brandColor": "#FF3D56" 
+  },
+  {
+    "id": 33,
+    "title": "In His Presence",
+    "tagline": "Step in. The world can wait.",
+    "media": "/church/ihp.jpg",
+    "slug": "in-his-presence",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#09E6CB" 
+  },
+  {
+    "id": 34,
+    "title": "MBS | 01",
+    "tagline": "Verse by verse. Truth by truth.",
+    "media": "/church/mbs.jpg",
+    "slug": "mbs01",
+    "type": "image",
+    "tags": ["MBS", "design"],
+    "brandColor": "#EAECEB" 
+  },
+  {
+    "id": 35,
+    "title": "Ephphatha | West Gate",
+    "tagline": "Be opened. Stay open.",
+    "media": "/church/eph.avif",
+    "slug": "ephwestgate",
+    "type": "image",
+    "tags": ["night", "prayer"],
+    "brandColor": "#EBBD10" 
+  },
+  {
+    "id": 36,
+    "title": "Call For Financial Service",
+    "tagline": "Kingdom economics 101",
+    "media": "/church/cffs.jpg",
+    "slug": "callforfinancialservice",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#CE2310" 
+  }
+  
+  
+]

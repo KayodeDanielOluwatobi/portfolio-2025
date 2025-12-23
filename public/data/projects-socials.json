@@ -10,8 +10,8 @@
   {
     "id": 2,
     "title": "Campaign",
-    "slug": "campaign",
-    "media": "/socials/campaign.jpg",
+    "slug": "student-campaign",
+    "media": "/socials/jet8.jpg",
     "type": "image",
     "order": 7
   },
@@ -155,7 +155,7 @@
     "id": 20,
     "title": "Bluegine",
     "slug": "bluegine",
-    "media": "/socials/carl.jpg",
+    "media": "/socials/blue1.jpg",
     "type": "image",
     "order": 20
   },

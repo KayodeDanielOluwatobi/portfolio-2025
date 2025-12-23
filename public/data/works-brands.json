@@ -1,0 +1,62 @@
+[
+  {
+    "id": 4,
+    "title": "The Indomitables",
+    "tagline": "We are Indomitable",
+    "media": "/projects/indomitables-thumb.png",
+    "slug": "indomitables",
+    "type": "image",
+    "tags": ["branding", "community"],
+    "brandColor": "#fbecf4"
+  },
+  {
+    "id": 3,
+    "title": "SampaSend",
+    "tagline": "Blink. It's done. It's in our DNA",
+    "media": "/works-thumbnail/sampasend-thumb.jpg",
+    "slug": "sampasend",
+    "type": "image",
+    "tags": ["Branding", "fintech"],
+    "brandColor": "#e9f3ff"
+  },
+  {
+    "id": 2,
+    "title": "CONCES",
+    "tagline": "Christ at the core of every innovation",
+    "media": "/works-thumbnail/conces-thumb.avif",
+    "slug": "conces",
+    "type": "image",
+    "tags": ["Branding", "organization"],
+    "brandColor": "#c7c8e1"
+  },
+  {
+    "id": 1,
+    "title": "Jael",
+    "tagline": "Confidence in every stitch",
+    "media": "/works-thumbnail/jael-thumb-2.avif",
+    "slug": "jael",
+    "type": "image",
+    "tags": ["Branding", "fashion"],
+    "brandColor": "#EDCAF4"
+  },
+  {
+    "id": 5,
+    "title": "Mamakay",
+    "tagline": " ",
+    "media": "/works-thumbnail/mamakay-thumb.png",
+    "slug": "mamakay",
+    "type": "image",
+    "tags": ["Branding", "ecommerce"],
+    "brandColor": "#ffeeec"
+  },
+  {
+    "id": 5,
+    "title": "Daiel",
+    "tagline": " ",
+    "media": "/works-thumbnail/daiel-thumb.png",
+    "slug": "daiel",
+    "type": "image",
+    "tags": ["Branding", "tech"],
+    "brandColor": "#f5f8fe"
+  }
+]

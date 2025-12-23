@@ -13,12 +13,6 @@ interface SpotifyTrack {
   duration_ms: number;
 }
 
-interface CurrentlyPlayingResponse {
-  item: SpotifyTrack | null;
-  is_playing: boolean;
-  progress_ms: number;
-}
-
 // Color extraction utilities
 function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
   r /= 255;
@@ -36,15 +30,9 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
     switch (max) {
-      case r:
-        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-        break;
-      case g:
-        h = ((b - r) / d + 2) / 6;
-        break;
-      case b:
-        h = ((r - g) / d + 4) / 6;
-        break;
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
     }
   }
 
@@ -259,19 +247,24 @@ export async function GET(request: NextRequest) {
     const accessToken = await getAccessToken();
 
     // Get currently playing
-    let currentlyPlaying = await getCurrentlyPlaying(accessToken);
+    const currentlyPlaying = await getCurrentlyPlaying(accessToken);
 
-    // If nothing playing, get recently played
     let track = null;
     let isPlaying = false;
     let progressMs = 0;
+    
+    // NEW LOGIC: Track if we are using fallback data
+    let isLastPlayed = false;
 
     if (currentlyPlaying && currentlyPlaying.item) {
+      // Scenario A: Active Session (Playing or Paused)
       track = currentlyPlaying.item;
       isPlaying = currentlyPlaying.is_playing;
       progressMs = currentlyPlaying.progress_ms || 0;
     } else {
+      // Scenario B: No Session (Last Played History)
       track = await getRecentlyPlayed(accessToken);
+      isLastPlayed = true; 
     }
 
     if (!track) {
@@ -301,6 +294,7 @@ export async function GET(request: NextRequest) {
       },
       isPlaying,
       progressMs,
+      isLastPlayed, // Sending this to frontend to handle greyscale logic
       colors,
       timestamp: Date.now(),
     };

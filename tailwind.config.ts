@@ -21,6 +21,8 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
+        
+        'din': ['DIN Next LT Pro', 'Apple SD Gothic Neo', 'Malgun Gothic', 'sans-serif'],
         'inter': ['var(--font-inter)', 'sans-serif'],
         'outfit': ['var(--font-outfit)', 'sans-serif'],
         'poppins': ['var(--font-poppins)', 'sans-serif'],

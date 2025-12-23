@@ -33,7 +33,6 @@ interface AudioVisualizerProps {
 }
 
 const FRAME_TIMING_MS = 11.6;
-const MAX_BARS = 20;
 
 function hashCode(str: string): number {
   let hash = 0;
@@ -183,7 +182,9 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   staggerAmount = 0.3,
   decayFactor = 0.15,
 }) => {
-  const controls = Array.from({ length: MAX_BARS }, () => useAnimationControls());
+  // ✅ FIX: Use ONE single hook for all bars
+  const controls = useAnimationControls();
+  
   const frameRef = useRef<number>();
   const startTimeRef = useRef<number>(Date.now());
   const previousHeightsRef = useRef<number[]>([]);
@@ -212,27 +213,35 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       const elapsedTime = (Date.now() - startTimeRef.current) / 1000;
       const hasFrequencyData = frequencyData && frequencyData.length > 0;
 
+      // 1. Calculate heights for THIS frame
       const newHeights: number[] = [];
+      let calculatedHeights: number[] = [];
 
-      controls.slice(0, barCount).forEach((control, index) => {
+      // Pre-calculate audio data based heights if available
+      if (hasFrequencyData) {
+        const frameData = frequencyData![currentFrameIndex];
+        if (frameData) {
+          calculatedHeights = mapFrequencyToBars(
+            frameData,
+            barCount,
+            maxHeight,
+            restHeight,
+            maxFrequencies,
+            previousHeightsRef.current,
+            decayFactor,
+            staggerAmount
+          );
+        }
+      }
+
+      // 2. Loop through every bar to determine its specific height
+      for (let index = 0; index < barCount; index++) {
         let height = restHeight;
 
-        if (hasFrequencyData) {
-          const frameData = frequencyData![currentFrameIndex];
-          if (frameData) {
-            const heights = mapFrequencyToBars(
-              frameData,
-              barCount,
-              maxHeight,
-              restHeight,
-              maxFrequencies,
-              previousHeightsRef.current,
-              decayFactor,
-              staggerAmount
-            );
-            height = heights[index] || restHeight;
-          }
+        if (hasFrequencyData && calculatedHeights.length > 0) {
+           height = calculatedHeights[index] || restHeight;
         } else {
+          // Fallback patterns
           const baseFreq = 0.005 * animationSpeed;
 
           switch (finalPattern) {
@@ -276,18 +285,19 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
                 (Math.sin(elapsedTime * baseFreq + index * 0.5) * 0.5 + 0.5) * maxHeight;
           }
         }
-
+        
         height = Math.max(restHeight, Math.min(height, maxHeight + restHeight));
         newHeights.push(height);
+      }
 
-        control.start({
-          height,
-          transition: { duration: 0.1, ease: 'easeOut' },
-        });
-      });
-
-      // Store heights for next frame's decay calculation
+      // 3. Store for next frame
       previousHeightsRef.current = newHeights;
+
+      // 4. Broadcast animation to ALL bars using their index
+      controls.start((index) => ({
+        height: newHeights[index],
+        transition: { duration: 0.1, ease: 'easeOut' },
+      }));
 
       frameRef.current = requestAnimationFrame(animateBars);
     };
@@ -308,6 +318,9 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     currentFrameIndex,
     restHeight,
     maxFrequencies,
+    controls, // Added controls to dependency array
+    decayFactor,
+    staggerAmount
   ]);
 
   // Calculate dynamic width based on bars, barWidth, and barSpacing
@@ -324,7 +337,8 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       {Array.from({ length: barCount }).map((_, index) => (
         <motion.div
           key={index}
-          animate={controls[index]}
+          custom={index} // ✅ Pass index so controls.start((i) => ...) knows which bar is which
+          animate={controls} // ✅ Connect the single control hook
           style={{
             width: `${barWidth}px`,
             backgroundColor: barColor,
@@ -340,5 +354,3 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
 };
 
 export default AudioVisualizer;
-
-

@@ -20,6 +20,7 @@ interface SpotifyTrackData {
     duration: number;
   };
   isPlaying: boolean;
+  isLastPlayed?: boolean; // Added optional property
   progressMs: number;
   colors: {
     barColor: string;
@@ -50,20 +51,22 @@ export default function SpotifyWidget({
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [progressMs, setProgressMs] = useState(0);
 
-  const { frequencyData } = useFrequencyData(track?.track?.id || null);
+  // Hook for frequency data - only active if actually playing
+  const { frequencyData } = useFrequencyData(track?.isPlaying ? track?.track?.id : null);
 
   const [isMobile, setIsMobile] = useState(false);
 
-useEffect(() => {
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth < 768); // 768px is md breakpoint
-  };
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); 
+    };
 
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-  return () => window.removeEventListener('resize', checkMobile);
-}, []);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
+  // Loader animation loop
   useEffect(() => {
     if (isLoading && !fadeOut) {
       const interval = setInterval(() => {
@@ -74,6 +77,7 @@ useEffect(() => {
     }
   }, [isLoading, fadeOut]);
 
+  // Progress Bar ticker (Only runs if playing)
   useEffect(() => {
     if (!track?.isPlaying) return;
 
@@ -94,6 +98,8 @@ useEffect(() => {
 
       const data: SpotifyTrackData = await response.json();
       setTrack(data);
+      
+      // Update progress. If paused or last played, this will stay static.
       setProgressMs(data.progressMs);
 
       setFadeOut(true);
@@ -115,11 +121,15 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [pollInterval]);
 
+  useEffect(() => {
+  console.log(`🎵 Widget Polling set to: ${pollInterval}ms`);
+  }, [pollInterval]);
+
   return (
     <Squircle
-      cornerRadius={isMobile ? 30 : 50} //16 for mobile, 30 for desktop
+      cornerRadius={isMobile ? 40 : 50} 
       cornerSmoothing={0.7}
-      className={`relative w-full h-full overflow-hidden shadow-xl shadow-black/50 border-white/0  ${className}`}
+      className={`relative w-full h-full overflow-hidden shadow-xl shadow-black/50 border-white/0 ${className}`}
       style={width || height ? {
         width: width ? `${width}px` : '100%',
         height: height ? `${height}px` : undefined,
@@ -128,11 +138,13 @@ useEffect(() => {
       {/* Background: Album Art */}
       {track && (
         <div 
-          className="absolute inset-0"
+          className="absolute inset-0 transition-all duration-700 ease-in-out"
           style={{
             backgroundImage: `url(${track.track.albumArt})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            // GREYSCALE LOGIC: Only greyscale if it is Last Played history. If just paused, keep color.
+            filter: track.isLastPlayed ? 'grayscale(100%) brightness(0.5)' : 'none',
           }}
         />
       )}
@@ -149,9 +161,9 @@ useEffect(() => {
         >
           <CircularWaveProgress
             progress={loaderProgress}
-            size={isMobile ? 50 : 70}              // Smaller on mobile
-            trackWidth={isMobile ? 5 : 6}          // Scale proportionally
-            waveWidth={isMobile ? 5 : 6}           // Scale proportionally
+            size={isMobile ? 50 : 70}
+            trackWidth={isMobile ? 5 : 6}
+            waveWidth={isMobile ? 5 : 6}
             trackColor="#475569"
             waveColor="#cbd5e1"
             waveAmplitude={isMobile ? 2 : 3}
@@ -173,10 +185,16 @@ useEffect(() => {
         style={{ minHeight: height ? `${height}px` : undefined }}
       >
         
-        {/* Top: "Currently listening to" text */}
+        {/* Top: Status Text */}
         <div className="mb-5 md:mb-auto -mt-1 md:-mt-1">
-          <span className="text-xs md:text-sm opacity-55 font-light md:font-regular  text-zinc-50 tracking-wider">
-            I'm Currently listening to...
+          <span className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
+             {/* TEXT LABEL LOGIC */}
+             {track?.isPlaying 
+              ? "I'm Currently listening to . . ." 
+              : track?.isLastPlayed 
+                ? "Last played . . ." 
+                : "Paused . . ." 
+            }
           </span>
         </div>
 
@@ -189,12 +207,15 @@ useEffect(() => {
               className="text-base font-bold text-white mb-1 leading-tight"
               speed={20}
               gap={20}
+              // Optional: Pause marquee if song is not playing
+              play={true} 
             />
             <MarqueeText
               text={track?.track.artist || 'Loading...'}
               className="text-sm text-zinc-50 leading-tight"
               speed={20}
               gap={20}
+              play={true}
             />
           </div>
 
@@ -208,7 +229,7 @@ useEffect(() => {
               className="text-green-500"
             />
 
-            {/* Subtle playback indicator - positioned at top-right of Spotify logo */}
+            {/* Subtle playback indicator - Only show if playing */}
             {track?.isPlaying && (
               <motion.div
                 className="absolute w-2 h-2 rounded-full z-20"
@@ -224,30 +245,32 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Bottom: Audio Visualizers (Side-by-side, one mirrored) */}
+        {/* Bottom: Audio Visualizers */}
         {track && (
-          <div className="mt-auto flex flex-row justify-start items-center gap-1 ">
-            
-            {/* This is the FIRST visualizer (normal) */}
+          <div 
+            className={`mt-auto flex flex-row justify-start items-center gap-1 transition-all duration-500
+             ${track.isLastPlayed ? 'opacity-50 grayscale' : 'opacity-100'} 
+            `}
+          >
+            {/* Visualizer 1 */}
             <AudioVisualizer
               barCount={3}
-              pulsePattern="mirror"
+              pulsePattern="wave"
               barColor={track.colors.barColor}
               barWidth={6}
               barSpacing={4}
               maxHeight={100}
               containerHeight={50}
-              staggerAmount={0.2}  // More stagger
-              decayFactor={0.3}    // More lag
-              //containerWidth="40px"
+              staggerAmount={0.2} 
+              decayFactor={0.3} 
               animationSpeed={1.2}
               restHeight={2}
               frequencyData={frequencyData || undefined}
               currentProgressMs={progressMs}
             />      
 
+            {/* Visualizer 2 (Atmosphere) */}
             <AudioVisualizer
-              //className="scale-x-[-1] " 
               barCount={3}
               pulsePattern="mirror"
               barColor={track.colors.barColor}
@@ -255,15 +278,13 @@ useEffect(() => {
               barSpacing={4}
               maxHeight={75}
               containerHeight={50}
-              staggerAmount={0.6}  // More stagger
-              decayFactor={0.7}    // More lag
-              //containerWidth="40px"
+              staggerAmount={0.6}
+              decayFactor={0.7} 
               animationSpeed={0.3}
               restHeight={2}
               frequencyData={frequencyData || undefined}
               currentProgressMs={progressMs}
             />
-
           </div>
         )}
       </div>

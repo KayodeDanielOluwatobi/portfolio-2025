@@ -1,0 +1,403 @@
+[
+  {
+    "id": 1,
+    "title": "LinkedIn Flyer",
+    "tagline": "Boss energy in blush tones.",
+    "media": "/socials/DOC-20250519-WA0051.avif",
+    "slug": "linkedinflyer",
+    "type": "image",
+    "tags": ["LinkedIn", "Flyer"],
+    "brandColor": "#F71F50"
+  },
+  {
+    "id": 2,
+    "title": "BootClass Examspiration",
+    "tagline": "Your Daily Exam Ammunition",
+    "media": [
+      "/socials/boot1.jpg",
+      "/socials/boot2.jpg",
+      "/socials/boot3.jpg",
+      "/socials/boot4.jpg",
+      "/socials/boot5.jpg",
+      "/socials/boot6.jpg"
+    
+    ],
+    "slug": "bootclass-examspiration",
+    "type": "image",
+    "tags": ["bootclass", "Flyer"],
+    "brandColor": "#FFFFFF"
+  },
+  {
+    "id": 2,
+    "title": "BootClass Examspiration",
+    "tagline": "Fuel For The Grind",
+    "media": [
+      "/socials/boot7.jpg",
+      "/socials/boot8.jpg",
+      "/socials/boot9.jpg",
+      "/socials/boot10.jpg",
+      "/socials/boot11.jpg",
+      "/socials/boot12.jpg"
+    ],
+    "slug": "bootclass-examspiration",
+    "type": "image",
+    "tags": ["bootclass", "Flyer"],
+    "brandColor": "#FFFFFF"
+  },
+  {
+    "id": 2,
+    "title": "BootClass Examspiration",
+    "tagline": "Your Daily Study Vitamin",
+    "media": [
+      "/socials/boot13.jpg",
+      "/socials/boot14.jpg",
+      "/socials/boot15.jpg",
+      "/socials/boot16.jpg",
+      "/socials/boot17.jpg",
+      "/socials/boot18.jpg"
+    ],
+    "slug": "bootclass-examspiration",
+    "type": "image",
+    "tags": ["bootclass", "Flyer"],
+    "brandColor": "#FFFFFF"
+  },
+  {
+    "id": 3,
+    "title": "Unideals New Year Flyer",
+    "tagline": "Happy New Year",
+    "media": "/socials/unidelas.jpg",
+    "slug": "unideals",
+    "type": "image",
+    "tags": ["Unideals", "Flyer"],
+    "brandColor": "#FF3F50"
+  },
+  {
+    "id": 3,
+    "title": "Exam Countdown '25",
+    "tagline": "God Abeg",
+    "media": [
+      "/socials/3.jpg",
+      "/socials/2.jpg",
+      "/socials/1.jpg",
+      "/socials/0.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#FFFFFF"
+  },
+  {
+    "id": 4,
+    "title": "Unideals New Month Flyer",
+    "tagline": "Happy New Month",
+    "media": "/socials/unifeb.jpg",
+    "slug": "unideals",
+    "type": "image",
+    "tags": ["Unideals", "Flyer"],
+    "brandColor": "#FF3F50"
+  },
+  {
+    "id": 5,
+    "title": "Chocolate Puff",
+    "tagline": "Happy New year...Again",
+    "media": "/socials/puff.jpg",
+    "slug": "chefdan",
+    "type": "image",
+    "tags": ["CHEFDAN", "Flyer"],
+    "brandColor": "#FFBDA0"
+  },
+  {
+    "id": 6,
+    "title": "Convocation Package",
+    "tagline": "Cap, Gown, Chow Down",
+    "media": "/socials/convoc.jpg",
+    "slug": "chefdan",
+    "type": "image",
+    "tags": ["CHEFDAN", "Flyer"],
+    "brandColor": "#59EBC6"
+  },
+  {
+    "id": 7,
+    "title": "MarOs New Month Flyer",
+    "tagline": "April Clean Slate",
+    "media": "/socials/maros-april.jpg",
+    "slug": "maros",
+    "type": "image",
+    "tags": ["maros", "Flyer"],
+    "brandColor": "#A7FFCC"
+  },
+  {
+    "id": 8,
+    "title": "MarOs | Flyer *",
+    "tagline": "Earn Green",
+    "media": "/socials/maros.jpg",
+    "slug": "maros",
+    "type": "image",
+    "tags": ["maros", "Flyer"],
+    "brandColor": "#A7FFCC"
+  },
+  {
+    "id": 9,
+    "title": "Bluegine",
+    "tagline": "Ignite, Imagine, Inspire",
+    "media": "/socials/bluegine.jpg",
+    "slug": "bluegine",
+    "type": "image",
+    "tags": ["Bluegine", "Flyer"],
+    "brandColor": "#83C9F7"
+  },
+  {
+    "id": 10,
+    "title": "Bluegine | Carousel",
+    "tagline": "That Spark...",
+    "media": [
+      "/socials/blue1.jpg",
+      "/socials/blue2.jpg",
+      "/socials/blue3.jpg",
+      "/socials/blue4.jpg"
+    ],
+
+    "slug": "bluegine",
+    "type": "image",
+    "tags": ["Bluegine", "carousel"],
+    "brandColor": "#83C9F7"
+  },
+  {
+    "id": 11,
+    "title": "KashFox",
+    "tagline": "KashFox",
+    "media": "/socials/kashfox.jpg",
+    "slug": "kashfox",
+    "type": "image",
+    "tags": ["banner", "design"],
+    "brandColor": "#FFB083"
+  },
+  {
+    "id": 12,
+    "title": "Folu's Creation",
+    "tagline": ":-)",
+    "media": "/socials/folu.jpg",
+    "slug": "foluscreation",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#CFA78D"
+  },
+  {
+    "id": 13,
+    "title": "Merry Christmas",
+    "tagline": ":-)",
+    "media": "/socials/christmas.jpg",
+    "slug": "christmas2024",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#CCA8FF"
+  },
+  {
+    "id": 14,
+    "title": "Exam Countdown '25",
+    "tagline": "Operation 5.0",
+    "media": [
+      "/socials/4.jpg",
+      "/socials/5.jpg",
+      "/socials/6.jpg",
+      "/socials/7.jpg",
+      "/socials/8.jpg",
+      "/socials/9.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#FFD700"
+  },
+  {
+    "id": 15,
+    "title": "Exam Countdown '25",
+    "tagline": "The Academic Comeback",
+    "media": [
+      "/socials/10.jpg",
+      "/socials/11.jpg",
+      "/socials/12.jpg",
+      "/socials/13.jpg",
+      "/socials/14.jpg",
+      "/socials/15.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#007FFF"
+  },
+  {
+    "id": 16,
+    "title": "Exam Countdown '25",
+    "tagline": "Just One More Chapter...",
+    "media": [
+      "/socials/16.jpg",
+      "/socials/17.jpg",
+      "/socials/18.jpg",
+      "/socials/19.jpg",
+      "/socials/20.jpg",
+      "/socials/21.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#BF00FF"
+  },
+  {
+    "id": 17,
+    "title": "Exam Countdown '25",
+    "tagline": "The Clock is Ticking Loudly",
+    "media": [
+      "/socials/22.jpg",
+      "/socials/23.jpg",
+      "/socials/24.jpg",
+      "/socials/25.jpg",
+      "/socials/26.jpg",
+      "/socials/27.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#FFA500"
+  },
+  {
+    "id": 18,
+    "title": "Exam Countdown '25",
+    "tagline": "The Road to 5.0",
+    "media": [
+      "/socials/28.jpg",
+      "/socials/29.jpg",
+      "/socials/30.jpg",
+      "/socials/31.jpg",
+      "/socials/32.jpg",
+      "/socials/33.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#33CCFF"
+  },
+  {
+    "id": 19,
+    "title": "Exam Countdown '25",
+    "tagline": "Cold Hard Focus Required",
+    "media": [
+      "/socials/34.jpg",
+      "/socials/35.jpg",
+      "/socials/36.jpg",
+      "/socials/37.jpg",
+      "/socials/38.jpg",
+      "/socials/39.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#FFFFFF"
+  },
+  {
+    "id": 20,
+    "title": "Exam Countdown '25",
+    "tagline": "Plenty of Time... Or Is It?",
+    "media": [
+      "/socials/40.jpg",
+      "/socials/41.jpg",
+      "/socials/42.jpg",
+      "/socials/43.jpg"
+      
+    ],
+    "slug": "examcountdown-2025",
+    "type": "image",
+    "tags": ["countdown", "Flyer"],
+    "brandColor": "#00FFFF"
+  },
+
+  {
+    "id": 21,
+    "title": "Student Campaign",
+    "tagline": "Trust The Process",
+    "media": [
+      "/socials/jet4.jpg",
+      "/socials/jet1.jpg",
+      "/socials/jet2.jpg",
+      "/socials/jet3.jpg"
+      
+    ],
+    "slug": "student-campaign",
+    "type": "image",
+    "tags": ["campaign", "Flyer"],
+    "brandColor": "#CCA8FF"
+  },
+
+  {
+    "id": 22,
+    "title": "Student Campaign",
+    "tagline": "Secure The Mandate",
+    "media": [
+      "/socials/jet8.jpg",
+      "/socials/jet5.jpg",
+      "/socials/jet7.jpg"
+
+      
+    ],
+    "slug": "student-campaign",
+    "type": "image",
+    "tags": ["campaign", "Flyer"],
+    "brandColor": "#CCA8FF"
+  },
+
+  {
+    "id": 23,
+    "title": "Student Campaign",
+    "tagline": "Charting A New Path",
+    "media": [
+      "/socials/jet6.jpg",
+      "/socials/jet9.jpg",
+      "/socials/jet10.jpg"
+      
+    ],
+    "slug": "student-campaign",
+    "type": "image",
+    "tags": ["campaign", "Flyer"],
+    "brandColor": "#CCA8FF"
+  },
+
+  {
+    "id": 24,
+    "title": "Afrolense*",
+    "tagline": "Beyond The Lens",
+    "media": "/socials/afrolens.jpg",
+    "slug": "afrolense",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#F5F5F5"
+  },
+
+  {
+    "id": 25,
+    "title": "Dael*",
+    "tagline": "Calculated Success",
+    "media": "/socials/dael.jpg",
+    "slug": "daiel",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#CCA8FF"
+  },
+
+  {
+    "id": 26,
+    "title": "Bluegine",
+    "tagline": "The Innovator's Community",
+    "media": "/socials/blue9.jpg",
+    "slug": "bluegine",
+    "type": "image",
+    "tags": ["flyer", "design"],
+    "brandColor": "#9932CC"
+  }
+]

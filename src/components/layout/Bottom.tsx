@@ -75,7 +75,19 @@ export default function Bottom() {
           {/* Brewed Line */}
           <div className="uppercase font-space text-xs text-white/40 tracking-wider text-center">
             <p className="uppercase">
-              Website Brewed From Bare Beans By <span> <a target='_blank' rel='noopener noreferrer' href='https://wa.me/message/JDKKXFLCFFYDB1' className='text-white/70'>Kayode Daniel </a> </span> — Ingredients: Nescafé, Midnight Inspiration And Kpop Instrumentals On Repeat...
+              Website Brewed From Bare Beans By{' '}
+              <span>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://wa.me/message/JDKKXFLCFFYDB1"
+                  className="text-white/70"
+                >
+                  Kayode Daniel{' '}
+                </a>
+              </span>{' '}
+              {/* 👇 The Fix: Wrapped 'é' in a span using a standard font */}
+              — Ingredients: Nescaf<span className="font-sans font-medium">é</span>, Midnight Inspiration And Kpop Instrumentals On Repeat...
             </p>
           </div>
 

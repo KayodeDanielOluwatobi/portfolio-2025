@@ -1,3 +1,5 @@
+//font.ts
+
 import localFont from 'next/font/local';
 
 export const sohneMono = localFont({
@@ -77,5 +79,33 @@ export const array = localFont({
     },
   ],
   variable: '--font-array',
+  display: 'swap',
+});
+
+
+export const monoblock = localFont({
+  src: [
+    {
+      path: './fonts/monoblock/MonoblockDemo-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/monoblock/MonoblockDemo-Thin.woff2',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: './fonts/monoblock/MonoblockDemo-Light.woff2',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: './fonts/monoblock/MonoblockDemo-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-monoblock',
   display: 'swap',
 });

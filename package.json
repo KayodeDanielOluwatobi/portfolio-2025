@@ -14,6 +14,7 @@
     "@heroui/skeleton": "^2.2.17",
     "@mui/material": "^7.3.4",
     "@squircle-js/react": "^1.2.18",
+    "@supabase/supabase-js": "^2.84.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
@@ -31,11 +32,13 @@
     "react-masonry-css": "^1.0.16",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
+    "vibrant": "^0.0.1",
     "weather-icons-react": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/imagesloaded": "^4.1.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -1,8 +1,16 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { createClient } from '@supabase/supabase-js'; // 1. Import Supabase
 import ProjectCard from '@/components/ui/ProjectCard';
 import imagesLoaded from 'imagesloaded';
+import TextPressure from '@/components/TextPressure';
+
+// 2. Initialize Client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface Socials {
   id: number;
@@ -26,12 +34,35 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
   const [columnCount, setColumnCount] = useState(5);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // --- Resize Handler ---
+  const [isMounted, setIsMounted] = useState(false);
+  const [pressureFontSize, setPressureFontSize] = useState(120);
+
+  // --- Resize Handler for TextPressure ---
+  useEffect(() => {
+    setIsMounted(true);
+    
+    const handleResize = () => {
+      const mobileSize = 50;    
+      const desktopSize = 120;  
+      const breakpoint = 521;   
+
+      setPressureFontSize(
+        window.innerWidth < breakpoint ? mobileSize : desktopSize
+      );
+    };
+  
+    handleResize(); 
+    window.addEventListener('resize', handleResize); 
+  
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // --- Resize Handler for Layout ---
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      setCornerRadius(window.innerWidth >= 1024 ? 30 : 30);
+      setCornerRadius(window.innerWidth >= 1024 ? 0 : 0); 
 
       if (window.innerWidth < 640) setColumnCount(2);
       else if (window.innerWidth < 768) setColumnCount(3);
@@ -44,20 +75,23 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Fetch Socials Data ---
+  // --- Fetch Socials Data (UPDATED FOR SUPABASE) ---
   useEffect(() => {
     const fetchSocials = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/data/projects-socials.json');
-        if (!response.ok) throw new Error('Failed to fetch');
-        const data = await response.json();
+        // 3. Fetch from 'featuredsocials' table
+        const { data, error } = await supabase
+          .from('featuredsocials')
+          .select('*')
+          .order('order', { ascending: true }) // Sort by order in DB
+          .limit(limit);                       // Limit in DB
 
-        const sortedData = data
-          .sort((a: Socials, b: Socials) => (a.order || Infinity) - (b.order || Infinity))
-          .slice(0, limit);
+        if (error) throw error;
 
-        setSocials(sortedData);
+        if (data) {
+          setSocials(data as Socials[]);
+        }
       } catch (error) {
         console.error('Fetch error:', error);
       } finally {
@@ -114,10 +148,9 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
 
     if (!columns.length) return;
 
-    // Wait for images to load
     const imgLoad = imagesLoaded(container);
 
-    imgLoad.on('always', () => {
+    const handleImagesLoaded = () => {
       const heights = columns.map((col) => col.scrollHeight);
       const maxHeight = Math.max(...heights);
 
@@ -133,12 +166,12 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
           col.style.transform = 'translateY(0px)';
         }
       });
-    });
+    };
+
+    imgLoad.on('always', handleImagesLoaded);
 
     return () => {
-      if (imgLoad && typeof imgLoad.off === 'function') {
-        imgLoad.off('always');
-      }
+      imgLoad.off('always', handleImagesLoaded);
     };
   }, [isBottomAligned, loading]);
 
@@ -156,9 +189,20 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
   return (
     <section className="w-full font-space py-16 bg-black">
       <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
-        <h2 className="pl-3 font-space text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase text-white/100 mb-12">
-          Social Media Designs
-        </h2>
+        
+        <TextPressure className='ml-2 mb-8'
+          text="SOCIAL MEDIA DESIGNS"
+          flex={false}
+          alpha={false}
+          stroke={false}
+          width={true}
+          weight={true}
+          italic={true}
+          textColor="#ffffff"
+          strokeColor="#ff0000"
+          minFontSize={36}
+          fixedFontSize={pressureFontSize}
+        />
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
@@ -179,7 +223,7 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
                         media={social.media}
                         type={social.type}
                         aspectRatio="auto"
-                        cornerRadius={cornerRadius}
+                        cornerRadius={30}
                       />
                     </div>
                   ))}
@@ -188,13 +232,13 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
             </div>
 
             {/* Gradient Overlay */}
-            <div className="absolute -bottom-1 left-0 opacity-90 -right-1 h-64 pointer-events-none bg-gradient-to-t from-black via-black/70 to-transparent" />
+            <div className="absolute -bottom-1 left-0 opacity-50 -right-1 h-64 pointer-events-none bg-gradient-to-t from-black via-black/60 to-transparent" />
 
             {/* View All Button */}
             <div className="absolute bottom-5 left-0 right-0 flex justify-center z-10">
               <a
-                href="/social-media"
-                className="scale-70 md:scale-80 text-center text-xs px-8 py-3 border-2 md:border-3 border-white/60 text-white font-space md:text-sm uppercase tracking-wider hover:border-white/90 hover:bg-white/5 hover:scale-75 md:hover:scale-85 transition-all duration-300 rounded-[12px]"
+                href="/works?category=socials"
+                className="scale-70 md:scale-80 text-center text-xs px-8 py-3 border-2 md:border-3 border-white/60 text-white font-space md:text-sm uppercase tracking-wider hover:border-white/90 hover:bg-white/5 hover:scale-75 md:hover:scale-85 transition-all duration-300 rounded-[15px]"
               >
                 View All Social Media Designs
               </a>

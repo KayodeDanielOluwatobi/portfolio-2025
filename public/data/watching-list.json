@@ -1,0 +1,26 @@
+[
+    {
+        "id": "1",
+        "title": "Abstract: The Art of Design",
+        "platform": "Netflix",
+        "cover": "/shows/abstract.jpg",
+        "category": "Design",
+        "status": "Watching"
+    },
+    {
+        "id": "2",
+        "title": "Black Mirror",
+        "platform": "Netflix",
+        "cover": "/shows/black-mirror.jpg",
+        "category": "Sci-Fi",
+        "status": "Waiting for new season"
+    },
+    {
+        "id": "3",
+        "title": "Silicon Valley",
+        "platform": "HBO",
+        "cover": "/shows/silicon-valley.jpg",
+        "category": "Tech Comedy",
+        "status": "Completed"
+    }
+]

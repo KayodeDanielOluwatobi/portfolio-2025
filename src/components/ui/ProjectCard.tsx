@@ -19,7 +19,7 @@ export default function ProjectCard({ title, slug, media, type, cornerRadius = 3
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <Link href={`/projects/${slug}`}>
+    <Link href={`/works/${slug}`}>
       <Squircle
         cornerRadius={cornerRadius}
         cornerSmoothing={0.7}

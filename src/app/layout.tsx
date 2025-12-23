@@ -1,11 +1,15 @@
+//layout.tsx
+
+
 import type { Metadata } from 'next'
-import { Inter, Outfit, Poppins, DM_Sans } from 'next/font/google'
+import { Inter, Outfit, Poppins, DM_Sans,} from 'next/font/google'
 import { Space_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from '@/lib/theme-provider'
 import { SmoothCursor } from '@/components/layout/SmoothCursor'
 import { array } from './fonts';
+import { monoblock } from './fonts'
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -42,6 +46,7 @@ const spaceMono = Space_Mono({
   variable: '--font-space-mono',
 })
 
+
 const sohnemono1 = localFont({
   src: './fonts/sohnemono1.woff2',
   variable: '--font-sohne-mono-1'
@@ -57,6 +62,11 @@ const dotted = localFont({
   variable: '--font-dotted'
 })
 
+const din = localFont({
+  src: './fonts/DIN Next Rounded LT W01 Regular.woff2',
+  variable: '--font-din'
+})
+
 export const metadata: Metadata = {
   title: 'everdann designs - Visual Designer',
   description: 'Graphic design portfolio by Daniel Kayode',
@@ -69,7 +79,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${dm_sans.variable} ${crux.variable} ${dotted.variable} ${outfit.variable} ${poppins.variable} ${array.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable} ${spaceMono.variable} antialiased`}>
+      <body className={`${inter.variable} ${spaceMono.variable} ${din.variable} ${dm_sans.variable} ${crux.variable} ${dotted.variable} ${monoblock.variable} ${outfit.variable} ${poppins.variable} ${array.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable}  antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
