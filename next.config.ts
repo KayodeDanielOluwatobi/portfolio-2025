@@ -1,19 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     // !! WARN !!
     // Dangerously allow production builds to successfully complete even if
     // your project has type errors.
     ignoreBuildErrors: true,
   },
-  
   images: {
     remotePatterns: [
       {
@@ -32,12 +25,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'books.googleusercontent.com',
       },
-      // TMDB images
       {
         protocol: 'https',
         hostname: 'image.tmdb.org',
       },
-      // Add this block for Supabase Storage
       {
         protocol: 'https',
         hostname: 'wnkbjxsnjquryyojfxmx.supabase.co',
