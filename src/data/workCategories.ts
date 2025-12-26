@@ -8,7 +8,7 @@ export const WORK_CATEGORIES = [
   {
     id: 'socials',
     label: 'Social Media',
-    subtitle: 'Visual Content that makes the algorithm question its life choices',
+    subtitle: 'Visual content that makes the algorithm question its life choices',
     color: '#FFFFFF',
   },
   {
