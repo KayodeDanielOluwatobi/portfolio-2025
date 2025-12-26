@@ -15,6 +15,7 @@
     "@mui/material": "^7.3.4",
     "@squircle-js/react": "^1.2.18",
     "@supabase/supabase-js": "^2.84.0",
+    "@vercel/analytics": "^1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
