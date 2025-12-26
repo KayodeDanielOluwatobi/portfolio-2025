@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react'; // Added Suspense import
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/layout/Header';
@@ -9,29 +9,36 @@ import CategoryNav from '@/components/works/CategoryNav';
 import WorksGrid from '@/components/works/WorksGrid';
 import { motion } from 'framer-motion';
 import TextPressure from '@/components/TextPressure';
-import ViewportIndicator from '@/components/layout/ViewportIndicator';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
+// 👇 NEW IMPORTS FOR CURSOR
+import { CursorProvider, useCursor } from '@/context/CursorContext';
+import { SmoothCursor } from '@/components/layout/SmoothCursor';
 
-// 1. Initialize Supabase Client
+// 1. Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// --- NEW COMPONENT: Holds all your original logic ---
+// 👇 CURSOR CONTROLLER: Reads context and passes colors to SmoothCursor
+function CursorController() {
+  const { cursorColor, cursorStrokeColor } = useCursor();
+  return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
+}
+
+// 👇 MAIN CONTENT LOGIC
 function WorksContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // State
   const [activeCategory, setActiveCategory] = useState('brands');
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [pressureFontSize, setPressureFontSize] = useState(192); // Default Desktop
+  const [pressureFontSize, setPressureFontSize] = useState(192);
 
-  // Sync activeCategory with URL on mount
+  // Sync URL
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
     if (categoryFromUrl && ['brands', 'socials', 'church'].includes(categoryFromUrl)) {
@@ -39,37 +46,26 @@ function WorksContent() {
     }
   }, [searchParams]);
 
-  // Handle category change
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
     router.push(`/works?category=${categoryId}`, { scroll: false });
   };
 
-  // --- 2. FETCH DATA FROM SUPABASE ---
+  // FETCH DATA & AUTO-FIX COLORS
   useEffect(() => {
     const fetchWorks = async () => {
       setLoading(true);
-      setWorks([]); // Clear current works to show loading skeleton
+      setWorks([]); 
 
       try {
         let tableName = '';
-        
-        // Map category ID to Supabase Table Name
         switch (activeCategory) {
-          case 'brands':
-            tableName = 'works_brands';
-            break;
-          case 'socials':
-            tableName = 'works_socials';
-            break;
-          case 'church':
-            tableName = 'works_church';
-            break;
-          default:
-            tableName = 'works_brands';
+          case 'brands': tableName = 'works_brands'; break;
+          case 'socials': tableName = 'works_socials'; break;
+          case 'church': tableName = 'works_church'; break;
+          default: tableName = 'works_brands';
         }
 
-        // Fetch from the correct table, sorted by rank
         const { data, error } = await supabase
           .from(tableName)
           .select('*')
@@ -79,6 +75,45 @@ function WorksContent() {
 
         if (data) {
           setWorks(data);
+
+          // AUTO-FIX MISSING COLORS
+          const missingColors = data.filter((item: any) => !item.brand_color || item.brand_color === '');
+          
+          if (missingColors.length > 0) {
+            console.log(`🎨 Auto-fixing ${missingColors.length} colors in ${tableName}...`);
+            
+            missingColors.forEach(async (item: any) => {
+              const mediaUrl = Array.isArray(item.media) ? item.media[0] : item.media;
+              
+              if (mediaUrl) {
+                try {
+                  const response = await fetch('/api/works/update-color', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      id: item.id,
+                      imageUrl: mediaUrl,
+                      tableName: tableName
+                    })
+                  });
+
+                  const result = await response.json();
+
+                  if (result.success && result.color) {
+                    setWorks(prevWorks => 
+                      prevWorks.map(work => 
+                        work.id === item.id 
+                          ? { ...work, brand_color: result.color } 
+                          : work
+                      )
+                    );
+                  }
+                } catch (err) {
+                  console.error('Auto-fix failed for item', item.id, err);
+                }
+              }
+            });
+          }
         }
       } catch (error) {
         console.error(`Error loading ${activeCategory}:`, error);
@@ -90,18 +125,10 @@ function WorksContent() {
     fetchWorks();
   }, [activeCategory]);
 
-  // Handle responsive font sizing for Title
   useEffect(() => {
     const handleResize = () => {
-      const mobileSize = 120;
-      const desktopSize = 192;
-      const breakpoint = 520;
-
-      setPressureFontSize(
-        window.innerWidth < breakpoint ? mobileSize : desktopSize
-      );
+      setPressureFontSize(window.innerWidth < 520 ? 120 : 192);
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -116,7 +143,6 @@ function WorksContent() {
       <section className="w-full py-32 bg-black min-h-screen">
         <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
           
-          {/* MY WORK Title */}
           <motion.div 
             className="mb-20"
             initial={{ opacity: 0, y: 20 }}
@@ -138,7 +164,6 @@ function WorksContent() {
             />
           </motion.div>
 
-          {/* Category Navigation */}
           <div className="mb-0 md:mb-6">
             <CategoryNav 
               activeCategory={activeCategory}
@@ -146,7 +171,6 @@ function WorksContent() {
             />
           </div>
 
-          {/* Category Subtitle */}
           <motion.p 
             key={activeCategory}
             className="text-white/60 font-thin text-lg md:text-2xl tracking-wide mb-12"
@@ -157,17 +181,15 @@ function WorksContent() {
             {activeCategory_obj?.subtitle}
           </motion.p>
 
-          {/* Works Grid with Loading Prop */}
           <WorksGrid 
             works={works} 
             activeCategory={activeCategory} 
-            isLoading={loading} // Pass loading state to Grid
+            isLoading={loading} 
           />
 
         </div>
       </section>
 
-      {/* <ViewportIndicator /> */}
       <Footer3 />
       <Bottom />
 
@@ -175,12 +197,17 @@ function WorksContent() {
   );
 }
 
-// --- MAIN PAGE COMPONENT: WRAPS CONTENT IN SUSPENSE ---
+// 👇 ROOT EXPORT: Wraps everything in Context & Suspense
 export default function Works() {
   return (
-    // This fallback shows a black screen while the search params load
     <Suspense fallback={<div className="min-h-screen w-full bg-black" />}>
-      <WorksContent />
+      <CursorProvider>
+        {/* The Controller sits here to grab the context values */}
+        <CursorController />
+        
+        {/* The Page Content sits here to trigger context updates */}
+        <WorksContent />
+      </CursorProvider>
     </Suspense>
   );
 }

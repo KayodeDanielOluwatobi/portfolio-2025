@@ -35,7 +35,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
   return (
     <>
       {/* MOBILE: Dropdown */}
-      <div ref={dropdownRef} className="md:hidden relative w-full">
+      <div ref={dropdownRef} className="md:hidden relative w-full select-none"> {/* Added select-none */}
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="flex items-center gap-2 pb-3"
@@ -82,7 +82,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                       onCategoryChange(category.id);
                       setIsDropdownOpen(false);
                     }}
-                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-white/5 last:border-b-0 ${
+                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-white/5 last:border-b-0 select-none ${
                       activeCategory === category.id
                         ? 'text-white bg-white/10'
                         : 'text-white/40 hover:text-white hover:bg-white/5'
@@ -99,7 +99,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
 
       {/* DESKTOP: Fancy Horizontal Layout */}
       <div 
-        className="hidden md:flex items-center gap-4"
+        className="hidden md:flex items-center gap-4 select-none" // Added select-none
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
@@ -108,15 +108,15 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
           
           {/* --- CHANGE 1 --- */}
           <motion.h2
-            key={activeCategory_obj.id} // Give it a key
-            layoutId={activeCategory_obj.id} // Give it the magic link
+            key={activeCategory_obj?.id} // Added optional chaining just in case
+            layoutId={activeCategory_obj?.id} 
             className="font-regular text-3xl text-white hover:text-white/80 transition-colors duration-300 pb-1 whitespace-nowrap"
             transition={{
               type: 'spring',
               stiffness: 200,
               damping: 25,
               mass: 0.8,
-            }} // Add a smooth transition
+            }} 
           >
             {activeCategory_obj?.label}
           </motion.h2>
@@ -145,7 +145,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                 // --- CHANGE 2 ---
                 <motion.button
                   key={category.id}
-                  layoutId={category.id} // Give it the magic link
+                  layoutId={category.id} 
                   onClick={() => {
                     onCategoryChange(category.id);
                     setIsHovering(false);
@@ -158,7 +158,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                     delay: index * 0.1,
                     ease: 'easeOut',
                   }}
-                  className="font-extralight text-3xl text-white/40 hover:text-white/70 transition-colors duration-300 whitespace-nowrap"
+                  className="font-extralight text-3xl text-white/40 hover:text-white/70 transition-colors duration-300 whitespace-nowrap select-none" // Added select-none
                 >
                   {category.label}
                 </motion.button>

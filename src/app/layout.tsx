@@ -89,7 +89,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* Global SmoothCursor - available on all pages */}
-          {/* <SmoothCursor cursorColor="#FFFFFF" cursorStrokeColor="#000000" /> //this line causes double cursor effect */}
+          {/* <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" /> */}
+          
           {children}
         </ThemeProvider>
       </body>

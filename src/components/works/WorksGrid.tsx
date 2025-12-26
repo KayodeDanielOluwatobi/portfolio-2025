@@ -1,3 +1,6 @@
+//WorksGrid.tsx
+
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -63,8 +66,9 @@ export default function WorksGrid({ works, activeCategory, isLoading }: WorksGri
               key={`${work.id}-${index}`} 
               {...work} 
               // IMPORTANT: Map Supabase snake_case to component camelCase
-              brandColor={work.brand_color} 
+               
               activeCategory={activeCategory} 
+              brandColor={work.brand_color || '#FFFFFF'}
             />
           ))}
         </motion.div>

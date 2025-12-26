@@ -1,3 +1,5 @@
+// src/components/works/WorkCard.tsx
+
 'use client';
 
 import Link from 'next/link';
@@ -6,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { darkenColor } from './ColorUtils';
 import { MarqueeText } from '@/components/ui/MarqueeText';
+import { useCursor } from '@/context/CursorContext'; // 👈 Import Context
 
 interface WorkCardProps {
   id: number;
@@ -32,6 +35,9 @@ export default function WorkCard({
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // 1. Hook into the Cursor Context
+  const { setCursorTheme, resetCursorTheme } = useCursor();
+
   // Convert media to array if it's a string
   const mediaArray = Array.isArray(media) ? media : [media];
   const isCarousel = mediaArray.length > 1;
@@ -39,41 +45,52 @@ export default function WorkCard({
   // Preload next image
   useEffect(() => {
     if (!isCarousel || type !== 'image') return;
-
     const nextIndex = (currentImageIndex + 1) % mediaArray.length;
     const img = new Image();
     img.src = mediaArray[nextIndex];
   }, [currentImageIndex, mediaArray, isCarousel, type]);
 
-  // Auto-rotate images every 4 seconds
+  // Auto-rotate images
   useEffect(() => {
     if (!isCarousel) return;
-
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % mediaArray.length);
     }, 4000);
-
     return () => clearInterval(interval);
   }, [mediaArray.length, isCarousel]);
 
   const currentMedia = mediaArray[currentImageIndex];
 
-  // Determine aspect ratio based on category
+  // Determine aspect ratio
   const getAspectRatio = () => {
     switch(activeCategory) {
-      case 'brands':
-        return 'aspect-video'; // 16/9
-      case 'socials':
-        return 'aspect-square'; // 1/1
-      case 'church':
-        return 'aspect-[3/4]'; // 3/4
-      default:
-        return 'aspect-video';
+      case 'brands': return 'aspect-video';
+      case 'socials': return 'aspect-square';
+      case 'church': return 'aspect-[3/4]';
+      default: return 'aspect-video';
     }
   };
 
+  // 2. Handle Mouse Events
+  const handleMouseEnter = () => {
+    // Debugging: Check console to see if this fires!
+    // console.log("Hovering:", title, brandColor); 
+    
+    const safeColor = brandColor || '#FFFFFF'; // Fallback if DB is empty
+    setCursorTheme(safeColor, darkenColor(safeColor));
+  };
+
+  const handleMouseLeave = () => {
+    resetCursorTheme();
+  };
+
   return (
-    <div className="flex flex-col gap-4">
+    <div 
+      className="flex flex-col gap-4"
+      // 👇 IMPORTANT: Events attached here
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Link wraps only Image and Title */}
       <Link href={`/works/${slug}`} className="cursor-pointer group">
         {/* Image Container */}
@@ -84,7 +101,7 @@ export default function WorkCard({
         >
           {!isLoaded && <div className="absolute inset-0 bg-white/5 animate-pulse" />}
 
-          {/* Carousel with crossfade transition */}
+          {/* Carousel */}
           <div className="relative w-full h-full">
             <AnimatePresence initial={false}>
               <motion.div
@@ -132,11 +149,11 @@ export default function WorkCard({
                   onContextMenu={(e) => e.preventDefault()}
                 />
               )}
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Indicator dots - only show if carousel */}
+          {/* Indicator dots */}
           {isCarousel && (
             <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1.5">
               {mediaArray.map((_, index) => (
@@ -154,7 +171,7 @@ export default function WorkCard({
           )}
         </Squircle>
 
-        {/* Title - Marquee version */}
+        {/* Title */}
         <div className="mt-4">
           <MarqueeText
             text={title}
@@ -165,7 +182,7 @@ export default function WorkCard({
         </div>
       </Link>
 
-      {/* Tagline - Marquee version */}
+      {/* Tagline */}
       <MarqueeText
         text={tagline}
         className="text-sm font-extralight tracking-wide -mt-4 text-white/50"
@@ -173,11 +190,10 @@ export default function WorkCard({
         gap={30}
       />
 
-      {/* Chips - NOT clickable */}
+      {/* Chips */}
       <div className="flex gap-2 flex-wrap">
         {tags.slice(0, 2).map((tag, index) => {
           const isFilled = index === 0;
-
           return (
             <span
               key={tag}
@@ -185,14 +201,14 @@ export default function WorkCard({
               style={{
                 ...(isFilled
                   ? {
-                      color: darkenColor(brandColor),
-                      backgroundColor: brandColor,
+                      color: darkenColor(brandColor || '#ffffff'),
+                      backgroundColor: brandColor || '#ffffff',
                       border: 'none',
                     }
                   : {
-                      color: brandColor,
+                      color: brandColor || '#ffffff',
                       backgroundColor: 'transparent',
-                      border: `1.5px solid ${brandColor}`,
+                      border: `1.5px solid ${brandColor || '#ffffff'}`,
                     }
                 )
               }}
