@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
-import { motion } from 'framer-motion'; // 1. Added framer-motion import
+import { motion } from 'framer-motion'; 
 
 // --- Interfaces ---
 interface Keycap {
@@ -76,7 +76,7 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// --- Animation Wrapper Component (UPDATED SPEED) ---
+// --- Animation Wrapper Component ---
 const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }: any) => {
   const [progress, setProgress] = useState(0);
 
@@ -115,7 +115,7 @@ export default function KeycapInteractive() {
   const [imageScale, setImageScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // 2. Add Wireframe State
+  // Wireframe State
   const [isWireframe, setIsWireframe] = useState(false);
 
   const [isMounted, setIsMounted] = useState(false);
@@ -127,45 +127,21 @@ export default function KeycapInteractive() {
   const getTooltipSize = () => {
     if (imageScale < 0.6) {
       return { 
-        progressSize: 30, 
-        padding: '8px', 
-        gap: '6px', 
-        minWidth: '120px',
-        toolNameSize: '10px',
-        proficiencyLabelSize: '9px',
-        proficiencyTextSize: '11px',
-        cornerRadius: 24,
-        cornerSmoothing: 0.8,
-        trackWidth: 3,
-        waveWidth: 4
+        progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
+        toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
+        cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
       };
     } else if (imageScale < 1) {
       return { 
-        progressSize: 45, 
-        padding: '12px', 
-        gap: '8px', 
-        minWidth: '150px',
-        toolNameSize: '11px',
-        proficiencyLabelSize: '9px',
-        proficiencyTextSize: '12px',
-        cornerRadius: 32,
-        cornerSmoothing: 0.9,
-        trackWidth: 5,
-        waveWidth: 6
+        progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
+        toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
+        cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
       };
     }
     return { 
-      progressSize: 60, 
-      padding: '20px', 
-      gap: '12px', 
-      minWidth: '180px',
-      toolNameSize: '14px',
-      proficiencyLabelSize: '11px',
-      proficiencyTextSize: '14px',
-      cornerRadius: 40,
-      cornerSmoothing: 1,
-      trackWidth: 6,
-      waveWidth: 7
+      progressSize: 60, padding: '20px', gap: '12px', minWidth: '180px',
+      toolNameSize: '14px', proficiencyLabelSize: '11px', proficiencyTextSize: '14px',
+      cornerRadius: 40, cornerSmoothing: 1, trackWidth: 6, waveWidth: 7
     };
   };
 
@@ -178,38 +154,23 @@ export default function KeycapInteractive() {
   };
 
   const tooltipSize = getTooltipSize();
-  // 3. Removed 'Shift' from non-interactive list
   const nonInteractiveKeycaps = ['Esc', 'Enter', 'Space'];
 
   const getTooltipPosition = (keycapY: number) => {
     if (imageScale < 1) {
-      if (keycapY < 120) return 'above';
-      else if (keycapY >= 120 && keycapY < 200) return 'above';
-      else return 'below';
+      return (keycapY < 120 || (keycapY >= 120 && keycapY < 200)) ? 'above' : 'below';
     }
-    else {
-      if (keycapY < 120) return 'below';
-      else if (keycapY >= 120 && keycapY < 200) return 'above';
-      else return 'above';
-    }
+    return (keycapY < 120 || (keycapY >= 120 && keycapY < 200)) ? 'above' : 'above'; 
   };
 
-  const shouldTooltipAppearBelow = (keycapY: number): boolean => {
-    return getTooltipPosition(keycapY) === 'below';
-  };
-
-  const shouldShowTooltip = (keycapName: string): boolean => {
-    return !nonInteractiveKeycaps.includes(keycapName);
-  };
+  const shouldTooltipAppearBelow = (keycapY: number): boolean => getTooltipPosition(keycapY) === 'below';
+  const shouldShowTooltip = (keycapName: string): boolean => !nonInteractiveKeycaps.includes(keycapName);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (loading && !fadeOut) {
       interval = setInterval(() => {
-        setLoaderProgress((prev) => {
-          if (prev >= 95) return prev;
-          return prev + Math.random() * 30;
-        });
+        setLoaderProgress((prev) => (prev >= 95 ? prev : prev + Math.random() * 30));
       }, 300);
     }
     return () => clearInterval(interval);
@@ -225,7 +186,6 @@ export default function KeycapInteractive() {
           proficiency: keycapProficiencies[keycap.tool] || 'Intermediate',
         }));
         setKeycaps(withProficiency);
-        
         setFadeOut(true);
         setTimeout(() => {
           setLoading(false);
@@ -236,19 +196,13 @@ export default function KeycapInteractive() {
         setLoading(false);
       }
     };
-
     fetchCoordinates();
   }, []);
 
   useEffect(() => {
     setIsMounted(true); 
     const handleResize = () => {
-      const mobileSize = 50;   
-      const desktopSize = 120; 
-      const breakpoint = 521;  
-      setPressureFontSize(
-        window.innerWidth < breakpoint ? mobileSize : desktopSize
-      );
+      setPressureFontSize(window.innerWidth < 521 ? 50 : 120);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -258,24 +212,19 @@ export default function KeycapInteractive() {
   useEffect(() => {
     const calculateScale = () => {
       if (imgRef.current) {
-        const originalWidth = 756;
-        const displayWidth = imgRef.current.offsetWidth;
-        setImageScale(displayWidth / originalWidth);
+        setImageScale(imgRef.current.offsetWidth / 756);
       }
     };
-
     calculateScale();
     window.addEventListener('resize', calculateScale);
     return () => window.removeEventListener('resize', calculateScale);
   }, []);
 
   const handleKeycapClick = (keycap: KeycapWithProficiency) => {
-    // 4. Handle Shift Click
     if (keycap.name === 'Shift') {
       setIsWireframe(!isWireframe);
       return;
     }
-
     if (keycap.name === 'Esc') {
       scrollToTop();
       return;
@@ -283,15 +232,10 @@ export default function KeycapInteractive() {
     if (keycap.name === 'Enter') {
       setTimeout(() => {
         const nextSection = document.querySelector('[data-section="after-keycaps"]');
-        if (nextSection) {
-          nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          console.warn('Section with data-section="after-keycaps" not found');
-        }
+        if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 0);
       return;
     }
-    return;
   };
 
   return (
@@ -300,73 +244,54 @@ export default function KeycapInteractive() {
         <div className="mb-12">
           <TextPressure className='ml-2 mb-8'
             text="MY DESIGN STACK"
-            flex={false}
-            alpha={false}
-            stroke={false}
-            width={true}
-            weight={true}
-            italic={true}
-            textColor="#ffffff"
-            strokeColor="#ff0000"
-            minFontSize={36}
-            fixedFontSize={pressureFontSize}
+            flex={false} alpha={false} stroke={false} width={true} weight={true} italic={true}
+            textColor="#ffffff" strokeColor="#ff0000"
+            minFontSize={36} fixedFontSize={pressureFontSize}
           />
           <p className="text-white/60 pl-2 md:pl-3 text-sm font-light sm:text-base">
-            {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools and proficiency levels' : 'Hover over keycaps to explore my tools and proficiency levels'}
+            {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools and proficiency levels' : 'Hover over keycaps to explore my tools. Click Shift to toggle Wireframe.'}
           </p>
         </div>
 
         <div className="relative w-full bg-black rounded-xl overflow-visible inline-block">
           {loading && (
-            <div
-              className={`absolute inset-0 flex items-center justify-center z-50 transition-opacity duration-500 ${
-                fadeOut ? 'opacity-0' : 'opacity-100'
-              }`}
-            >
+            <div className={`absolute inset-0 flex items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
               <CircularWaveProgress
-                progress={loaderProgress}
-                size={60}
-                trackWidth={5}
-                waveWidth={5}
-                trackColor="#475569"
-                waveColor="#cbd5e1"
-                waveAmplitude={2}
-                maxWaveFrequency={6}
-                undulationSpeed={2}
-                rotationSpeed={7}
-                edgeGap={20}
-                relaxationDuration={0}
-                className="opacity-30"
+                progress={loaderProgress} size={60} trackWidth={5} waveWidth={5}
+                trackColor="#475569" waveColor="#cbd5e1"
+                waveAmplitude={2} maxWaveFrequency={6} undulationSpeed={2} rotationSpeed={7}
+                edgeGap={20} relaxationDuration={0} className="opacity-30"
               />
             </div>
           )}
 
-          {/* 5. Replaced single Image with Stacked Motion Images */}
+          {/* 👇 IMAGE STACK: CLEAN CROSSFADE */}
           <div className="relative w-full">
-            {/* Raster Image */}
+            
+            {/* 1. Raster Image */}
             <motion.img
               ref={imgRef}
               src="/keycaps2.png"
               alt="Design Tools Keyboard"
               className="w-full h-auto block relative z-10"
+              initial={false}
               animate={{ opacity: isWireframe ? 0 : 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
               onLoad={() => {
-                if (imgRef.current) {
-                  setImageScale(imgRef.current.offsetWidth / 756);
-                }
+                if (imgRef.current) setImageScale(imgRef.current.offsetWidth / 756);
               }}
             />
 
-            {/* Wireframe Image */}
+            {/* 2. Wireframe Image (Overlay) */}
             <motion.img 
               src="/keyboard-wireframe.png"
               alt="Keyboard Wireframe"
               className="absolute inset-0 w-full h-full object-cover z-0"
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: isWireframe ? 1 : 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
             />
+
           </div>
 
           {/* Interactive Hotspots */}
@@ -382,7 +307,6 @@ export default function KeycapInteractive() {
                     height: `${keycap.height * imageScale}px`,
                   }}
                   onMouseEnter={() => {
-                    // Prevent tooltip for Shift
                     if (shouldShowTooltip(keycap.name) && keycap.name !== 'Shift') {
                       setHoveredKeycap(keycap.name);
                     }
@@ -390,10 +314,9 @@ export default function KeycapInteractive() {
                   onMouseLeave={() => setHoveredKeycap(null)}
                   onClick={() => handleKeycapClick(keycap)}
                 >
-                  {/* Transparent Hotspot (No Visual Box) */}
+                  {/* Transparent Hotspot */}
                 </div>
 
-                {/* Tooltip (Hidden for Shift) */}
                 {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && keycap.name !== 'Shift' && (
                   <Squircle
                     cornerRadius={tooltipSize.cornerRadius}
@@ -402,21 +325,13 @@ export default function KeycapInteractive() {
                     style={{
                       left: `${(keycap.x + keycap.width / 2) * imageScale + OFFSET_X * imageScale}px`,
                       ...(shouldTooltipAppearBelow(keycap.y)
-                        ? {
-                            top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px`,
-                          }
-                        : {
-                            top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px`,
-                          }),
+                        ? { top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px` }
+                        : { top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px` }),
                       transform: 'translateX(-50%)',
                       background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
                       border: '1px solid rgba(255, 255, 255, 0.2)',
                       padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: tooltipSize.gap,
-                      minWidth: tooltipSize.minWidth,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: tooltipSize.gap, minWidth: tooltipSize.minWidth,
                     }}
                   >
                     <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
@@ -424,33 +339,21 @@ export default function KeycapInteractive() {
                     </h3>
 
                     <div className="flex flex-col items-center gap-2">
-                      
                       <AnimatedCircularProgress
                         targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
                         duration={2000} 
-                        size={tooltipSize.progressSize}
-                        trackWidth={tooltipSize.trackWidth}
-                        waveWidth={tooltipSize.waveWidth}
-                        trackColor={getKeycapColor(keycap.tool).track}
-                        waveColor={getKeycapColor(keycap.tool).wave}
-                        waveAmplitude={0}
-                        maxWaveFrequency={0}
-                        undulationSpeed={0}
-                        edgeGap={20}
+                        size={tooltipSize.progressSize} trackWidth={tooltipSize.trackWidth} waveWidth={tooltipSize.waveWidth}
+                        trackColor={getKeycapColor(keycap.tool).track} waveColor={getKeycapColor(keycap.tool).wave}
+                        waveAmplitude={0} maxWaveFrequency={0} undulationSpeed={0} edgeGap={20}
                       />
-
                       {keycap.tool !== 'Be' ? (
                         <div className="text-center">
                           <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
-                          <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>
-                            {keycap.proficiency}
-                          </p>
+                          <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>{keycap.proficiency}</p>
                         </div>
                       ) : (
                         <div className="text-center">
-                          <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>
-                            My Behance Portfolio
-                          </p>
+                          <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>My Behance Portfolio</p>
                         </div>
                       )}
                     </div>
@@ -461,22 +364,12 @@ export default function KeycapInteractive() {
           </div>
         </div>
       </div>
-
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
+          from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
       `}</style>
     </section>
   );
