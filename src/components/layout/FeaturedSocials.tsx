@@ -5,6 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 import ProjectCard from '@/components/ui/ProjectCard';
 import imagesLoaded from 'imagesloaded';
 import TextPressure from '@/components/TextPressure';
+import { darkenColor } from '@/utils/colorUtils'; 
+// 👇 Import the new component
+import TypewriterLink from '@/components/ui/TypewriterLink';
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -19,32 +22,31 @@ interface Socials {
   media: string;
   type: 'image' | 'gif' | 'video';
   order: number;
+  extracted_color: string | null; 
 }
 
 interface FeaturedSocialsProps {
   limit?: number;
+  onHoverColor?: (fill: string, stroke?: string) => void;
+  onLeaveColor?: () => void;
 }
 
-export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
+export default function FeaturedSocials({ limit = 15, onHoverColor, onLeaveColor }: FeaturedSocialsProps) {
   const [socials, setSocials] = useState<Socials[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // ❌ DELETED: isMobile, cornerRadius, isMounted (Redundant)
-
   // Masonry & Layout State
   const [isBottomAligned, setIsBottomAligned] = useState(false);
   const [columnCount, setColumnCount] = useState(5);
   const containerRef = useRef<HTMLDivElement>(null);
   const [pressureFontSize, setPressureFontSize] = useState(120);
 
-  // --- Consolidated Resize Handler ---
+  // --- Resize Handler ---
   useEffect(() => {
     const handleResize = () => {
-      // 1. Text Size Logic
       const breakpoint = 521;   
       setPressureFontSize(window.innerWidth < breakpoint ? 50 : 120);
 
-      // 2. Column Count Logic
       if (window.innerWidth < 640) setColumnCount(2);
       else if (window.innerWidth < 768) setColumnCount(3);
       else if (window.innerWidth < 1024) setColumnCount(4);
@@ -57,9 +59,9 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Fetch Data ---
+  // --- Fetch Data & Trigger Extraction ---
   useEffect(() => {
-    const fetchSocials = async () => {
+    const fetchAndProcessSocials = async () => {
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -71,7 +73,14 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
         if (error) throw error;
 
         if (data) {
-          setSocials(data as Socials[]);
+          const fetchedItems = data as Socials[];
+          setSocials(fetchedItems);
+
+          fetchedItems.forEach(async (item) => {
+            if (!item.extracted_color && item.media) {
+              await extractAndSaveColor(item.id, item.media);
+            }
+          });
         }
       } catch (error) {
         console.error('Fetch error:', error);
@@ -80,13 +89,39 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
       }
     };
 
-    fetchSocials();
+    fetchAndProcessSocials();
   }, [limit]);
 
-  // --- Scroll Detection (Parallax Alignment) ---
+  // 👇 HELPER: Extract -> Save -> Update State
+  const extractAndSaveColor = async (id: number, imageUrl: string) => {
+    try {
+      const res = await fetch(`/api/spotify/extract-color?imageUrl=${encodeURIComponent(imageUrl)}`);
+      if (!res.ok) return;
+      
+      const { barColor } = await res.json(); 
+
+      if (barColor) {
+        await fetch('/api/save-color', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                table: 'featuredsocials', 
+                id, 
+                color: barColor 
+            })
+        });
+
+        setSocials(prev => 
+          prev.map(item => item.id === id ? { ...item, extracted_color: barColor } : item)
+        );
+      }
+    } catch (err) {
+      console.error('Extraction failed:', err);
+    }
+  };
+
+  // --- Scroll Detection ---
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
-
     const handleScroll = () => {
       if (timeoutId) clearTimeout(timeoutId);
       if (!containerRef.current) return;
@@ -97,8 +132,6 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
 
         const sectionRect = sectionElement.getBoundingClientRect();
         const TOP_THRESHOLD = 500;
-
-        // Check if we scrolled past the top to trigger the bottom alignment animation
         const shouldAlignBottom = sectionRect.top < -TOP_THRESHOLD;
 
         if (shouldAlignBottom !== isBottomAligned) {
@@ -109,18 +142,16 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isBottomAligned]);
 
-  // --- Masonry Animation Logic ---
+  // --- Masonry Animation ---
   useEffect(() => {
     if (loading || !containerRef.current) return;
     const container = containerRef.current;
-
     const columns = Array.from(container.children).filter((el) =>
       el.classList.contains('masonry-column')
     ) as HTMLElement[];
@@ -128,14 +159,12 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     if (!columns.length) return;
 
     const imgLoad = imagesLoaded(container);
-
     const handleImagesLoaded = () => {
       const heights = columns.map((col) => col.scrollHeight);
       const maxHeight = Math.max(...heights);
 
       columns.forEach((col) => {
         col.style.transition = 'transform 1s ease, justify-content 1s ease';
-
         if (isBottomAligned) {
           const diff = maxHeight - col.scrollHeight;
           col.style.justifyContent = 'flex-end';
@@ -149,9 +178,9 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
 
     imgLoad.on('always', handleImagesLoaded);
     return () => imgLoad.off('always', handleImagesLoaded);
-  }, [isBottomAligned, loading, socials]); // Added socials dependency
+  }, [isBottomAligned, loading, socials]);
 
-  // --- Distribute Columns ---
+  // --- Columns ---
   const columns = Array.from({ length: columnCount }, (_, i) => 
     socials.filter((_, index) => index % columnCount === i)
   );
@@ -181,20 +210,36 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
             ))}
           </div>
         ) : (
-          <div className="relative">
-            {/* Masonry Container */}
-            <div ref={containerRef} className="masonry-container">
+          <div className="">
+            {/* Masonry Container with MASK applied */}
+            <div 
+              ref={containerRef} 
+              className="masonry-container"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+              }}
+            >
               {columns.map((column, colIndex) => (
                 <div key={colIndex} className="masonry-column">
                   {column.map((social) => (
-                    <div key={social.id} className="masonry-item">
+                    <div 
+                      key={social.id} 
+                      className="masonry-item"
+                      // 👇 CURSOR HOVER LOGIC
+                      onMouseEnter={() => {
+                        const fillColor = social.extracted_color || '#ffffff';
+                        const strokeColor = darkenColor(fillColor, 60);
+                        onHoverColor?.(fillColor, strokeColor);
+                      }}
+                      onMouseLeave={() => onLeaveColor?.()}
+                    >
                       <ProjectCard
                         title={social.title}
                         slug={social.slug}
                         media={social.media}
                         type={social.type}
                         aspectRatio="auto"
-                        // 👇 FIX: Static radius, let the card handle resizing
                         cornerRadius={30}
                       />
                     </div>
@@ -203,17 +248,13 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
               ))}
             </div>
 
-            {/* Gradient Overlay */}
-            <div className="absolute -bottom-1 left-0 opacity-50 -right-1 h-64 pointer-events-none bg-gradient-to-t from-black via-black/60 to-transparent" />
-
-            {/* View All Button */}
-            <div className="absolute bottom-5 left-0 right-0 flex justify-center z-10">
-              <a
-                href="/works?category=socials"
-                className="scale-70 md:scale-80 text-center text-xs px-8 py-3 border-2 md:border-3 border-white/60 text-white font-space md:text-sm uppercase tracking-wider hover:border-white/90 hover:bg-white/5 hover:scale-75 md:hover:scale-85 transition-all duration-300 rounded-[15px]"
-              >
-                View All Social Media Designs
-              </a>
+            {/* 👇 NEW TYPING LINK */}
+            <div onMouseEnter={() => onLeaveColor?.()}>
+              <TypewriterLink 
+                text="VIEW ALL SOCIAL MEDIA DESIGNS" 
+                href="/works?category=socials" 
+                cursorClass="bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]"
+              />
             </div>
           </div>
         )}

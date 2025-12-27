@@ -5,6 +5,9 @@ import { createClient } from '@supabase/supabase-js';
 import ProjectCard from '@/components/ui/ProjectCard';
 import imagesLoaded from 'imagesloaded';
 import TextPressure from '@/components/TextPressure';
+import { darkenColor } from '@/utils/colorUtils';
+// 👇 Import our new component
+import TypewriterLink from '@/components/ui/TypewriterLink'; 
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -19,43 +22,42 @@ interface Brands {
   media: string;
   type: 'image' | 'gif' | 'video';
   order: number;
+  extracted_color: string | null; 
 }
 
 interface FeaturedBrandsProps {
   limit?: number;
+  onHoverColor?: (fill: string, stroke?: string) => void;
+  onLeaveColor?: () => void;
 }
 
-export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
+export default function FeaturedBrands({ limit = 6, onHoverColor, onLeaveColor }: FeaturedBrandsProps) {
   const [brands, setBrands] = useState<Brands[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Masonry & Layout State
   const [isBottomAligned, setIsBottomAligned] = useState(false);
-  const [columnCount, setColumnCount] = useState(3); // Start with 3 for brands
+  const [columnCount, setColumnCount] = useState(3); 
   const containerRef = useRef<HTMLDivElement>(null);
   const [pressureFontSize, setPressureFontSize] = useState(120);
 
   // --- Resize Handler ---
   useEffect(() => {
     const handleResize = () => {
-      // 1. Text Size
       const breakpoint = 521;
       setPressureFontSize(window.innerWidth < breakpoint ? 50 : 120);
-
-      // 2. Column Count (Adjusted for Brands - usually we want fewer, wider columns than socials)
-      if (window.innerWidth < 640) setColumnCount(2);       // Mobile: 2 cols
-      else if (window.innerWidth < 1024) setColumnCount(3); // Tablet: 3 cols
-      else setColumnCount(3);                               // Desktop: 3 cols (Clean look for brands)
+      if (window.innerWidth < 640) setColumnCount(2);        
+      else if (window.innerWidth < 1024) setColumnCount(3); 
+      else setColumnCount(3);                               
     };
-  
     handleResize(); 
     window.addEventListener('resize', handleResize); 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Fetch Data ---
+  // --- Fetch Data & Trigger Extraction ---
   useEffect(() => {
-    const fetchBrands = async () => {
+    const fetchAndProcessBrands = async () => {
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -67,7 +69,14 @@ export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
         if (error) throw error;
 
         if (data) {
-          setBrands(data as Brands[]);
+          const fetchedBrands = data as Brands[];
+          setBrands(fetchedBrands);
+
+          fetchedBrands.forEach(async (brand) => {
+            if (!brand.extracted_color && brand.media) {
+              await extractAndSaveColor(brand.id, brand.media);
+            }
+          });
         }
       } catch (error) {
         console.error('Fetch error:', error);
@@ -76,10 +85,37 @@ export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
       }
     };
 
-    fetchBrands();
+    fetchAndProcessBrands();
   }, [limit]);
 
-  // --- Scroll Detection (Parallax) ---
+  // 👇 HELPER: Extract from API -> Save to DB -> Update Local State
+  const extractAndSaveColor = async (id: number, imageUrl: string) => {
+    try {
+      const res = await fetch(`/api/spotify/extract-color?imageUrl=${encodeURIComponent(imageUrl)}`);
+      if (!res.ok) return;
+      
+      const { barColor } = await res.json(); 
+
+      if (barColor) {
+        await fetch('/api/save-color', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                table: 'featuredbrands', 
+                id, 
+                color: barColor 
+            })
+        });
+
+        setBrands(prev => 
+          prev.map(item => item.id === id ? { ...item, extracted_color: barColor } : item)
+        );
+      }
+    } catch (err) {
+      console.error('Extraction failed:', err);
+    }
+  };
+
+  // --- Scroll Detection ---
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
     const handleScroll = () => {
@@ -170,19 +206,29 @@ export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
             ))}
           </div>
         ) : (
-          <div className="relative">
+          // 👇 Removing "relative" here so the link sits naturally in flow below the grid
+          <div className="">
             {/* Masonry Container */}
             <div ref={containerRef} className="masonry-container">
               {columns.map((column, colIndex) => (
                 <div key={colIndex} className="masonry-column">
                   {column.map((brand) => (
-                    <div key={brand.id} className="masonry-item">
+                    <div 
+                      key={brand.id} 
+                      className="masonry-item"
+                      // 👇 CURSOR HOVER LOGIC
+                      onMouseEnter={() => {
+                        const fillColor = brand.extracted_color || '#ffffff';
+                        const strokeColor = darkenColor(fillColor, 60); 
+                        onHoverColor?.(fillColor, strokeColor);
+                      }}
+                      onMouseLeave={() => onLeaveColor?.()}
+                    >
                       <ProjectCard
                         title={brand.title}
                         slug={brand.slug}
                         media={brand.media}
                         type={brand.type}
-                        // 👇 I kept this 'square' for consistency, but you can change to 'auto' if you have tall mockups!
                         aspectRatio="square" 
                         cornerRadius={30}
                       />
@@ -192,18 +238,14 @@ export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
               ))}
             </div>
 
-            {/* Gradient Overlay */}
-            <div className="absolute -bottom-1 left-0 right-0 opacity-60 h-40 pointer-events-none bg-gradient-to-t from-black/60 to-transparent rounded-none" />
-
-            {/* View All Button */}
-            <div className="absolute bottom-5 left-0 right-0 flex justify-center z-10">
-              <a
-                href="/works?category=brands"
-                className="scale-70 md:scale-80 text-center text-xs px-8 py-3 border-2 md:border-3 border-white/60 text-white font-space md:text-sm uppercase tracking-wider hover:border-white/100 hover:bg-white/5 hover:scale-75 md:hover:scale-85 transition-all duration-300 rounded-[15px]"
-              >
-                View All Brand Projects
-              </a>
+            {/* 👇 NEW TYPING LINK (Left Aligned, No Absolute Positioning) */}
+            <div onMouseEnter={() => onLeaveColor?.()}>
+              <TypewriterLink 
+                text="VIEW ALL BRAND PROJECTS" 
+                href="/works?category=brands" 
+              />
             </div>
+
           </div>
         )}
       </div>
@@ -213,12 +255,10 @@ export default function FeaturedBrands({ limit = 6 }: FeaturedBrandsProps) {
         .masonry-column { flex: 1; display: flex; flex-direction: column; gap: 24px; position: relative; transition: transform 0.7s ease, justify-content 0.7s ease; will-change: transform; }
         .masonry-item { margin-bottom: 0; }
         
-        /* Tablet Spacing */
         @media (max-width: 1024px) { 
           .masonry-container, .masonry-column { gap: 16px; } 
         }
         
-        /* Mobile Spacing */
         @media (max-width: 640px) { 
           .masonry-container, .masonry-column { gap: 12px; } 
         }

@@ -5,6 +5,7 @@ import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
 import { motion } from 'framer-motion'; 
+import { darkenColor } from '@/utils/colorUtils';
 
 // --- Interfaces ---
 interface Keycap {
@@ -21,7 +22,12 @@ interface KeycapWithProficiency extends Keycap {
   proficiency: 'Expert' | 'Advanced' | 'Intermediate';
 }
 
-// --- Data & Configuration ---
+interface KeycapInteractiveProps {
+  onHoverColor?: (fill: string, stroke?: string) => void;
+  onLeaveColor?: () => void;
+}
+
+// --- Configuration ---
 const keycapProficiencies: Record<string, 'Expert' | 'Advanced' | 'Intermediate'> = {
   'Figma': 'Expert',
   'Premiere Pro': 'Advanced',
@@ -53,6 +59,7 @@ const toolProgressOverrides: Record<string, number> = {
   'After Effects': 70,
 };
 
+// 🎨 Tool Colors
 const keycapColors: Record<string, { track: string; wave: string }> = {
   'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, 
   'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, 
@@ -68,6 +75,16 @@ const keycapColors: Record<string, { track: string; wave: string }> = {
   'default':        { track: '#EEEEEE', wave: '#cccccc' }, 
 };
 
+// 🎨 Special Key Colors
+const specialKeyColors: Record<string, string> = {
+  'Esc':   '#FF9AA2', 
+  'Shift': '#DCCEB2', 
+  'Space': '#BDD4E7', 
+  'Enter': '#D5C2D9', 
+};
+
+const KEYBOARD_BASE_COLOR = '#F3EFE0'; 
+
 const getKeycapColor = (tool: string): { track: string; wave: string } => {
   return keycapColors[tool] || keycapColors['default'];
 };
@@ -76,29 +93,21 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// --- Animation Wrapper Component ---
+// --- Animation Wrapper ---
 const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }: any) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let animationFrameId: number;
     const startTime = performance.now();
-
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progressRatio = Math.min(elapsed / duration, 1);
-      
       const ease = 1 - Math.pow(1 - progressRatio, 5);
-      
       setProgress(ease * targetProgress);
-
-      if (progressRatio < 1) {
-        animationFrameId = requestAnimationFrame(animate);
-      }
+      if (progressRatio < 1) animationFrameId = requestAnimationFrame(animate);
     };
-
     animationFrameId = requestAnimationFrame(animate);
-
     return () => cancelAnimationFrame(animationFrameId);
   }, [targetProgress, duration]);
 
@@ -106,7 +115,7 @@ const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }:
 };
 
 // --- Main Component ---
-export default function KeycapInteractive() {
+export default function KeycapInteractive({ onHoverColor, onLeaveColor }: KeycapInteractiveProps) {
   const [keycaps, setKeycaps] = useState<KeycapWithProficiency[]>([]);
   const [hoveredKeycap, setHoveredKeycap] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -114,36 +123,26 @@ export default function KeycapInteractive() {
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [imageScale, setImageScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
-
-  // Wireframe State
+  const sectionRef = useRef<HTMLElement>(null);
   const [isWireframe, setIsWireframe] = useState(false);
-
-  const [isMounted, setIsMounted] = useState(false);
   const [pressureFontSize, setPressureFontSize] = useState(120);
 
   const OFFSET_X = -6;
   const OFFSET_Y = -15;
 
-  const getTooltipSize = () => {
-    if (imageScale < 0.6) {
-      return { 
-        progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
-        toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
-        cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
-      };
-    } else if (imageScale < 1) {
-      return { 
-        progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
-        toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
-        cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
-      };
-    }
-    return { 
+  const tooltipSize = imageScale < 0.6 ? { 
+      progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
+      toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
+      cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
+    } : imageScale < 1 ? { 
+      progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
+      toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
+      cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
+    } : { 
       progressSize: 60, padding: '20px', gap: '12px', minWidth: '180px',
       toolNameSize: '14px', proficiencyLabelSize: '11px', proficiencyTextSize: '14px',
       cornerRadius: 40, cornerSmoothing: 1, trackWidth: 6, waveWidth: 7
     };
-  };
 
   const getTooltipOffset = () => {
     if (imageScale < 0.40) return 250;
@@ -153,29 +152,98 @@ export default function KeycapInteractive() {
     return 120;
   };
 
-  const tooltipSize = getTooltipSize();
+  const shouldTooltipAppearBelow = (keycapY: number): boolean => keycapY >= 120 && keycapY < 200;
   const nonInteractiveKeycaps = ['Esc', 'Enter', 'Space'];
-
-  const getTooltipPosition = (keycapY: number) => {
-    if (imageScale < 1) {
-      return (keycapY < 120 || (keycapY >= 120 && keycapY < 200)) ? 'above' : 'below';
-    }
-    return (keycapY < 120 || (keycapY >= 120 && keycapY < 200)) ? 'above' : 'above'; 
-  };
-
-  const shouldTooltipAppearBelow = (keycapY: number): boolean => getTooltipPosition(keycapY) === 'below';
   const shouldShowTooltip = (keycapName: string): boolean => !nonInteractiveKeycaps.includes(keycapName);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (loading && !fadeOut) {
-      interval = setInterval(() => {
-        setLoaderProgress((prev) => (prev >= 95 ? prev : prev + Math.random() * 30));
-      }, 300);
-    }
-    return () => clearInterval(interval);
-  }, [loading, fadeOut]);
+  // --- Logic Handlers ---
 
+  // 👇 HELPER: Centralized Color Logic
+  const triggerCursorColor = (fill: string, stroke: string) => {
+    if (isWireframe) {
+      // 💀 WIREFRAME MODE: Transparent White (better interpolation) + Beige Stroke
+      onHoverColor?.('rgba(255, 255, 255, 0)', '#F3EFE0');
+    } else {
+      // NORMAL MODE: Requested colors
+      onHoverColor?.(fill, stroke);
+    }
+  };
+
+  const handleKeycapClick = (keycapName: string) => {
+    if (keycapName === 'Shift') {
+      const nextState = !isWireframe;
+      setIsWireframe(nextState);
+      
+      // Update cursor immediately upon toggle
+      if (nextState) {
+        onHoverColor?.('rgba(255, 255, 255, 0)', '#F3EFE0');
+      } else {
+        onHoverColor?.(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
+      }
+      return;
+    }
+    if (keycapName === 'Esc') {
+      scrollToTop();
+      return;
+    }
+    if (keycapName === 'Enter') {
+      setTimeout(() => {
+        const nextSection = document.querySelector('[data-section="after-keycaps"]');
+        if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+      return;
+    }
+  };
+
+  // 🎹 Keyboard Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        if (!isVisible) return; 
+      }
+
+      let targetKey = '';
+      if (e.key === 'Escape') targetKey = 'Esc';
+      else if (e.key === 'Shift') targetKey = 'Shift';
+      else if (e.key === 'Enter') targetKey = 'Enter';
+      
+      if (targetKey) {
+        handleKeycapClick(targetKey);
+        
+        const color = specialKeyColors[targetKey];
+        if (color) {
+            triggerCursorColor(color, darkenColor(color, 40));
+            setTimeout(() => {
+                triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
+            }, 300);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onHoverColor, onLeaveColor, isWireframe]); // Dependency array matches used variables
+
+  // --- Resize & Setup ---
+  useEffect(() => {
+    const handleResize = () => setPressureFontSize(window.innerWidth < 521 ? 50 : 120);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const calculateScale = () => {
+      if (imgRef.current) setImageScale(imgRef.current.offsetWidth / 756);
+    };
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, []);
+
+  // Fetch Logic
   useEffect(() => {
     const fetchCoordinates = async () => {
       try {
@@ -200,46 +268,49 @@ export default function KeycapInteractive() {
   }, []);
 
   useEffect(() => {
-    setIsMounted(true); 
-    const handleResize = () => {
-      setPressureFontSize(window.innerWidth < 521 ? 50 : 120);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    let interval: NodeJS.Timeout;
+    if (loading && !fadeOut) {
+      interval = setInterval(() => {
+        setLoaderProgress((prev) => (prev >= 95 ? prev : prev + Math.random() * 30));
+      }, 300);
+    }
+    return () => clearInterval(interval);
+  }, [loading, fadeOut]);
 
-  useEffect(() => {
-    const calculateScale = () => {
-      if (imgRef.current) {
-        setImageScale(imgRef.current.offsetWidth / 756);
-      }
-    };
-    calculateScale();
-    window.addEventListener('resize', calculateScale);
-    return () => window.removeEventListener('resize', calculateScale);
-  }, []);
-
-  const handleKeycapClick = (keycap: KeycapWithProficiency) => {
-    if (keycap.name === 'Shift') {
-      setIsWireframe(!isWireframe);
-      return;
+  // --- Render Helper for Tooltip ---
+  // Decides whether to render Squircle or Div based on wireframe mode
+  const TooltipWrapper = ({ children, style, className }: any) => {
+    if (isWireframe) {
+      return (
+        <div 
+          className={className} 
+          style={{
+            ...style,
+            background: 'rgba(0, 0, 0, 0.8)', // Dark solid background
+            border: '1px solid #ffffff',      // Crisp white border
+            borderRadius: '0px',              // Sharp corners
+            backdropFilter: 'none',
+          }}
+        >
+          {children}
+        </div>
+      );
     }
-    if (keycap.name === 'Esc') {
-      scrollToTop();
-      return;
-    }
-    if (keycap.name === 'Enter') {
-      setTimeout(() => {
-        const nextSection = document.querySelector('[data-section="after-keycaps"]');
-        if (nextSection) nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 0);
-      return;
-    }
+    return (
+      <Squircle 
+        cornerRadius={tooltipSize.cornerRadius}
+        cornerSmoothing={tooltipSize.cornerSmoothing}
+        className={className}
+        style={style}
+      >
+        {children}
+      </Squircle>
+    );
   };
 
+
   return (
-    <section className="w-full py-20 bg-black">
+    <section ref={sectionRef} className="w-full py-20 bg-black">
       <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
         <div className="mb-12">
           <TextPressure className='ml-2 mb-8'
@@ -248,8 +319,8 @@ export default function KeycapInteractive() {
             textColor="#ffffff" strokeColor="#ff0000"
             minFontSize={36} fixedFontSize={pressureFontSize}
           />
-          <p className="text-white/60 pl-2 md:pl-3 text-sm font-light sm:text-base">
-            {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools and proficiency levels' : 'Hover over keycaps to explore my tools. Click Shift to toggle Wireframe.'}
+          <p className="text-white/60 pl-2 md:pl-3 text-sm font-extralight sm:text-base">
+            {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools' : 'Hover over keycaps to explore my tools. Click Shift to toggle Wireframe.'}
           </p>
         </div>
 
@@ -265,10 +336,12 @@ export default function KeycapInteractive() {
             </div>
           )}
 
-          {/* 👇 IMAGE STACK: CLEAN CROSSFADE */}
-          <div className="relative w-full">
-            
-            {/* 1. Raster Image */}
+          {/* 👇 KEYBOARD IMAGE CONTAINER 👇 */}
+          <div 
+            className="relative w-full"
+            onMouseEnter={() => triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40))}
+            onMouseLeave={() => onLeaveColor?.()}
+          >
             <motion.img
               ref={imgRef}
               src="/keycaps2.png"
@@ -281,8 +354,6 @@ export default function KeycapInteractive() {
                 if (imgRef.current) setImageScale(imgRef.current.offsetWidth / 756);
               }}
             />
-
-            {/* 2. Wireframe Image (Overlay) */}
             <motion.img 
               src="/keyboard-wireframe.png"
               alt="Keyboard Wireframe"
@@ -292,75 +363,91 @@ export default function KeycapInteractive() {
               transition={{ duration: 0.6, ease: "easeInOut" }}
             />
 
-          </div>
-
-          {/* Interactive Hotspots */}
-          <div className="absolute inset-0 z-20">
-            {keycaps.map((keycap, index) => (
-              <div key={`${keycap.name}-${index}`}>
-                <div
-                  className="absolute cursor-pointer group transition-all duration-300"
-                  style={{
-                    left: `${keycap.x * imageScale + OFFSET_X * imageScale}px`,
-                    top: `${keycap.y * imageScale + OFFSET_Y * imageScale}px`,
-                    width: `${keycap.width * imageScale}px`,
-                    height: `${keycap.height * imageScale}px`,
-                  }}
-                  onMouseEnter={() => {
-                    if (shouldShowTooltip(keycap.name) && keycap.name !== 'Shift') {
-                      setHoveredKeycap(keycap.name);
-                    }
-                  }}
-                  onMouseLeave={() => setHoveredKeycap(null)}
-                  onClick={() => handleKeycapClick(keycap)}
-                >
-                  {/* Transparent Hotspot */}
-                </div>
-
-                {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && keycap.name !== 'Shift' && (
-                  <Squircle
-                    cornerRadius={tooltipSize.cornerRadius}
-                    cornerSmoothing={tooltipSize.cornerSmoothing}
-                    className="absolute z-50 backdrop-blur-md pointer-events-none shadow-xl animate-fadeIn"
+            {/* Hotspots Layer */}
+            <div className="absolute inset-0 z-20">
+              {keycaps.map((keycap, index) => (
+                <div key={`${keycap.name}-${index}`}>
+                  <div
+                    className="absolute cursor-pointer group transition-all duration-300"
                     style={{
-                      left: `${(keycap.x + keycap.width / 2) * imageScale + OFFSET_X * imageScale}px`,
-                      ...(shouldTooltipAppearBelow(keycap.y)
-                        ? { top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px` }
-                        : { top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px` }),
-                      transform: 'translateX(-50%)',
-                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: tooltipSize.gap, minWidth: tooltipSize.minWidth,
+                      left: `${keycap.x * imageScale + OFFSET_X * imageScale}px`,
+                      top: `${keycap.y * imageScale + OFFSET_Y * imageScale}px`,
+                      width: `${keycap.width * imageScale}px`,
+                      height: `${keycap.height * imageScale}px`,
                     }}
+                    onMouseEnter={() => {
+                      if (specialKeyColors[keycap.name]) {
+                          const color = specialKeyColors[keycap.name];
+                          triggerCursorColor(color, darkenColor(color, 40));
+                      } 
+                      else if (shouldShowTooltip(keycap.name)) {
+                        setHoveredKeycap(keycap.name);
+                        const colors = getKeycapColor(keycap.tool);
+                        const fillColor = colors.wave; 
+                        const strokeColor = darkenColor(fillColor, 40);
+                        triggerCursorColor(fillColor, strokeColor);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      setHoveredKeycap(null);
+                      triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
+                    }}
+                    onClick={() => handleKeycapClick(keycap.name)}
                   >
-                    <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
-                      {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
-                    </h3>
+                  </div>
 
-                    <div className="flex flex-col items-center gap-2">
-                      <AnimatedCircularProgress
-                        targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
-                        duration={2000} 
-                        size={tooltipSize.progressSize} trackWidth={tooltipSize.trackWidth} waveWidth={tooltipSize.waveWidth}
-                        trackColor={getKeycapColor(keycap.tool).track} waveColor={getKeycapColor(keycap.tool).wave}
-                        waveAmplitude={0} maxWaveFrequency={0} undulationSpeed={0} edgeGap={20}
-                      />
-                      {keycap.tool !== 'Be' ? (
-                        <div className="text-center">
-                          <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
-                          <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>{keycap.proficiency}</p>
-                        </div>
-                      ) : (
-                        <div className="text-center">
-                          <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>My Behance Portfolio</p>
-                        </div>
-                      )}
-                    </div>
-                  </Squircle>
-                )}
-              </div>
-            ))}
+                  {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && keycap.name !== 'Shift' && (
+                    <TooltipWrapper
+                      className="absolute z-50 pointer-events-none shadow-xl animate-fadeIn"
+                      style={{
+                        left: `${(keycap.x + keycap.width / 2) * imageScale + OFFSET_X * imageScale}px`,
+                        ...(shouldTooltipAppearBelow(keycap.y)
+                          ? { top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px` }
+                          : { top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px` }),
+                        transform: 'translateX(-50%)',
+                        // Normal mode styles (overridden in wrapper if wireframe)
+                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        backdropFilter: 'blur(12px)',
+                        padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: tooltipSize.gap, minWidth: tooltipSize.minWidth,
+                      }}
+                    >
+                      <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
+                        {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
+                      </h3>
+                      <div className="flex flex-col items-center gap-2">
+                        <AnimatedCircularProgress
+                          targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
+                          duration={2000} 
+                          size={tooltipSize.progressSize} 
+                          
+                          // WIREFRAME LOGIC 💀
+                          trackWidth={isWireframe ? 1 : tooltipSize.trackWidth}
+                          waveWidth={isWireframe ? 2 : tooltipSize.waveWidth}
+                          // 👇 Track is now more visible (0.4 opacity)
+                          trackColor={isWireframe ? 'rgba(255,255,255,0.4)' : getKeycapColor(keycap.tool).track}
+                          waveColor={isWireframe ? '#ffffff' : getKeycapColor(keycap.tool).wave}
+                          
+                          waveAmplitude={0} maxWaveFrequency={0} undulationSpeed={0} edgeGap={20}
+                        />
+
+                        {keycap.tool !== 'Be' ? (
+                          <div className="text-center">
+                            <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
+                            <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>{keycap.proficiency}</p>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>My Behance Portfolio</p>
+                          </div>
+                        )}
+                      </div>
+                    </TooltipWrapper>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -5,6 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 import ProjectCard from '@/components/ui/ProjectCard';
 import imagesLoaded from 'imagesloaded';
 import TextPressure from '@/components/TextPressure';
+import { darkenColor } from '@/utils/colorUtils'; 
+import TypewriterLink from '@/components/ui/TypewriterLink';
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -19,17 +21,18 @@ interface Church {
   media: string;
   type: 'image' | 'gif' | 'video';
   rank: number;
+  extracted_color: string | null; 
 }
 
 interface FeaturedChurchProps {
   limit?: number;
+  onHoverColor?: (fill: string, stroke?: string) => void;
+  onLeaveColor?: () => void;
 }
 
-export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
+export default function FeaturedChurch({ limit = 15, onHoverColor, onLeaveColor }: FeaturedChurchProps) {
   const [church, setChurch] = useState<Church[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  // ❌ DELETED: isMobile, cornerRadius (ProjectCard handles this now)
   
   // Masonry & Animation State
   const [isBottomAligned, setIsBottomAligned] = useState(false);
@@ -37,13 +40,11 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pressureFontSize, setPressureFontSize] = useState(120);
 
-  // --- Resize Handler (Simplified) ---
+  // --- Resize Handler ---
   useEffect(() => {
     const handleResize = () => {
-      // 1. Handle Text Size
       setPressureFontSize(window.innerWidth < 521 ? 50 : 120);
       
-      // 2. Handle Masonry Columns
       if (window.innerWidth < 640) setColumnCount(2);
       else if (window.innerWidth < 768) setColumnCount(3);
       else if (window.innerWidth < 1024) setColumnCount(4);
@@ -56,9 +57,9 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Fetch Data ---
+  // --- Fetch Data & Trigger Extraction ---
   useEffect(() => {
-    const fetchChurch = async () => {
+    const fetchAndProcessChurch = async () => {
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -71,7 +72,15 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
         if (error) throw error;
 
         if (data) {
-          setChurch(data as Church[]);
+          const fetchedItems = data as Church[];
+          setChurch(fetchedItems);
+
+          // 👇 LAZY EXTRACTION LOOP
+          fetchedItems.forEach(async (item) => {
+            if (!item.extracted_color && item.media) {
+              await extractAndSaveColor(item.id, item.media);
+            }
+          });
         }
       } catch (error) {
         console.error('Fetch error:', error);
@@ -80,24 +89,48 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
       }
     };
 
-    fetchChurch();
+    fetchAndProcessChurch();
   }, [limit]);
 
-  // --- Scroll Detection for "Parallax" Alignment ---
+  // 👇 HELPER: Extract -> Save -> Update State
+  const extractAndSaveColor = async (id: number, imageUrl: string) => {
+    try {
+      const res = await fetch(`/api/spotify/extract-color?imageUrl=${encodeURIComponent(imageUrl)}`);
+      if (!res.ok) return;
+      
+      const { barColor } = await res.json(); 
+
+      if (barColor) {
+        await fetch('/api/save-color', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                table: 'featuredchurch', 
+                id, 
+                color: barColor 
+            })
+        });
+
+        setChurch(prev => 
+          prev.map(item => item.id === id ? { ...item, extracted_color: barColor } : item)
+        );
+      }
+    } catch (err) {
+      console.error('Extraction failed:', err);
+    }
+  };
+
+  // --- Scroll Detection ---
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
-    
     const handleScroll = () => {
       if (timeoutId) clearTimeout(timeoutId);
       if (!containerRef.current) return;
       
-      // Debounce the check
       timeoutId = setTimeout(() => {
         const sectionElement = containerRef.current?.closest('section');
         if (!sectionElement) return;
         
         const sectionRect = sectionElement.getBoundingClientRect();
-        // Toggle alignment when section is scrolled past a certain point
         const shouldAlignBottom = sectionRect.top < -500;
         
         if (shouldAlignBottom !== isBottomAligned) {
@@ -108,17 +141,15 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isBottomAligned]);
 
-  // --- Masonry Animation Logic ---
+  // --- Masonry Animation ---
   useEffect(() => {
     if (loading || !containerRef.current) return;
-    
     const container = containerRef.current;
     const columns = Array.from(container.children).filter((el) =>
       el.classList.contains('masonry-column')
@@ -126,23 +157,18 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
 
     if (!columns.length) return;
 
-    // Wait for images to load before calculating heights
     const imgLoad = imagesLoaded(container);
-    
     const handleImagesLoaded = () => {
       const heights = columns.map((col) => col.scrollHeight);
       const maxHeight = Math.max(...heights);
 
       columns.forEach((col) => {
         col.style.transition = 'transform 1s ease, justify-content 1s ease';
-        
         if (isBottomAligned) {
-          // Push shorter columns down to align bottom
           const diff = maxHeight - col.scrollHeight;
           col.style.justifyContent = 'flex-end';
           col.style.transform = `translateY(${diff}px)`;
         } else {
-          // Align top normally
           col.style.justifyContent = 'flex-start';
           col.style.transform = 'translateY(0px)';
         }
@@ -151,9 +177,9 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
 
     imgLoad.on('always', handleImagesLoaded);
     return () => imgLoad.off('always', handleImagesLoaded);
-  }, [isBottomAligned, loading, church]); // Added church dependency so it runs on data load
+  }, [isBottomAligned, loading, church]);
 
-  // --- Column Distribution Helper ---
+  // --- Columns ---
   const columns = Array.from({ length: columnCount }, (_, i) => 
     church.filter((_, index) => index % columnCount === i)
   );
@@ -183,20 +209,36 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
             ))}
           </div>
         ) : (
-          <div className="relative">
-            {/* Masonry Container */}
-            <div ref={containerRef} className="masonry-container">
+          <div className="">
+            {/* Masonry Container with MASK */}
+            <div 
+              ref={containerRef} 
+              className="masonry-container"
+              style={{
+                maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+              }}
+            >
               {columns.map((column, colIndex) => (
                 <div key={colIndex} className="masonry-column">
                   {column.map((item) => (
-                    <div key={item.id} className="masonry-item">
+                    <div 
+                      key={item.id} 
+                      className="masonry-item"
+                      // 👇 CURSOR HOVER LOGIC
+                      onMouseEnter={() => {
+                        const fillColor = item.extracted_color || '#ffffff';
+                        const strokeColor = darkenColor(fillColor, 60);
+                        onHoverColor?.(fillColor, strokeColor);
+                      }}
+                      onMouseLeave={() => onLeaveColor?.()}
+                    >
                       <ProjectCard
                         title={item.title}
                         slug={item.slug}
                         media={item.media}
                         type={item.type}
                         aspectRatio="auto"
-                        // 👇 FIX: Pass static 30. Child component handles mobile resizing.
                         cornerRadius={30}
                       />
                     </div>
@@ -204,18 +246,14 @@ export default function FeaturedChurch({ limit = 15 }: FeaturedChurchProps) {
                 </div>
               ))}
             </div>
-
-            {/* Gradient Fade */}
-            <div className="absolute -bottom-1 left-0 opacity-50 -right-1 h-64 pointer-events-none bg-gradient-to-t from-black via-black/60 to-transparent" />
             
-            {/* View All Button */}
-            <div className="absolute bottom-5 left-0 right-0 flex justify-center z-10">
-              <a
-                href="/works?category=church"
-                className="scale-70 md:scale-80 text-center text-xs px-8 py-3 border-2 md:border-3 border-white/60 text-white font-space md:text-sm uppercase tracking-wider hover:border-white/90 hover:bg-white/5 hover:scale-75 md:hover:scale-85 transition-all duration-300 rounded-[15px]"
-              >
-                View All Church Media Designs
-              </a>
+            {/* 👇 NEW TYPING LINK (Custom Purple Cursor) */}
+            <div onMouseEnter={() => onLeaveColor?.()}>
+              <TypewriterLink 
+                text="VIEW ALL CHURCH MEDIA DESIGNS" 
+                href="/works?category=church" 
+                cursorClass="bg-violet-500 shadow-[0_0_10px_rgba(139,92,246,0.8)]"
+              />
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-// Color utility functions
+// src/utils/colorUtils.ts
 
 // Helper function to convert hex to RGB
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -69,8 +69,13 @@ export function hslToRgb(h: number, s: number, l: number): { r: number; g: numbe
   };
 }
 
-// Helper function to create a darker version of a color with better contrast
-export function darkenColor(color: string): string {
+/**
+ * Updated darkenColor
+ * @param color - The hex color
+ * @param percent - (Optional) Percentage to darken by (0-100). 
+ * If omitted, uses the old "contrast" logic (L=15%).
+ */
+export function darkenColor(color: string, percent?: number): string {
   let hex = color.replace('#', '').replace('0x', '');
   
   // Handle hex format
@@ -84,10 +89,18 @@ export function darkenColor(color: string): string {
     
     const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
     
-    // Reduce lightness to 15% for darker color with better contrast
-    hsl.l = 15;
-    // Increase saturation for more vibrant dark color
-    hsl.s = Math.min(100, hsl.s + 20);
+    // 👇 LOGIC BRANCH
+    if (percent !== undefined) {
+      // NEW LOGIC: Relative darkening (Subtract percentage from Lightness)
+      // e.g., if L is 50 and percent is 20, new L is 30.
+      hsl.l = Math.max(0, hsl.l - percent);
+    } else {
+      // OLD LOGIC: Absolute darkening (High contrast for text)
+      // Reduce lightness to 15% for darker color with better contrast
+      hsl.l = 15;
+      // Increase saturation for more vibrant dark color
+      hsl.s = Math.min(100, hsl.s + 20);
+    }
     
     const darkRgb = hslToRgb(hsl.h, hsl.s, hsl.l);
     const result = `#${[darkRgb.r, darkRgb.g, darkRgb.b]

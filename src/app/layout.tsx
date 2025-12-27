@@ -11,6 +11,7 @@ import { SmoothCursor } from '@/components/layout/SmoothCursor'
 import { array } from './fonts';
 import { monoblock } from './fonts'
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -81,6 +82,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
     <Analytics />
+    <SpeedInsights/>
+
       <body className={`${inter.variable} ${spaceMono.variable} ${din.variable} ${dm_sans.variable} ${crux.variable} ${dotted.variable} ${monoblock.variable} ${outfit.variable} ${poppins.variable} ${array.variable} ${departureMono.variable} ${sohnemono1.variable} ${sohnemono2.variable}  antialiased`}>
         <ThemeProvider
           attribute="class"

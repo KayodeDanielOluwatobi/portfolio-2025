@@ -1,15 +1,13 @@
-// src/app/api/spotify/extract-color/route.ts
-
 import { NextRequest, NextResponse } from 'next/server';
 import { Vibrant } from 'node-vibrant/node';
+import sharp from 'sharp'; // 👈 Added Sharp
 
 /**
- * Color Extraction Logic - The Claude Method™
- * 
- * Philosophy:
- * - Respect the album's artistic mood (dark albums stay dark, vibrant stays vibrant)
- * - Ensure visibility on dark backgrounds without destroying the vibe
- * - Simple, fast, and elegant
+ * Color Extraction Logic - The Claude Method™ (Refactored for Robustness)
+ * * Philosophy:
+ * - Respect the album's artistic mood
+ * - Ensure visibility on dark backgrounds
+ * - ROBUSTNESS UPGRADE: Now handles AVIF/WebP by converting to PNG on the fly.
  */
 
 interface ExtractedColors {
@@ -99,26 +97,19 @@ function hslToHex(h: number, s: number, l: number): string {
  * Adjusts lightness while preserving hue and saturation
  */
 function ensureVisibility(hexColor: string): string {
-  // Parse hex to RGB
   const hex = hexColor.replace('#', '');
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
 
-  // Convert to HSL
   const hsl = rgbToHsl(r, g, b);
 
-  // Visibility rules:
-  // - If too dark (L < 35%), lighten to 45%
-  // - If too light (L > 85%), darken to 75%
-  // - Keep saturation intact (preserves the vibe)
   if (hsl.l < 35) {
     hsl.l = 45;
   } else if (hsl.l > 85) {
     hsl.l = 75;
   }
 
-  // Boost saturation slightly if too muted (< 20%)
   if (hsl.s < 20) {
     hsl.s = 30;
   }
@@ -154,10 +145,32 @@ function determineMood(lightness: number, saturation: number): 'dark' | 'light' 
 
 /**
  * Extract color from album art using The Claude Method™
+ * NOW WITH SHARP SUPPORT FOR AVIF!
  */
 async function extractColors(imageUrl: string): Promise<ExtractedColors> {
   try {
-    const palette = await Vibrant.from(imageUrl).getPalette();
+    // 1. Fetch image manually (Vibrant fails on AVIF URLs)
+    const response = await fetch(imageUrl);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+    
+    const arrayBuffer = await response.arrayBuffer();
+    let buffer = Buffer.from(arrayBuffer);
+
+    // 2. Convert to PNG using Sharp (The Robust Fix)
+    // We resize to 200px to make extraction faster
+    try {
+        buffer = await sharp(buffer)
+            .resize(200, 200, { fit: 'inside' })
+            .toFormat('png')
+            .toBuffer();
+    } catch (sharpError) {
+        console.warn('Sharp conversion failed, attempting raw buffer...', sharpError);
+    }
+
+    // 3. Pass the clean PNG buffer to Vibrant
+    const palette = await Vibrant.from(buffer).getPalette();
+
+    // --- YOUR ORIGINAL LOGIC BELOW (UNTOUCHED) ---
 
     // Priority cascade for color selection
     let selectedColor: string | null = null;

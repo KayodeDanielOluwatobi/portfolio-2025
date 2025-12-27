@@ -1,5 +1,3 @@
-//main page.tsx
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,7 +6,6 @@ import Header from '@/components/layout/Header';
 import Hero from '@/components/layout/Hero';
 import Bio from '@/components/layout/Bio';
 import ViewportIndicator from '@/components/layout/ViewportIndicator';
-// Import interface but NOT the static array
 import { DEFAULT_CURSOR_COLOR, DEFAULT_CURSOR_STROKE, type BrandShowcase } from '@/data/brandShowcases';
 import { darkenColor } from '@/utils/colorUtils';
 import { useBrandRotation } from '@/hooks/useBrandRotation';
@@ -20,13 +17,9 @@ import FeaturedChurch from '@/components/layout/FeaturedChurch';
 import KeycapMapper from '@/components/ui/KeyCaps';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
-import ImageDisplay from '@/components/layout/ImageDisplay';
-import { supabase } from '@/utils/supabase/client'; // Import the client
-import Footer2 from '@/components/layout/Footer2';
-import Footer from '@/components/layout/Footer';
-import WatchfaceWidget from '@/components/ui/WatchFaceWidget';
+import { supabase } from '@/utils/supabase/client';
 
-// Dynamic import to prevent hydration issues
+// Dynamic import for the cursor
 const SmoothCursor = dynamic(
   () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
   { ssr: false }
@@ -35,11 +28,27 @@ const SmoothCursor = dynamic(
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  // 1. New State for Supabase Data
+  // 1. Data State
   const [showcases, setShowcases] = useState<BrandShowcase[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. Fetch from Supabase
+  // 2. Cursor Override State (For Hover Interactions)
+  // When null, we fall back to the Hero/Default logic
+  const [hoverCursorColor, setHoverCursorColor] = useState<{ fill: string; stroke: string } | null>(null);
+
+  // 3. Handlers for Child Components
+  const handleHoverColor = (fill: string, stroke?: string) => {
+    setHoverCursorColor({
+      fill,
+      stroke: stroke || darkenColor(fill, 40) // Auto-darken if no stroke provided
+    });
+  };
+
+  const handleResetColor = () => {
+    setHoverCursorColor(null);
+  };
+
+  // 4. Fetch Data
   useEffect(() => {
     const fetchShowcases = async () => {
       try {
@@ -51,7 +60,6 @@ export default function Home() {
         if (error) throw error;
 
         if (data) {
-          // Map DB columns (snake_case) to Frontend props (camelCase)
           const formattedData: BrandShowcase[] = data.map((item) => ({
             id: item.id,
             brandName: item.brand_name,
@@ -77,19 +85,18 @@ export default function Home() {
     fetchShowcases();
   }, []);
 
-  // Custom hooks logic (Dependent on showcases length)
+  // 5. Hero Rotation Logic
   const { currentIndex, setCurrentIndex, isTransitioning } = useBrandRotation({ 
-    totalBrands: showcases.length > 0 ? showcases.length : 1, // Prevent divide by zero
+    totalBrands: showcases.length > 0 ? showcases.length : 1,
     intervalDuration: 15000,
     fadeDuration: 400 
   });
   
   const cursorInHeroHeader = useCursorPosition();
   
-  // Safety check: Ensure we have data before accessing currentBrand
   const currentBrand = showcases.length > 0 
     ? showcases[currentIndex] 
-    : { // Fallback/Loading state placeholder
+    : { // Fallback
         id: 'loading',
         brandName: '',
         tagline: '',
@@ -102,32 +109,44 @@ export default function Home() {
         cursorColor: DEFAULT_CURSOR_COLOR
       };
 
-  const cursorFillColor = isMobileMenuOpen 
-    ? DEFAULT_CURSOR_COLOR 
-    : (cursorInHeroHeader ? currentBrand.cursorColor : DEFAULT_CURSOR_COLOR);
+  // 6. MASTER CURSOR LOGIC 🧠
+  // Priority: Mobile Menu > Hover Override (Keycaps/Cards) > Hero Section > Default Black
+  let cursorFillColor = DEFAULT_CURSOR_COLOR;
+  let cursorStrokeColor = DEFAULT_CURSOR_STROKE;
 
-  const cursorStrokeColor = isMobileMenuOpen 
-    ? DEFAULT_CURSOR_STROKE 
-    : (cursorInHeroHeader ? darkenColor(currentBrand.cursorColor) : DEFAULT_CURSOR_STROKE);
+  if (isMobileMenuOpen) {
+    cursorFillColor = DEFAULT_CURSOR_COLOR;
+    cursorStrokeColor = DEFAULT_CURSOR_STROKE;
+  } else if (hoverCursorColor) {
+    // If hovering over a card or keycap, use that color
+    cursorFillColor = hoverCursorColor.fill;
+    cursorStrokeColor = hoverCursorColor.stroke;
+  } else if (cursorInHeroHeader) {
+    // If inside Hero section, use Brand color
+    cursorFillColor = currentBrand.cursorColor;
+    cursorStrokeColor = darkenColor(currentBrand.cursorColor);
+  } else {
+    // Rest of the document (Bio, Footer, etc.) -> Black Fill / White Stroke
+    cursorFillColor = '#000000';
+    cursorStrokeColor = '#ffffff';
+  }
 
-  // 3. Loading Screen (Optional - prevents empty flash)
   if (loading) {
-    return <div className="h-screen w-full bg-black" />; // Or your FakeLoader component
+    return <div className="h-screen w-full bg-black" />;
   }
 
   return (
     <main>
-      {/* <SmoothCursor 
+      <SmoothCursor 
         cursorColor={cursorFillColor}
         cursorStrokeColor={cursorStrokeColor}
-      /> */}
+      />
       
       <Header 
         currentBrand={currentBrand.logoVariant}
         onMobileMenuToggle={setIsMobileMenuOpen}
       />
       
-      {/* Pass fetched showcases to Hero */}
       <Hero 
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
@@ -135,19 +154,43 @@ export default function Home() {
         isTransitioning={isTransitioning}
       />
 
-      <Bio />
-      {/* <ImageDisplay className='hidden md:block'/> */}
+      {/* Bio Section - Resets cursor if dragging from Hero */}
+      <div onMouseEnter={handleResetColor}>
+        <Bio />
+      </div>
+
       <MoreBio />
-      <FeaturedBrands />
-      <FeaturedSocials />
-      <FeaturedChurch />
-      <KeycapMapper /> 
-      {/* <Footer />
-      <Footer2 />  */}
+
+      {/* For these sections, you need to update them to accept:
+          onHoverColor={handleHoverColor} 
+          onLeaveColor={handleResetColor}
+          and implement the onMouseEnter logic inside them (like we did for About widgets)
+      */}
+      <FeaturedBrands 
+        onHoverColor={handleHoverColor} 
+        onLeaveColor={handleResetColor} 
+      />
+      <FeaturedSocials 
+        onHoverColor={handleHoverColor} 
+        onLeaveColor={handleResetColor} 
+      />
+      <FeaturedChurch 
+        onHoverColor={handleHoverColor} 
+        onLeaveColor={handleResetColor} 
+      />
       
-      <Footer3 />
-      <Bottom />
-      <ViewportIndicator />
+      {/* Keycaps: Pass the handlers so hovering a keycap sets the color */}
+      <KeycapMapper 
+        onHoverColor={handleHoverColor} 
+        onLeaveColor={handleResetColor} 
+      /> 
+      
+      <div onMouseEnter={handleResetColor}>
+        <Footer3 />
+        <Bottom />
+      </div>
+      
+      {/* <ViewportIndicator /> */}
     </main>
   );
 }

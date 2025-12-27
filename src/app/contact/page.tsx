@@ -9,6 +9,8 @@ import TextPressure from '@/components/TextPressure';
 import ViewportIndicator from '@/components/layout/ViewportIndicator';
 import Bottom from '@/components/layout/Bottom';
 import Footer3 from '@/components/layout/Footer3';
+// 👇 1. Import SmoothCursor
+import { SmoothCursor } from '@/components/layout/SmoothCursor';
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -95,6 +97,9 @@ export default function Contact() {
   return (
     <main>
       <Header onMobileMenuToggle={setIsMobileMenuOpen} />
+
+      {/* 👇 2. Insert SmoothCursor with Black Fill / White Stroke */}
+      <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" />
 
       <section className="w-full pt-32 pb-20 bg-black min-h-screen overflow-x-hidden">
         <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
