@@ -4,6 +4,13 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { WORK_CATEGORIES } from '@/data/workCategories';
 import { ChevronDown } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface CategoryNavProps {
   activeCategory: string;
@@ -13,9 +20,47 @@ interface CategoryNavProps {
 export default function CategoryNav({ activeCategory, onCategoryChange }: CategoryNavProps) {
   const [isHovering, setIsHovering] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
+  // State to store counts
+  const [counts, setCounts] = useState<Record<string, number>>({
+    all: 0,
+    brands: 0,
+    church: 0,
+    socials: 0
+  });
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const activeCategory_obj = WORK_CATEGORIES.find(cat => cat.id === activeCategory);
   const hiddenCategories = WORK_CATEGORIES.filter(cat => cat.id !== activeCategory);
+
+  // --- FETCH COUNTS FROM THE CORRECT TABLES ---
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        // Run queries in parallel for 'works_brands', 'works_church', 'works_socials'
+        const [brands, church, socials] = await Promise.all([
+          supabase.from('works_brands').select('*', { count: 'exact', head: true }),
+          supabase.from('works_church').select('*', { count: 'exact', head: true }),
+          supabase.from('works_socials').select('*', { count: 'exact', head: true }),
+        ]);
+
+        const brandCount = brands.count || 0;
+        const churchCount = church.count || 0;
+        const socialCount = socials.count || 0;
+
+        setCounts({
+          brands: brandCount,
+          church: churchCount,
+          socials: socialCount,
+          all: brandCount + churchCount + socialCount // Sum all for the 'All' category
+        });
+      } catch (error) {
+        console.error('Error fetching project counts:', error);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -32,18 +77,27 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
     };
   }, [isDropdownOpen]);
 
+  // Helper component for the Number Tag
+  const NumberTag = ({ count }: { count: number }) => (
+    <span className="align-top text-[0.6em] font-thin text-white/50 ml-1 -mt-1 inline-block">
+      {count}
+    </span>
+  );
+
   return (
     <>
       {/* MOBILE: Dropdown */}
-      <div ref={dropdownRef} className="md:hidden relative w-full select-none"> {/* Added select-none */}
+      <div ref={dropdownRef} className="md:hidden relative w-full select-none">
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="flex items-center gap-2 pb-3"
         >
-          <h2 className="text-white font-regular text-2xl">
+          <h2 className="text-white font-regular text-2xl flex items-start">
             {activeCategory_obj?.label}
+            {/* Mobile Number Tag */}
+            <NumberTag count={counts[activeCategory] || 0} />
           </h2>
-          <div className="relative w-5 h-5">
+          <div className="relative w-5 h-5 mt-1">
             <motion.div
               initial={{ opacity: 1 }}
               animate={{ opacity: isDropdownOpen ? 0 : 1 }}
@@ -82,13 +136,17 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                       onCategoryChange(category.id);
                       setIsDropdownOpen(false);
                     }}
-                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-white/5 last:border-b-0 select-none ${
+                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-white/5 last:border-b-0 select-none flex items-start ${
                       activeCategory === category.id
                         ? 'text-white bg-white/10'
                         : 'text-white/40 hover:text-white hover:bg-white/5'
                     }`}
                   >
                     {category.label}
+                    {/* Dropdown List Number Tag */}
+                    <span className="align-top text-[0.6em] font-thin ml-1 opacity-60">
+                      {counts[category.id] || 0}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -99,18 +157,17 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
 
       {/* DESKTOP: Fancy Horizontal Layout */}
       <div 
-        className="hidden md:flex items-center gap-4 select-none" // Added select-none
+        className="hidden md:flex items-center gap-4 select-none"
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         {/* Active Category Text with underline */}
         <div className="relative cursor-pointer">
           
-          {/* --- CHANGE 1 --- */}
           <motion.h2
-            key={activeCategory_obj?.id} // Added optional chaining just in case
+            key={activeCategory_obj?.id}
             layoutId={activeCategory_obj?.id} 
-            className="font-regular text-3xl text-white hover:text-white/80 transition-colors duration-300 pb-1 whitespace-nowrap"
+            className="font-regular text-3xl text-white hover:text-white/80 transition-colors duration-300 pb-1 whitespace-nowrap flex items-start"
             transition={{
               type: 'spring',
               stiffness: 200,
@@ -119,9 +176,11 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
             }} 
           >
             {activeCategory_obj?.label}
+            {/* Desktop Active Number Tag */}
+            <NumberTag count={counts[activeCategory] || 0} />
           </motion.h2>
 
-          {/* Underline - 80% of text width */}
+          {/* Underline */}
           <motion.div
             className="absolute bottom-0 left-0 h-0.5 bg-white origin-left"
             style={{ width: '80%' }}
@@ -142,7 +201,6 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
             <motion.div className="flex gap-16 items-center ml-16">
               {hiddenCategories.map((category, index) => (
                 
-                // --- CHANGE 2 ---
                 <motion.button
                   key={category.id}
                   layoutId={category.id} 
@@ -158,9 +216,11 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                     delay: index * 0.1,
                     ease: 'easeOut',
                   }}
-                  className="font-extralight text-3xl text-white/40 hover:text-white/70 transition-colors duration-300 whitespace-nowrap select-none" // Added select-none
+                  className="font-extralight text-3xl text-white/40 hover:text-white/70 transition-colors duration-300 whitespace-nowrap select-none flex items-start"
                 >
                   {category.label}
+                  {/* Desktop Hover Item Number Tag */}
+                  <NumberTag count={counts[category.id] || 0} />
                 </motion.button>
 
               ))}

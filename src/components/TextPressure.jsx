@@ -32,6 +32,25 @@ const TextPressure = ({
   const [scaleY, setScaleY] = useState(1);
   const [lineHeight, setLineHeight] = useState(1);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkDevice = () => {
+      if (typeof navigator === 'undefined') return;
+      
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent.toLowerCase());
+      const hasTouch = navigator.maxTouchPoints > 0;
+
+      if (isMobileUA || (hasTouch && window.innerWidth < 1024)) {
+        setIsMobile(true);
+      } else {
+        setIsMobile(false);
+      }
+    };
+    checkDevice();
+  }, []);
+
   const chars = text.split('');
 
   const dist = (a, b) => {
@@ -41,6 +60,8 @@ const TextPressure = ({
   };
 
   useEffect(() => {
+    if (isMobile) return;
+
     const handleMouseMove = e => {
       cursorRef.current.x = e.clientX;
       cursorRef.current.y = e.clientY;
@@ -66,7 +87,7 @@ const TextPressure = ({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, []);
+  }, [isMobile]);
 
   const setSize = () => {
     if (!containerRef.current || !titleRef.current) return;
@@ -121,6 +142,8 @@ const TextPressure = ({
   }, [scale, text, fixedFontSize]);
 
   useEffect(() => {
+    if (isMobile) return;
+
     let rafId;
     const animate = () => {
       mouseRef.current.x += (cursorRef.current.x - mouseRef.current.x) / 15;
@@ -161,9 +184,8 @@ const TextPressure = ({
 
     animate();
     return () => cancelAnimationFrame(rafId);
-  }, [width, weight, italic, alpha, chars.length]);
+  }, [width, weight, italic, alpha, chars.length, isMobile]);
 
-  // --- 1. 'flex' IS REMOVED FROM HERE ---
   const dynamicClassName = [className, stroke ? 'stroke' : ''].filter(Boolean).join(' ');
 
   return (
@@ -184,8 +206,6 @@ const TextPressure = ({
           src: url('${fontUrl}');
           font-style: normal;
         }
-
-        /* --- 2. THE .flex CLASS IS GONE --- */
 
         .stroke span {
           position: relative;
@@ -223,7 +243,6 @@ const TextPressure = ({
           whiteSpace: 'nowrap',
           fontWeight: 100,
           width: '100%',
-          // --- 3. FLEX STYLES ARE APPLIED INLINE ---
           display: flex ? 'flex' : 'block',
           justifyContent: flex ? 'space-between' : undefined,
         }}
@@ -235,7 +254,9 @@ const TextPressure = ({
             data-char={char}
             style={{
               display: 'inline-block',
-              color: stroke ? undefined : textColor
+              color: stroke ? undefined : textColor,
+              // 👇 FIX: Default to Thin (100) and Ultra-Compressed (5)
+              fontVariationSettings: "'wght' 100, 'wdth' 5, 'ital' 0"
             }}
           >
             {char === ' ' ? '\u00A0' : char}

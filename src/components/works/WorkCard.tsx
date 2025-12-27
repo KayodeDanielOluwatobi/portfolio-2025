@@ -1,5 +1,3 @@
-// src/components/works/WorkCard.tsx
-
 'use client';
 
 import Link from 'next/link';
@@ -8,7 +6,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { darkenColor } from './ColorUtils';
 import { MarqueeText } from '@/components/ui/MarqueeText';
-import { useCursor } from '@/context/CursorContext'; // 👈 Import Context
+import { useCursor } from '@/context/CursorContext';
+import { useSquircleRadius } from '@/hooks/useSquircleRadius'; 
 
 interface WorkCardProps {
   id: number;
@@ -37,6 +36,10 @@ export default function WorkCard({
 
   // 1. Hook into the Cursor Context
   const { setCursorTheme, resetCursorTheme } = useCursor();
+
+  // 2. Hook into the Responsive Squircle Radius
+  // Desktop: 30px | Tablet/Mobile: 20px | Tiny Phones (320px): 12px
+  const dynamicRadius = useSquircleRadius(30, 22, 16, 12);
 
   // Convert media to array if it's a string
   const mediaArray = Array.isArray(media) ? media : [media];
@@ -71,12 +74,9 @@ export default function WorkCard({
     }
   };
 
-  // 2. Handle Mouse Events
+  // Handle Mouse Events for Cursor
   const handleMouseEnter = () => {
-    // Debugging: Check console to see if this fires!
-    // console.log("Hovering:", title, brandColor); 
-    
-    const safeColor = brandColor || '#FFFFFF'; // Fallback if DB is empty
+    const safeColor = brandColor || '#FFFFFF'; // Fallback
     setCursorTheme(safeColor, darkenColor(safeColor));
   };
 
@@ -87,15 +87,15 @@ export default function WorkCard({
   return (
     <div 
       className="flex flex-col gap-4"
-      // 👇 IMPORTANT: Events attached here
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Link wraps only Image and Title */}
       <Link href={`/works/${slug}`} className="cursor-pointer group">
-        {/* Image Container */}
+        
+        {/* Image Container with Dynamic Squircle */}
         <Squircle
-          cornerRadius={30}
+          cornerRadius={dynamicRadius} // 👈 Uses the calculated radius
           cornerSmoothing={0.7}
           className={`relative overflow-hidden ${getAspectRatio()} bg-white/5 image-protected`}
         >
@@ -153,7 +153,7 @@ export default function WorkCard({
             </AnimatePresence>
           </div>
 
-          {/* Indicator dots */}
+          {/* Indicator dots for Carousel */}
           {isCarousel && (
             <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1.5">
               {mediaArray.map((_, index) => (

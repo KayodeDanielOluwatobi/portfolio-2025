@@ -16,7 +16,7 @@ export default function AnimatedUnderlineLink({
   href,
   children,
   className = '',
-  underlineClassName = 'h-[2px] md:h-[4px] bottom-[-0px] sm:bottom-[-0px] md:bottom-[-1px] lg:bottom-[-2px]', // Default thickness & offset
+  underlineClassName = 'h-[2.5px] md:h-[4px] bottom-[3px] sm:bottom-[3px] md:bottom-[-1px] lg:bottom-[5px]', // Default thickness & offset
 }: AnimatedUnderlineLinkProps) {
   const ref = useRef(null);
   // Trigger animation once when it enters the viewport

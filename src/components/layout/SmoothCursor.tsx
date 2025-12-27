@@ -1,5 +1,3 @@
-// File: components/layout/SmoothCursor.tsx
-
 'use client'
 
 import { FC, useEffect, useRef, useState } from "react"
@@ -95,99 +93,45 @@ const RadiatingLines: FC<RadiatingLinesProps> = ({ strokeColor }) => {
         `}</style>
       </defs>
       <g>
-        {/* Top-left line */}
         <motion.line
           className="radiating-line"
-          x1="10"
-          y1="3"
-          x2="13.5"
-          y2="9"
+          x1="10" y1="3" x2="13.5" y2="9"
           stroke={strokeColor}
           initial={{ pathLength: 1, opacity: 0 }}
-          animate={{ 
-            pathLength: 0, 
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{ 
-            pathLength: { duration: 0.4, ease: "easeOut" },
-            opacity: { duration: 0.6, times: [0, 0.3, 1] }
-          }}
+          animate={{ pathLength: 0, opacity: [0, 1, 1, 0] }}
+          transition={{ pathLength: { duration: 0.4, ease: "easeOut" }, opacity: { duration: 0.6, times: [0, 0.3, 1] } }}
         />
-        
-        {/* Top-center line */}
         <motion.line
           className="radiating-line"
-          x1="25"
-          y1="2"
-          x2="24"
-          y2="8.5"
+          x1="25" y1="2" x2="24" y2="8.5"
           stroke={strokeColor}
           initial={{ pathLength: 1, opacity: 0 }}
-          animate={{ 
-            pathLength: 0, 
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{ 
-            pathLength: { duration: 0.4, ease: "easeOut", delay: 0.05 },
-            opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.05 }
-          }}
+          animate={{ pathLength: 0, opacity: [0, 1, 1, 0] }}
+          transition={{ pathLength: { duration: 0.4, ease: "easeOut", delay: 0.05 }, opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.05 } }}
         />
-        
-        {/* Top-right line */}
         <motion.line
           className="radiating-line"
-          x1="38"
-          y1="12"
-          x2="32"
-          y2="15.5"
+          x1="38" y1="12" x2="32" y2="15.5"
           stroke={strokeColor}
           initial={{ pathLength: 1, opacity: 0 }}
-          animate={{ 
-            pathLength: 0, 
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{ 
-            pathLength: { duration: 0.4, ease: "easeOut", delay: 0.1 },
-            opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.1 }
-          }}
+          animate={{ pathLength: 0, opacity: [0, 1, 1, 0] }}
+          transition={{ pathLength: { duration: 0.4, ease: "easeOut", delay: 0.1 }, opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.1 } }}
         />
-        
-        {/* Left line */}
         <motion.line
           className="radiating-line"
-          x1="3"
-          y1="15"
-          x2="9"
-          y2="17"
+          x1="3" y1="15" x2="9" y2="17"
           stroke={strokeColor}
           initial={{ pathLength: 1, opacity: 0 }}
-          animate={{ 
-            pathLength: 0, 
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{ 
-            pathLength: { duration: 0.4, ease: "easeOut", delay: 0.15 },
-            opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.15 }
-          }}
+          animate={{ pathLength: 0, opacity: [0, 1, 1, 0] }}
+          transition={{ pathLength: { duration: 0.4, ease: "easeOut", delay: 0.15 }, opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.15 } }}
         />
-        
-        {/* Bottom-left line */}
         <motion.line
           className="radiating-line"
-          x1="5"
-          y1="30"
-          x2="10"
-          y2="27"
+          x1="5" y1="30" x2="10" y2="27"
           stroke={strokeColor}
           initial={{ pathLength: 1, opacity: 0 }}
-          animate={{ 
-            pathLength: 0, 
-            opacity: [0, 1, 1, 0],
-          }}
-          transition={{ 
-            pathLength: { duration: 0.4, ease: "easeOut", delay: 0.2 },
-            opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.2 }
-          }}
+          animate={{ pathLength: 0, opacity: [0, 1, 1, 0] }}
+          transition={{ pathLength: { duration: 0.4, ease: "easeOut", delay: 0.2 }, opacity: { duration: 0.6, times: [0, 0.3, 1], delay: 0.2 } }}
         />
       </g>
     </svg>
@@ -211,7 +155,12 @@ export function SmoothCursor({
   const [isVisible, setIsVisible] = useState(true)
   const [cursorInHeroSection, setCursorInHeroSection] = useState(true)
   const [hasMouseInput, setHasMouseInput] = useState(false)
+  
+  // 👇 State to track device type
   const [isTouchDevice, setIsTouchDevice] = useState(false)
+  // 👇 State to track if we HAVE CHECKED the device type yet
+  const [isInputDetermined, setIsInputDetermined] = useState(false)
+
   const lastMousePos = useRef<Position>({ x: 0, y: 0 })
   const velocity = useRef<Position>({ x: 0, y: 0 })
   const lastUpdateTime = useRef(Date.now())
@@ -220,9 +169,9 @@ export function SmoothCursor({
   const resetRotationTimeout = useRef<NodeJS.Timeout | null>(null)
   const inactivityTimeout = useRef<NodeJS.Timeout | null>(null)
   
-  const RESET_ROTATION_DELAY = 4000 // 4 seconds after stopping before rotating back
-  const RESET_ANGLE = -17 // Tilt angle to reset to
-  const INACTIVITY_DELAY = 20000 // 20 seconds before fading out
+  const RESET_ROTATION_DELAY = 4000
+  const RESET_ANGLE = -17
+  const INACTIVITY_DELAY = 20000
 
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
@@ -241,100 +190,84 @@ export function SmoothCursor({
     stiffness: 300,
   })
 
-  // Smart input detection that handles all edge cases
-useEffect(() => {
-  let mouseMovementDetected = false
-  let touchDetected = false
-  let inputDecided = false
+  // Smart input detection
+  useEffect(() => {
+    let mouseMovementDetected = false
+    let touchDetected = false
+    let inputDecided = false
 
-  // Check if there's ANY mouse movement (excluding touch-triggered mouse events)
-  const handleMouseMove = (e: MouseEvent) => {
-    // Touch events can trigger mouse events on mobile, so we check if touch was detected first
-    if (touchDetected) return
-    
-    // Check if this is real mouse movement (not emulated from touch)
-    // Real mouse events have movementX/Y, touch-emulated ones typically don't
-    if (!mouseMovementDetected && (e.movementX !== 0 || e.movementY !== 0)) {
-      mouseMovementDetected = true
-      decideInput()
-    }
-  }
-
-  // Check for touch interactions
-  const handleTouchStart = () => {
-    if (!inputDecided) {
-      touchDetected = true
-      decideInput()
-    }
-  }
-
-  // Make the final decision on input type
-  const decideInput = () => {
-    if (inputDecided) return
-    inputDecided = true
-
-    if (mouseMovementDetected && !touchDetected) {
-      // Real mouse detected - enable custom cursor
-      setHasMouseInput(true)
-      setIsTouchDevice(false)
-      document.body.style.cursor = "none"
-    } else {
-      // Touch detected or no clear mouse movement - use default cursor
-      setHasMouseInput(false)
-      setIsTouchDevice(true)
-      document.body.style.cursor = "auto"
-    }
-
-    // Clean up listeners after decision is made
-    cleanup()
-  }
-
-  // Fallback: If no interaction after 500ms, make an educated guess
-  const fallbackTimer = setTimeout(() => {
-    if (!inputDecided) {
-      // Check basic indicators as fallback
-      const userAgent = navigator.userAgent.toLowerCase()
-      const hasTouchPoints = navigator.maxTouchPoints > 0
-      const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|windows phone|mobile/.test(userAgent)
+    const handleMouseMove = (e: MouseEvent) => {
+      if (touchDetected) return
       
-      // If clear mobile indicators, assume touch
-      if (isMobileUA || (hasTouchPoints && window.innerWidth < 1024)) {
-        touchDetected = true
-      } else {
-        // Assume desktop with mouse
+      if (!mouseMovementDetected && (e.movementX !== 0 || e.movementY !== 0)) {
         mouseMovementDetected = true
+        decideInput()
       }
-      decideInput()
     }
-  }, 500)
 
-  // Add event listeners
-  window.addEventListener('mousemove', handleMouseMove, { passive: true })
-  window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    const handleTouchStart = () => {
+      if (!inputDecided) {
+        touchDetected = true
+        decideInput()
+      }
+    }
 
-  // Cleanup function
-  const cleanup = () => {
-    window.removeEventListener('mousemove', handleMouseMove)
-    window.removeEventListener('touchstart', handleTouchStart)
-    clearTimeout(fallbackTimer)
-  }
+    const decideInput = () => {
+      if (inputDecided) return
+      inputDecided = true
 
-  return cleanup
-}, [])
+      if (mouseMovementDetected && !touchDetected) {
+        setHasMouseInput(true)
+        setIsTouchDevice(false)
+        document.body.style.cursor = "none"
+      } else {
+        setHasMouseInput(false)
+        setIsTouchDevice(true)
+        document.body.style.cursor = "auto"
+      }
 
+      // 👇 CONFIRM WE KNOW THE DEVICE TYPE NOW
+      setIsInputDetermined(true)
+      cleanup()
+    }
 
-  // Reset rotation to default tilt after idle - use spring's current value to find shortest path
+    const fallbackTimer = setTimeout(() => {
+      if (!inputDecided) {
+        const userAgent = navigator.userAgent.toLowerCase()
+        const hasTouchPoints = navigator.maxTouchPoints > 0
+        const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|windows phone|mobile/.test(userAgent)
+        
+        if (isMobileUA || (hasTouchPoints && window.innerWidth < 1024)) {
+          touchDetected = true
+        } else {
+          mouseMovementDetected = true
+        }
+        decideInput()
+      }
+    }, 500)
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+
+    const cleanup = () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchstart', handleTouchStart)
+      clearTimeout(fallbackTimer)
+      // 👇 RESTORE CURSOR ON UNMOUNT (Cleanup Fix)
+      document.body.style.cursor = 'auto'
+    }
+
+    return cleanup
+  }, [])
+
   const scheduleRotationReset = () => {
     if (resetRotationTimeout.current) {
       clearTimeout(resetRotationTimeout.current)
     }
     
     resetRotationTimeout.current = setTimeout(() => {
-      // Get the spring's current visual rotation value
       const currentSpringRotation = rotation.get()
       
-      // Find the closest equivalent angle to RESET_ANGLE
-      // by adding/subtracting 360 until we're close to current position
       let targetRotation = RESET_ANGLE
       while (targetRotation - currentSpringRotation > 180) {
         targetRotation -= 360
@@ -343,31 +276,26 @@ useEffect(() => {
         targetRotation += 360
       }
       
-      // Now animate to this close equivalent - smooth, no wild spin
       rotation.set(targetRotation)
       accumulatedRotation.current = targetRotation
       previousAngle.current = targetRotation
     }, RESET_ROTATION_DELAY)
   }
 
-  // Reset inactivity timer for fade out
   const resetInactivityTimer = () => {
     if (inactivityTimeout.current) {
       clearTimeout(inactivityTimeout.current)
     }
     
-    // Make cursor visible immediately on any activity
     opacity.set(1)
     setIsVisible(true)
     
-    // Set new timeout for next fade out
     inactivityTimeout.current = setTimeout(() => {
       opacity.set(0)
       setIsVisible(false)
     }, INACTIVITY_DELAY)
   }
 
-  // Main useEffect - handles mouse movement, rotation, and inactivity (runs once)
   useEffect(() => {
     const updateVelocity = (currentPos: Position) => {
       const currentTime = Date.now()
@@ -387,11 +315,8 @@ useEffect(() => {
     const smoothMouseMove = (e: MouseEvent) => {
       const currentPos = { x: e.clientX, y: e.clientY }
       updateVelocity(currentPos)
-
-      // Reset inactivity timer on any movement
       resetInactivityTimer()
 
-      // Detect if in hero section
       const heroSection = document.querySelector('[data-cursor-brand]')
       if (heroSection) {
         const heroRect = heroSection.getBoundingClientRect()
@@ -425,7 +350,6 @@ useEffect(() => {
         const timeout = setTimeout(() => {
           scale.set(1)
           setIsMoving(false)
-          // Schedule rotation reset after cursor stops moving
           scheduleRotationReset()
         }, 150)
 
@@ -434,20 +358,14 @@ useEffect(() => {
     }
 
     const handleClick = (e: MouseEvent) => {
-      // Check if click is on a link
       const target = e.target as HTMLElement
       const isLink = target.closest('a') !== null
       
       if (isLink) {
-        // Show radiating lines effect
         setShowRadiatingLines(true)
-        
-        // Hide radiating lines after animation completes
         setTimeout(() => {
           setShowRadiatingLines(false)
         }, 800)
-        
-        // Reset inactivity timer on link click
         resetInactivityTimer()
       }
     }
@@ -455,7 +373,6 @@ useEffect(() => {
     let rafId: number
     const throttledMouseMove = (e: MouseEvent) => {
       if (rafId) return
-
       rafId = requestAnimationFrame(() => {
         smoothMouseMove(e)
         rafId = 0
@@ -464,8 +381,6 @@ useEffect(() => {
 
     window.addEventListener("mousemove", throttledMouseMove)
     window.addEventListener("click", handleClick)
-
-    // Initialize inactivity timer
     resetInactivityTimer()
 
     return () => {
@@ -475,44 +390,39 @@ useEffect(() => {
       if (resetRotationTimeout.current) clearTimeout(resetRotationTimeout.current)
       if (inactivityTimeout.current) clearTimeout(inactivityTimeout.current)
     }
-  }, []) // Empty dependency array - runs only once
+  }, [])
 
- // Link hover detection with MutationObserver to detect dynamic links
-// Link hover detection using event delegation (no race conditions)
-useEffect(() => {
-  const handleMouseOver = (e: MouseEvent) => {
-    const target = e.target as HTMLElement
-    if (target.closest('a')) {
-      setIsHoveringLink(true)
+  useEffect(() => {
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (target.closest('a')) {
+        setIsHoveringLink(true)
+      }
     }
-  }
-  
-  const handleMouseOut = (e: MouseEvent) => {
-    const relatedTarget = e.relatedTarget as HTMLElement
     
-    // Don't care where we're leaving from, only care where we're going
-    // If mouse is moving to anything that's NOT a link, turn off hover state
-    if (!relatedTarget?.closest('a')) {
-      setIsHoveringLink(false)
+    const handleMouseOut = (e: MouseEvent) => {
+      const relatedTarget = e.relatedTarget as HTMLElement
+      if (!relatedTarget?.closest('a')) {
+        setIsHoveringLink(false)
+      }
     }
-  }
 
-  // Use event delegation on document - works for all links, even dynamic ones
-  document.addEventListener('mouseover', handleMouseOver)
-  document.addEventListener('mouseout', handleMouseOut)
+    document.addEventListener('mouseover', handleMouseOver)
+    document.addEventListener('mouseout', handleMouseOut)
 
-  return () => {
-    document.removeEventListener('mouseover', handleMouseOver)
-    document.removeEventListener('mouseout', handleMouseOut)
-  }
-}, [])
+    return () => {
+      document.removeEventListener('mouseover', handleMouseOver)
+      document.removeEventListener('mouseout', handleMouseOut)
+    }
+  }, [])
 
-  // Don't render cursor only if it's a touch device
-  if (isTouchDevice) {
+  // 👇 STOP RENDER:
+  // 1. If it's a touch device
+  // 2. OR if we haven't figured out the device type yet (prevents peeking)
+  if (isTouchDevice || !isInputDetermined) {
     return null
   }
 
-  // Use default cursor with brand colors
   const cursorElement = cursor || (
     <DefaultCursorSVG 
       fillColor={cursorColor} 
@@ -543,7 +453,6 @@ useEffect(() => {
         damping: 30,
       }}
     >
-      {/* Cursor - pulsates on link hover, stops immediately on unhover */}
       <motion.div
         animate={isHoveringLink ? { scale: [1, 1.15, 1] } : { scale: 1 }}
         transition={isHoveringLink ? { duration: 1.5, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }}
@@ -551,7 +460,6 @@ useEffect(() => {
         {cursorElement}
       </motion.div>
       
-      {/* Radiating lines on link click - white in bio section, brand color in hero */}
       <AnimatePresence>
         {showRadiatingLines && (
           <RadiatingLines strokeColor={cursorInHeroSection ? cursorColor : '#FFFFFF'} />

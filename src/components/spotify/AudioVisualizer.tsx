@@ -99,7 +99,6 @@ function normalizeFrequency(value: number, max: number): number {
   return Math.max(0, Math.min(normalized, 1));
 }
 
-// Map frequency data to bar heights with staggering and decay effect
 function mapFrequencyToBars(
   frequencyData: FrequencyFrame,
   barCount: number,
@@ -121,39 +120,33 @@ function mapFrequencyToBars(
   const heights: number[] = [];
   let barIndex = 0;
 
-  // Helper function to apply staggering and decay
   const applyStaggeringAndDecay = (
     frequencyNorm: number,
     barIndexInGroup: number,
     totalBarsInGroup: number,
     globalBarIndex: number
   ): number => {
-    // Staggering: vary each bar slightly based on position
     const staggerVariation = (1 - staggerAmount / 2) + (barIndexInGroup / Math.max(1, totalBarsInGroup - 1)) * staggerAmount;
     const staggeredHeight = restHeight + (frequencyNorm * staggerVariation) * maxHeight;
 
-    // Decay/lag effect: blend with previous height for smooth interpolation
     const previousHeight = previousHeights[globalBarIndex] || staggeredHeight;
     const decayedHeight = previousHeight * decayFactor + staggeredHeight * (1 - decayFactor);
 
     return Math.max(restHeight, Math.min(decayedHeight, maxHeight + restHeight));
   };
 
-  // Bass bars
   for (let i = 0; i < bassBars; i++) {
     const height = applyStaggeringAndDecay(bassNorm, i, bassBars, barIndex);
     heights.push(height);
     barIndex++;
   }
 
-  // Mid bars
   for (let i = 0; i < midBars; i++) {
     const height = applyStaggeringAndDecay(midNorm, i, midBars, barIndex);
     heights.push(height);
     barIndex++;
   }
 
-  // Treble bars
   for (let i = 0; i < trebleBars; i++) {
     const height = applyStaggeringAndDecay(trebleNorm, i, trebleBars, barIndex);
     heights.push(height);
@@ -182,13 +175,14 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   staggerAmount = 0.3,
   decayFactor = 0.15,
 }) => {
-  // ✅ FIX: Use ONE single hook for all bars
   const controls = useAnimationControls();
   
   const frameRef = useRef<number>();
   const startTimeRef = useRef<number>(Date.now());
   const previousHeightsRef = useRef<number[]>([]);
 
+  // Even though we aren't using the patterns for fallback anymore, 
+  // we leave this if you ever want to use it for initial load states.
   const finalPattern = useSequentialPatterns
     ? getPatternFromSequence(sequenceId)
     : pulsePattern;
@@ -210,7 +204,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     startTimeRef.current = Date.now();
     
     const animateBars = () => {
-      const elapsedTime = (Date.now() - startTimeRef.current) / 1000;
+      // Remove elapsedTime since we don't need sine waves anymore
       const hasFrequencyData = frequencyData && frequencyData.length > 0;
 
       // 1. Calculate heights for THIS frame
@@ -241,49 +235,17 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         if (hasFrequencyData && calculatedHeights.length > 0) {
            height = calculatedHeights[index] || restHeight;
         } else {
-          // Fallback patterns
-          const baseFreq = 0.005 * animationSpeed;
-
-          switch (finalPattern) {
-            case 'wave':
-              height =
-                restHeight +
-                (Math.sin(elapsedTime * baseFreq + index * 0.5) * 0.5 + 0.5) * maxHeight;
-              break;
-
-            case 'mirror':
-              const center = barCount / 2;
-              const dist = Math.abs(index - center);
-              height =
-                restHeight +
-                (Math.sin(elapsedTime * baseFreq + dist * 0.3) * 0.5 + 0.5) * maxHeight;
-              break;
-
-            case 'random':
-              height =
-                restHeight +
-                (Math.sin(elapsedTime * baseFreq * (1 + index * 0.1)) * 0.3 +
-                  Math.sin(elapsedTime * baseFreq * 2 * (1 + index * 0.05)) * 0.3 +
-                  Math.random() * 0.4) *
-                  maxHeight;
-              break;
-
-            case 'bounce':
-              height =
-                restHeight +
-                Math.abs(Math.sin(elapsedTime * baseFreq + index * Math.PI)) * maxHeight;
-              break;
-
-            case 'uniform':
-              height =
-                restHeight + (Math.sin(elapsedTime * baseFreq) * 0.5 + 0.5) * maxHeight;
-              break;
-
-            default:
-              height =
-                restHeight +
-                (Math.sin(elapsedTime * baseFreq + index * 0.5) * 0.5 + 0.5) * maxHeight;
-          }
+           // 🛑 FIX APPLIED HERE:
+           // Instead of generating a sine wave (breathing effect),
+           // we check if we have a previous height and HOLD IT (Freeze).
+           const lastKnownHeight = previousHeightsRef.current[index];
+           
+           if (lastKnownHeight !== undefined) {
+             height = lastKnownHeight;
+           } else {
+             // If no history exists (initial load), stay flat
+             height = restHeight;
+           }
         }
         
         height = Math.max(restHeight, Math.min(height, maxHeight + restHeight));
@@ -318,12 +280,11 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     currentFrameIndex,
     restHeight,
     maxFrequencies,
-    controls, // Added controls to dependency array
+    controls, 
     decayFactor,
     staggerAmount
   ]);
 
-  // Calculate dynamic width based on bars, barWidth, and barSpacing
   const dynamicWidth = containerWidth || `${barCount * barWidth + (barCount - 1) * barSpacing}px`;
 
   return (
@@ -337,8 +298,8 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
       {Array.from({ length: barCount }).map((_, index) => (
         <motion.div
           key={index}
-          custom={index} // ✅ Pass index so controls.start((i) => ...) knows which bar is which
-          animate={controls} // ✅ Connect the single control hook
+          custom={index}
+          animate={controls}
           style={{
             width: `${barWidth}px`,
             backgroundColor: barColor,

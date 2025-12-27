@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Squircle } from '@squircle-js/react';
 import { useState } from 'react';
+// 👇 Import the hook
+import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 
 interface ProjectCardProps {
   title: string;
@@ -14,14 +16,25 @@ interface ProjectCardProps {
   cornerRadius?: number;
 }
 
-export default function ProjectCard({ title, slug, media, type, cornerRadius = 30, aspectRatio = 'square' }: ProjectCardProps) {
+export default function ProjectCard({ 
+  title, 
+  slug, 
+  media, 
+  type, 
+  cornerRadius = 30, // This is now your "Desktop Max"
+  aspectRatio = 'square' 
+}: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // 👇 Initialize the responsive radius
+  // It uses your prop for Desktop, but enforces 20px for Mobile and 12px for Tiny screens
+  const dynamicRadius = useSquircleRadius(30, 22, 16, 12);
 
   return (
     <Link href={`/works/${slug}`}>
       <Squircle
-        cornerRadius={cornerRadius}
+        cornerRadius={dynamicRadius} // 👈 Use the dynamic value here
         cornerSmoothing={0.7}
         className={`relative overflow-hidden cursor-pointer ${
           aspectRatio === 'square' ? 'aspect-square' : ''
@@ -97,12 +110,6 @@ export default function ProjectCard({ title, slug, media, type, cornerRadius = 3
             }`}
           />
         )}
-        {/* Overlay on hover */}
-        {/* <div
-          className={`absolute inset-0 transition-colors duration-300 ${
-            isHovered ? 'bg-black/10' : 'bg-black/0'
-          }`}
-        /> */}
       </Squircle>
     </Link>
   );

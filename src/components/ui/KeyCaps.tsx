@@ -5,6 +5,7 @@ import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
 
+// --- Interfaces ---
 interface Keycap {
   name: string;
   tool: string;
@@ -19,6 +20,7 @@ interface KeycapWithProficiency extends Keycap {
   proficiency: 'Expert' | 'Advanced' | 'Intermediate';
 }
 
+// --- Data & Configuration ---
 const keycapProficiencies: Record<string, 'Expert' | 'Advanced' | 'Intermediate'> = {
   'Figma': 'Expert',
   'Premiere Pro': 'Advanced',
@@ -51,18 +53,18 @@ const toolProgressOverrides: Record<string, number> = {
 };
 
 const keycapColors: Record<string, { track: string; wave: string }> = {
-  'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, // Pastel Blue
-  'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, // Pastel Apricot
-  'Premiere Pro':   { track: '#E3E3FF', wave: '#9999FF' }, // Pastel Lavender
-  'After Effects':  { track: '#F2D9FF', wave: '#D999FF' }, // Pastel Lilac
-  'InDesign':       { track: '#FFC2D1', wave: '#FF3366' }, // Pastel Rose
-  'Be':             { track: '#EAEAEA', wave: '#ffffff' }, // Light Gray (Contrast for white)
-  'Figma':          { track: '#C2F2E3', wave: '#0ACF83' }, // Pastel Mint
-  'Spline':         { track: '#EAD9FF', wave: '#B388FF' }, // Pastel Violet
-  'ChatGPT':        { track: '#D9EDE8', wave: '#74AA9C' }, // Pastel Sage
-  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8' }, // Pastel Sky
-  'Affinity':       { track: '#E4FFD1', wave: '#A8FF71' }, // Pastel Lime
-  'default':        { track: '#EEEEEE', wave: '#cccccc' }, // Lighter Gray
+  'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, 
+  'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, 
+  'Premiere Pro':   { track: '#E3E3FF', wave: '#9999FF' }, 
+  'After Effects':  { track: '#F2D9FF', wave: '#D999FF' }, 
+  'InDesign':       { track: '#FFC2D1', wave: '#FF3366' }, 
+  'Be':             { track: '#EAEAEA', wave: '#ffffff' }, 
+  'Figma':          { track: '#C2F2E3', wave: '#0ACF83' }, 
+  'Spline':         { track: '#EAD9FF', wave: '#B388FF' }, 
+  'ChatGPT':        { track: '#D9EDE8', wave: '#74AA9C' }, 
+  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8' }, 
+  'Affinity':       { track: '#E4FFD1', wave: '#A8FF71' }, 
+  'default':        { track: '#EEEEEE', wave: '#cccccc' }, 
 };
 
 const getKeycapColor = (tool: string): { track: string; wave: string } => {
@@ -73,12 +75,41 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+// --- Animation Wrapper Component (UPDATED SPEED) ---
+// Default duration increased to 2000ms for that slow, premium feel
+const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }: any) => {
+  const [progress, setProgress] = useState(0);
 
+  useEffect(() => {
+    let animationFrameId: number;
+    const startTime = performance.now();
 
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progressRatio = Math.min(elapsed / duration, 1);
+      
+      // Quintic Ease-Out: Starts fast, brakes slowly
+      const ease = 1 - Math.pow(1 - progressRatio, 5);
+      
+      setProgress(ease * targetProgress);
+
+      if (progressRatio < 1) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [targetProgress, duration]);
+
+  return <CircularWaveProgress {...props} progress={progress} />;
+};
+
+// --- Main Component ---
 export default function KeycapInteractive() {
   const [keycaps, setKeycaps] = useState<KeycapWithProficiency[]>([]);
   const [hoveredKeycap, setHoveredKeycap] = useState<string | null>(null);
-  const [lastTappedKeycap, setLastTappedKeycap] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [loaderProgress, setLoaderProgress] = useState(0);
@@ -86,7 +117,7 @@ export default function KeycapInteractive() {
   const imgRef = useRef<HTMLImageElement>(null);
 
   const [isMounted, setIsMounted] = useState(false);
-  const [pressureFontSize, setPressureFontSize] = useState(120); // Default to desktop size
+  const [pressureFontSize, setPressureFontSize] = useState(120);
 
   const OFFSET_X = -6;
   const OFFSET_Y = -15;
@@ -145,7 +176,6 @@ export default function KeycapInteractive() {
   };
 
   const tooltipSize = getTooltipSize();
-
   const nonInteractiveKeycaps = ['Esc', 'Shift', 'Enter', 'Space'];
 
   const getTooltipPosition = (keycapY: number) => {
@@ -169,7 +199,6 @@ export default function KeycapInteractive() {
     return !nonInteractiveKeycaps.includes(keycapName);
   };
 
-  // Loader progress animation
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (loading && !fadeOut) {
@@ -194,7 +223,6 @@ export default function KeycapInteractive() {
         }));
         setKeycaps(withProficiency);
         
-        // Trigger fade out before setting loading to false
         setFadeOut(true);
         setTimeout(() => {
           setLoading(false);
@@ -210,26 +238,19 @@ export default function KeycapInteractive() {
   }, []);
 
   useEffect(() => {
-        // This runs only on the client
-        setIsMounted(true); 
-    
-        const handleResize = () => {
-          const mobileSize = 50;    // <-- Set your desired mobile size
-          const desktopSize = 120;  // <-- Your 96*2 desktop size
-          const breakpoint = 521;   // Tailwind 'md' breakpoint
-    
-          // Set size based on window width
-          setPressureFontSize(
-            window.innerWidth < breakpoint ? mobileSize : desktopSize
-          );
-        };
-    
-        handleResize(); // Run once on mount
-        window.addEventListener('resize', handleResize); // Add listener
-    
-        // Cleanup listener on unmount
-        return () => window.removeEventListener('resize', handleResize);
-  }, []); // Empty array ensures this runs only once on mount
+    setIsMounted(true); 
+    const handleResize = () => {
+      const mobileSize = 50;   
+      const desktopSize = 120; 
+      const breakpoint = 521;  
+      setPressureFontSize(
+        window.innerWidth < breakpoint ? mobileSize : desktopSize
+      );
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const calculateScale = () => {
@@ -245,16 +266,11 @@ export default function KeycapInteractive() {
     return () => window.removeEventListener('resize', calculateScale);
   }, []);
 
-
-
-  
-
   const handleKeycapClick = (keycap: KeycapWithProficiency) => {
     if (keycap.name === 'Esc') {
       scrollToTop();
       return;
     }
-
     if (keycap.name === 'Enter') {
       setTimeout(() => {
         const nextSection = document.querySelector('[data-section="after-keycaps"]');
@@ -266,41 +282,32 @@ export default function KeycapInteractive() {
       }, 0);
       return;
     }
-
     return;
   };
 
   return (
     <section className="w-full py-20 bg-black">
       <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
-        {/* Header */}
         <div className="mb-12">
-          {/* <h2 className="pl-3 font-space text-xl sm:text-2xl md:text-3xl lg:text-4xl uppercase text-white/95 mb-4">
-            My Design Stack
-          </h2> */}
-
           <TextPressure className='ml-2 mb-8'
-                          text="MY DESIGN STACK"
-                          flex={false}
-                          alpha={false}
-                          stroke={false}
-                          width={true}
-                          weight={true}
-                          italic={true}
-                          textColor="#ffffff"
-                          strokeColor="#ff0000"
-                          minFontSize={36}
-                          fixedFontSize={pressureFontSize}
-            />
-
+            text="MY DESIGN STACK"
+            flex={false}
+            alpha={false}
+            stroke={false}
+            width={true}
+            weight={true}
+            italic={true}
+            textColor="#ffffff"
+            strokeColor="#ff0000"
+            minFontSize={36}
+            fixedFontSize={pressureFontSize}
+          />
           <p className="text-white/60 pl-2 md:pl-3 text-sm font-light sm:text-base">
             {imageScale < 0.5 ? 'Tap on the keycaps to explore my tools and proficiency levels' : 'Hover over keycaps to explore my tools and proficiency levels'}
           </p>
         </div>
 
-        {/* Image Container with Interactive Overlay */}
         <div className="relative w-full bg-black rounded-xl overflow-visible inline-block">
-          {/* Loader - Fades out when data arrives */}
           {loading && (
             <div
               className={`absolute inset-0 flex items-center justify-center z-50 transition-opacity duration-500 ${
@@ -325,7 +332,6 @@ export default function KeycapInteractive() {
             </div>
           )}
 
-          {/* Base Image */}
           <img
             ref={imgRef}
             src="/keycaps2.png"
@@ -338,10 +344,8 @@ export default function KeycapInteractive() {
             }}
           />
 
-          {/* Interactive Hotspots */}
           {keycaps.map((keycap, index) => (
             <div key={`${keycap.name}-${index}`}>
-              {/* Invisible Hotspot */}
               <div
                 className="absolute cursor-pointer group transition-all duration-300"
                 style={{
@@ -358,13 +362,11 @@ export default function KeycapInteractive() {
                 onMouseLeave={() => setHoveredKeycap(null)}
                 onClick={() => handleKeycapClick(keycap)}
               >
-                {/* Hover Highlight */}
                 {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && (
                   <div className="absolute opacity-0 inset-0 bg-cyan-400/90 border border-cyan-400/40 rounded-lg transition-all duration-300" />
                 )}
               </div>
 
-              {/* Tooltip - Smart positioning */}
               {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && (
                 <Squircle
                   cornerRadius={tooltipSize.cornerRadius}
@@ -390,15 +392,16 @@ export default function KeycapInteractive() {
                     minWidth: tooltipSize.minWidth,
                   }}
                 >
-                  {/* Tool Name */}
                   <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
                     {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
                   </h3>
 
-                  {/* Circular Progress */}
                   <div className="flex flex-col items-center gap-2">
-                    <CircularWaveProgress
-                      progress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
+                    
+                    {/* 👇 Updated Duration to 2000ms */}
+                    <AnimatedCircularProgress
+                      targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
+                      duration={2000} 
                       size={tooltipSize.progressSize}
                       trackWidth={tooltipSize.trackWidth}
                       waveWidth={tooltipSize.waveWidth}
@@ -409,7 +412,7 @@ export default function KeycapInteractive() {
                       undulationSpeed={0}
                       edgeGap={20}
                     />
-                    {/* Proficiency Label */}
+
                     {keycap.tool !== 'Be' ? (
                       <div className="text-center">
                         <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>

@@ -135,7 +135,7 @@ export default function Home() {
       />
 
       <Bio />
-      <ImageDisplay className='hidden md:block'/>
+      {/* <ImageDisplay className='hidden md:block'/> */}
       <MoreBio />
       <FeaturedBrands />
       <FeaturedSocials />
@@ -145,7 +145,7 @@ export default function Home() {
       <Footer2 />  */}
       <Footer3 />
       <Bottom />
-      {/* <ViewportIndicator /> */}
+      <ViewportIndicator />
     </main>
   );
 }

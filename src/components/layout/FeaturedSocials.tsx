@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js'; // 1. Import Supabase
+import { createClient } from '@supabase/supabase-js'; 
 import ProjectCard from '@/components/ui/ProjectCard';
 import imagesLoaded from 'imagesloaded';
 import TextPressure from '@/components/TextPressure';
 
-// 2. Initialize Client
+// 1. Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -28,64 +28,45 @@ interface FeaturedSocialsProps {
 export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
   const [socials, setSocials] = useState<Socials[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [cornerRadius, setCornerRadius] = useState(30);
+  
+  // ❌ DELETED: isMobile, cornerRadius, isMounted (Redundant)
+
+  // Masonry & Layout State
   const [isBottomAligned, setIsBottomAligned] = useState(false);
   const [columnCount, setColumnCount] = useState(5);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const [isMounted, setIsMounted] = useState(false);
   const [pressureFontSize, setPressureFontSize] = useState(120);
 
-  // --- Resize Handler for TextPressure ---
+  // --- Consolidated Resize Handler ---
   useEffect(() => {
-    setIsMounted(true);
-    
     const handleResize = () => {
-      const mobileSize = 50;    
-      const desktopSize = 120;  
+      // 1. Text Size Logic
       const breakpoint = 521;   
+      setPressureFontSize(window.innerWidth < breakpoint ? 50 : 120);
 
-      setPressureFontSize(
-        window.innerWidth < breakpoint ? mobileSize : desktopSize
-      );
-    };
-  
-    handleResize(); 
-    window.addEventListener('resize', handleResize); 
-  
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // --- Resize Handler for Layout ---
-  useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-      setCornerRadius(window.innerWidth >= 1024 ? 0 : 0); 
-
+      // 2. Column Count Logic
       if (window.innerWidth < 640) setColumnCount(2);
       else if (window.innerWidth < 768) setColumnCount(3);
       else if (window.innerWidth < 1024) setColumnCount(4);
       else if (window.innerWidth < 1280) setColumnCount(5);
       else setColumnCount(5);
     };
-    handleResize();
-    window.addEventListener('resize', handleResize);
+  
+    handleResize(); 
+    window.addEventListener('resize', handleResize); 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // --- Fetch Socials Data (UPDATED FOR SUPABASE) ---
+  // --- Fetch Data ---
   useEffect(() => {
     const fetchSocials = async () => {
       setLoading(true);
       try {
-        // 3. Fetch from 'featuredsocials' table
         const { data, error } = await supabase
           .from('featuredsocials')
           .select('*')
-          .order('order', { ascending: true }) // Sort by order in DB
-          .limit(limit);                       // Limit in DB
+          .order('order', { ascending: true })
+          .limit(limit);
 
         if (error) throw error;
 
@@ -102,7 +83,7 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     fetchSocials();
   }, [limit]);
 
-  // --- Scroll Detection for Bottom Alignment ---
+  // --- Scroll Detection (Parallax Alignment) ---
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
 
@@ -117,13 +98,11 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
         const sectionRect = sectionElement.getBoundingClientRect();
         const TOP_THRESHOLD = 500;
 
-        const hasScrolledPastTop = sectionRect.top < -TOP_THRESHOLD;
-        const shouldAlignBottom = hasScrolledPastTop;
+        // Check if we scrolled past the top to trigger the bottom alignment animation
+        const shouldAlignBottom = sectionRect.top < -TOP_THRESHOLD;
 
-        if (shouldAlignBottom && !isBottomAligned) {
-          setIsBottomAligned(true);
-        } else if (!shouldAlignBottom && isBottomAligned) {
-          setIsBottomAligned(false);
+        if (shouldAlignBottom !== isBottomAligned) {
+          setIsBottomAligned(shouldAlignBottom);
         }
       }, 100);
     };
@@ -137,7 +116,7 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     };
   }, [isBottomAligned]);
 
-  // --- Apply Alignment Animation ---
+  // --- Masonry Animation Logic ---
   useEffect(() => {
     if (loading || !containerRef.current) return;
     const container = containerRef.current;
@@ -169,22 +148,13 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
     };
 
     imgLoad.on('always', handleImagesLoaded);
+    return () => imgLoad.off('always', handleImagesLoaded);
+  }, [isBottomAligned, loading, socials]); // Added socials dependency
 
-    return () => {
-      imgLoad.off('always', handleImagesLoaded);
-    };
-  }, [isBottomAligned, loading]);
-
-  // --- Distribute into Columns ---
-  const distributeIntoColumns = () => {
-    const columns: Socials[][] = Array.from({ length: columnCount }, () => []);
-    socials.forEach((social, index) => {
-      columns[index % columnCount].push(social);
-    });
-    return columns;
-  };
-
-  const columns = distributeIntoColumns();
+  // --- Distribute Columns ---
+  const columns = Array.from({ length: columnCount }, (_, i) => 
+    socials.filter((_, index) => index % columnCount === i)
+  );
 
   return (
     <section className="w-full font-space py-16 bg-black">
@@ -212,6 +182,7 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
           </div>
         ) : (
           <div className="relative">
+            {/* Masonry Container */}
             <div ref={containerRef} className="masonry-container">
               {columns.map((column, colIndex) => (
                 <div key={colIndex} className="masonry-column">
@@ -223,6 +194,7 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
                         media={social.media}
                         type={social.type}
                         aspectRatio="auto"
+                        // 👇 FIX: Static radius, let the card handle resizing
                         cornerRadius={30}
                       />
                     </div>
@@ -248,44 +220,11 @@ export default function FeaturedSocials({ limit = 15 }: FeaturedSocialsProps) {
       </div>
 
       <style jsx>{`
-        .masonry-container {
-          display: flex;
-          gap: 24px;
-          width: 100%;
-          align-items: flex-start;
-        }
-
-        .masonry-column {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 24px;
-          position: relative;
-          transition: transform 0.7s ease, justify-content 0.7s ease;
-          will-change: transform;
-        }
-
-        .masonry-item {
-          margin-bottom: 0;
-        }
-
-        @media (max-width: 1024px) {
-          .masonry-container {
-            gap: 16px;
-          }
-          .masonry-column {
-            gap: 16px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .masonry-container {
-            gap: 12px;
-          }
-          .masonry-column {
-            gap: 12px;
-          }
-        }
+        .masonry-container { display: flex; gap: 24px; width: 100%; align-items: flex-start; }
+        .masonry-column { flex: 1; display: flex; flex-direction: column; gap: 24px; position: relative; transition: transform 0.7s ease, justify-content 0.7s ease; will-change: transform; }
+        .masonry-item { margin-bottom: 0; }
+        @media (max-width: 1024px) { .masonry-container, .masonry-column { gap: 16px; } }
+        @media (max-width: 640px) { .masonry-container, .masonry-column { gap: 12px; } }
       `}</style>
     </section>
   );
