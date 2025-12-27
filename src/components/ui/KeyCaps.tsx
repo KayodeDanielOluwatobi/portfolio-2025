@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
+import { motion } from 'framer-motion'; // 1. Added framer-motion import
 
 // --- Interfaces ---
 interface Keycap {
@@ -76,7 +77,6 @@ const scrollToTop = () => {
 };
 
 // --- Animation Wrapper Component (UPDATED SPEED) ---
-// Default duration increased to 2000ms for that slow, premium feel
 const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }: any) => {
   const [progress, setProgress] = useState(0);
 
@@ -88,7 +88,6 @@ const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }:
       const elapsed = currentTime - startTime;
       const progressRatio = Math.min(elapsed / duration, 1);
       
-      // Quintic Ease-Out: Starts fast, brakes slowly
       const ease = 1 - Math.pow(1 - progressRatio, 5);
       
       setProgress(ease * targetProgress);
@@ -115,6 +114,9 @@ export default function KeycapInteractive() {
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [imageScale, setImageScale] = useState(1);
   const imgRef = useRef<HTMLImageElement>(null);
+
+  // 2. Add Wireframe State
+  const [isWireframe, setIsWireframe] = useState(false);
 
   const [isMounted, setIsMounted] = useState(false);
   const [pressureFontSize, setPressureFontSize] = useState(120);
@@ -176,7 +178,8 @@ export default function KeycapInteractive() {
   };
 
   const tooltipSize = getTooltipSize();
-  const nonInteractiveKeycaps = ['Esc', 'Shift', 'Enter', 'Space'];
+  // 3. Removed 'Shift' from non-interactive list
+  const nonInteractiveKeycaps = ['Esc', 'Enter', 'Space'];
 
   const getTooltipPosition = (keycapY: number) => {
     if (imageScale < 1) {
@@ -267,6 +270,12 @@ export default function KeycapInteractive() {
   }, []);
 
   const handleKeycapClick = (keycap: KeycapWithProficiency) => {
+    // 4. Handle Shift Click
+    if (keycap.name === 'Shift') {
+      setIsWireframe(!isWireframe);
+      return;
+    }
+
     if (keycap.name === 'Esc') {
       scrollToTop();
       return;
@@ -332,106 +341,124 @@ export default function KeycapInteractive() {
             </div>
           )}
 
-          <img
-            ref={imgRef}
-            src="/keycaps2.png"
-            alt="Design Tools Keyboard"
-            className="w-full h-auto block"
-            onLoad={() => {
-              if (imgRef.current) {
-                setImageScale(imgRef.current.offsetWidth / 756);
-              }
-            }}
-          />
+          {/* 5. Replaced single Image with Stacked Motion Images */}
+          <div className="relative w-full">
+            {/* Raster Image */}
+            <motion.img
+              ref={imgRef}
+              src="/keycaps2.png"
+              alt="Design Tools Keyboard"
+              className="w-full h-auto block relative z-10"
+              animate={{ opacity: isWireframe ? 0 : 1 }}
+              transition={{ duration: 0.5 }}
+              onLoad={() => {
+                if (imgRef.current) {
+                  setImageScale(imgRef.current.offsetWidth / 756);
+                }
+              }}
+            />
 
-          {keycaps.map((keycap, index) => (
-            <div key={`${keycap.name}-${index}`}>
-              <div
-                className="absolute cursor-pointer group transition-all duration-300"
-                style={{
-                  left: `${keycap.x * imageScale + OFFSET_X * imageScale}px`,
-                  top: `${keycap.y * imageScale + OFFSET_Y * imageScale}px`,
-                  width: `${keycap.width * imageScale}px`,
-                  height: `${keycap.height * imageScale}px`,
-                }}
-                onMouseEnter={() => {
-                  if (shouldShowTooltip(keycap.name)) {
-                    setHoveredKeycap(keycap.name);
-                  }
-                }}
-                onMouseLeave={() => setHoveredKeycap(null)}
-                onClick={() => handleKeycapClick(keycap)}
-              >
-                {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && (
-                  <div className="absolute opacity-0 inset-0 bg-cyan-400/90 border border-cyan-400/40 rounded-lg transition-all duration-300" />
+            {/* Wireframe Image */}
+            <motion.img 
+              src="/keyboard-wireframe.png"
+              alt="Keyboard Wireframe"
+              className="absolute inset-0 w-full h-full object-cover z-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: isWireframe ? 1 : 0 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+
+          {/* Interactive Hotspots */}
+          <div className="absolute inset-0 z-20">
+            {keycaps.map((keycap, index) => (
+              <div key={`${keycap.name}-${index}`}>
+                <div
+                  className="absolute cursor-pointer group transition-all duration-300"
+                  style={{
+                    left: `${keycap.x * imageScale + OFFSET_X * imageScale}px`,
+                    top: `${keycap.y * imageScale + OFFSET_Y * imageScale}px`,
+                    width: `${keycap.width * imageScale}px`,
+                    height: `${keycap.height * imageScale}px`,
+                  }}
+                  onMouseEnter={() => {
+                    // Prevent tooltip for Shift
+                    if (shouldShowTooltip(keycap.name) && keycap.name !== 'Shift') {
+                      setHoveredKeycap(keycap.name);
+                    }
+                  }}
+                  onMouseLeave={() => setHoveredKeycap(null)}
+                  onClick={() => handleKeycapClick(keycap)}
+                >
+                  {/* Transparent Hotspot (No Visual Box) */}
+                </div>
+
+                {/* Tooltip (Hidden for Shift) */}
+                {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && keycap.name !== 'Shift' && (
+                  <Squircle
+                    cornerRadius={tooltipSize.cornerRadius}
+                    cornerSmoothing={tooltipSize.cornerSmoothing}
+                    className="absolute z-50 backdrop-blur-md pointer-events-none shadow-xl animate-fadeIn"
+                    style={{
+                      left: `${(keycap.x + keycap.width / 2) * imageScale + OFFSET_X * imageScale}px`,
+                      ...(shouldTooltipAppearBelow(keycap.y)
+                        ? {
+                            top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px`,
+                          }
+                        : {
+                            top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px`,
+                          }),
+                      transform: 'translateX(-50%)',
+                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: tooltipSize.gap,
+                      minWidth: tooltipSize.minWidth,
+                    }}
+                  >
+                    <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
+                      {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
+                    </h3>
+
+                    <div className="flex flex-col items-center gap-2">
+                      
+                      <AnimatedCircularProgress
+                        targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
+                        duration={2000} 
+                        size={tooltipSize.progressSize}
+                        trackWidth={tooltipSize.trackWidth}
+                        waveWidth={tooltipSize.waveWidth}
+                        trackColor={getKeycapColor(keycap.tool).track}
+                        waveColor={getKeycapColor(keycap.tool).wave}
+                        waveAmplitude={0}
+                        maxWaveFrequency={0}
+                        undulationSpeed={0}
+                        edgeGap={20}
+                      />
+
+                      {keycap.tool !== 'Be' ? (
+                        <div className="text-center">
+                          <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
+                          <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>
+                            {keycap.proficiency}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>
+                            My Behance Portfolio
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </Squircle>
                 )}
               </div>
-
-              {hoveredKeycap === keycap.name && shouldShowTooltip(keycap.name) && (
-                <Squircle
-                  cornerRadius={tooltipSize.cornerRadius}
-                  cornerSmoothing={tooltipSize.cornerSmoothing}
-                  className="absolute z-50 backdrop-blur-md pointer-events-none shadow-xl animate-fadeIn"
-                  style={{
-                    left: `${(keycap.x + keycap.width / 2) * imageScale + OFFSET_X * imageScale}px`,
-                    ...(shouldTooltipAppearBelow(keycap.y)
-                      ? {
-                          top: `${(keycap.y + keycap.height + 15) * imageScale + OFFSET_Y * imageScale}px`,
-                        }
-                      : {
-                          top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px`,
-                        }),
-                    transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: tooltipSize.gap,
-                    minWidth: tooltipSize.minWidth,
-                  }}
-                >
-                  <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
-                    {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
-                  </h3>
-
-                  <div className="flex flex-col items-center gap-2">
-                    
-                    {/* 👇 Updated Duration to 2000ms */}
-                    <AnimatedCircularProgress
-                      targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
-                      duration={2000} 
-                      size={tooltipSize.progressSize}
-                      trackWidth={tooltipSize.trackWidth}
-                      waveWidth={tooltipSize.waveWidth}
-                      trackColor={getKeycapColor(keycap.tool).track}
-                      waveColor={getKeycapColor(keycap.tool).wave}
-                      waveAmplitude={0}
-                      maxWaveFrequency={0}
-                      undulationSpeed={0}
-                      edgeGap={20}
-                    />
-
-                    {keycap.tool !== 'Be' ? (
-                      <div className="text-center">
-                        <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
-                        <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>
-                          {keycap.proficiency}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>
-                          My Behance Portfolio
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </Squircle>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 

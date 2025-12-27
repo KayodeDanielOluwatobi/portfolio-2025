@@ -144,7 +144,7 @@ export default function SpotifyWidget({
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             // GREYSCALE LOGIC: Only greyscale if it is Last Played history. If just paused, keep color.
-            filter: track.isLastPlayed ? 'grayscale(100%) brightness(0.5)' : 'none',
+            filter: track.isLastPlayed ? 'grayscale(100%) brightness(0.8)' : 'none',
           }}
         />
       )}

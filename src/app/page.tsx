@@ -24,6 +24,7 @@ import ImageDisplay from '@/components/layout/ImageDisplay';
 import { supabase } from '@/utils/supabase/client'; // Import the client
 import Footer2 from '@/components/layout/Footer2';
 import Footer from '@/components/layout/Footer';
+import WatchfaceWidget from '@/components/ui/WatchFaceWidget';
 
 // Dynamic import to prevent hydration issues
 const SmoothCursor = dynamic(
@@ -143,6 +144,7 @@ export default function Home() {
       <KeycapMapper /> 
       {/* <Footer />
       <Footer2 />  */}
+      
       <Footer3 />
       <Bottom />
       <ViewportIndicator />

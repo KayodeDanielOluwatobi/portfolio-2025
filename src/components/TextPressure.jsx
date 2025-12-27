@@ -37,11 +37,11 @@ const TextPressure = ({
   useEffect(() => {
     const checkDevice = () => {
       if (typeof navigator === 'undefined') return;
-      
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|windows phone/i.test(userAgent.toLowerCase());
       const hasTouch = navigator.maxTouchPoints > 0;
-
+      
+      // If mobile, set true.
       if (isMobileUA || (hasTouch && window.innerWidth < 1024)) {
         setIsMobile(true);
       } else {
@@ -60,6 +60,7 @@ const TextPressure = ({
   };
 
   useEffect(() => {
+    // If mobile, we do NOT run the listeners
     if (isMobile) return;
 
     const handleMouseMove = e => {
@@ -77,10 +78,13 @@ const TextPressure = ({
 
     if (containerRef.current) {
       const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+      
+      // 🛑 FIX: Initialize cursor FAR AWAY (-2000px) so it starts "Relaxed"
+      // Previously, this was initializing at center (width/2), causing the "Expanded/Frozen" look.
       mouseRef.current.x = left + width / 2;
       mouseRef.current.y = top + height / 2;
-      cursorRef.current.x = mouseRef.current.x;
-      cursorRef.current.y = mouseRef.current.y;
+      cursorRef.current.x = left - 2000; // Far to the left
+      cursorRef.current.y = top - 2000;  // Far to the top
     }
 
     return () => {
@@ -255,7 +259,7 @@ const TextPressure = ({
             style={{
               display: 'inline-block',
               color: stroke ? undefined : textColor,
-              // 👇 FIX: Default to Thin (100) and Ultra-Compressed (5)
+              // Force Rest State on Mobile
               fontVariationSettings: "'wght' 100, 'wdth' 5, 'ital' 0"
             }}
           >
