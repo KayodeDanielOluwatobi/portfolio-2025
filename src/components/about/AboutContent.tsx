@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import BioCard from './BioCard';
 import SpotifyWidget from '@/components/spotify/SpotifyWidget';
 import CurrentlyReading from './CurrentlyReading';
@@ -14,7 +14,9 @@ interface AboutContentProps {
 }
 
 export default function AboutContent({ onHoverColor, onLeaveColor }: AboutContentProps) {
-    const containerVariants = {
+    
+    // 👇 Explicitly typed as Variants to fix the TS error
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -22,7 +24,8 @@ export default function AboutContent({ onHoverColor, onLeaveColor }: AboutConten
         }
     };
 
-    const itemVariants = {
+    // 👇 Explicitly typed as Variants
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
             opacity: 1,
@@ -58,7 +61,7 @@ export default function AboutContent({ onHoverColor, onLeaveColor }: AboutConten
                     <motion.div variants={itemVariants} className="w-full md:w-5/12 self-start h-[250px] md:h-[300px]">
                         <SpotifyWidget 
                             pollInterval={60000}
-                            onHoverColor={onHoverColor} 
+                            onHoverColor={onHoverColor}
                             onLeaveColor={onLeaveColor}
                         />
                     </motion.div>
