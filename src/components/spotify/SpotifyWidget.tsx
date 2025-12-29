@@ -88,8 +88,11 @@ export default function SpotifyWidget({
     try {
       const response = await fetch('/api/spotify/currently-playing');
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch track data');
+      if (response.status === 204 || response.status > 400) {
+        setTrack(null); // Clear the track so we know we are idle
+        setFadeOut(true);
+        setIsLoading(false);
+        return;
       }
 
       const data: SpotifyTrackData = await response.json();
@@ -122,15 +125,27 @@ export default function SpotifyWidget({
   }, [pollInterval]);
 
   // 👇 Handle Hover Logic
-  const handleMouseEnter = () => {
-    if (track?.colors?.barColor) {
-      // Use the extracted vibrant color from the album art
-      onHoverColor?.(track.colors.barColor, '#ffffff');
-    } else {
-      // Fallback to Spotify Green
-      onHoverColor?.('#1DB954', '#ffffff');
-    }
-  };
+ const handleMouseEnter = () => {
+  // If no track exists, default to Green
+  if (!track) {
+    onHoverColor?.('#1DB954', '#ffffff');
+    return;
+  }
+
+  // If not playing (Paused OR Last Played), force Grey cursor
+  if (!track.isPlaying) {
+    onHoverColor?.('#71717a', '#ffffff'); // #71717a is Zinc-500 (Clean Grey)
+    return;
+  }
+
+  // If Playing, use the vibrant album color
+  if (track.colors?.barColor) {
+    onHoverColor?.(track.colors.barColor, '#ffffff');
+  } else {
+    onHoverColor?.('#1DB954', '#ffffff');
+  }
+};
+
 
   return (
     // Wrapper div to capture hover events cleanly outside the Squircle

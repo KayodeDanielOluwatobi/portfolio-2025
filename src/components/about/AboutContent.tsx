@@ -23,7 +23,7 @@ export default function AboutContent({ onHoverColor, onLeaveColor }: AboutConten
                 <div className="flex flex-col gap-12 md:gap-24">
                     
                     {/* Row 1: Bio (Left) */}
-                    <FadeUp className="w-full md:w-7/12 self-start">
+                    <FadeUp className="w-full h-auto md:w-7/12 self-start">
                         <div onMouseEnter={onLeaveColor}>
                             <BioCard />
                         </div>

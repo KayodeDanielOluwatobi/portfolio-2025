@@ -26,6 +26,10 @@ export default function FadeUp({
   return (
     <motion.div
       ref={ref}
+
+      // 👇 Allow vertical animation WITHOUT freezing height
+      layout="position"
+
       initial={{ opacity: 0, y: yOffset }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: yOffset }}
       transition={{ 
@@ -35,6 +39,10 @@ export default function FadeUp({
         // Starts with momentum, slows down very smoothly at the end. No bounce.
         ease: [0.22, 1, 0.36, 1] 
       }}
+
+      // 👇 Defensive: never clip expanding children
+      style={{ overflow: 'visible' }}
+
       className={className}
     >
       {children}
