@@ -8,7 +8,7 @@ import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MarqueeText } from '@/components/ui/MarqueeText';
-import { useSquircleRadius } from '@/hooks/useSquircleRadius'; // 👈 Hook import
+import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 
 interface Show {
   id: number;
@@ -18,6 +18,7 @@ interface Show {
   provider_logo: string | null;
   progress: number;
   myrating: number | null;
+  extracted_color: string | null;
 }
 
 interface ExtractedColors {
@@ -27,7 +28,6 @@ interface ExtractedColors {
 
 const DEFAULT_COLORS = { barColor: '#1DB954', glowColor: '#2EE86E' };
 
-// 👇 Props Interface
 interface CurrentlyWatchingProps {
   onHoverColor?: (fill: string, stroke?: string) => void;
   onLeaveColor?: () => void;
@@ -40,7 +40,6 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
 
-  // 👇 Using Hook with Default Values
   const squircleRadius = useSquircleRadius();
   const isMobile = squircleRadius <= 16;
 
@@ -54,23 +53,43 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
     return () => clearInterval(interval);
   }, [isLoading]);
 
+  // 👇 Updated Fetch Logic
   useEffect(() => {
     const fetchWatchList = async () => {
       setIsLoading(true);
       try {
         const response = await fetch('/api/watch-list');
         if (!response.ok) throw new Error('Failed to fetch');
+        
         const data = await response.json();
-        const validShows = data.filter((s: Show) => s.backdrop);
+        const validShows = data.filter((s: Show) => s.backdrop) as Show[];
 
         setShows(validShows);
         setFadeOut(true);
         setTimeout(() => setIsLoading(false), 500);
 
-        // Prefetch colors
-        validShows.forEach((show: Show) => {
-          if (show.backdrop) prefetchColor(show.backdrop);
+        // Initialize Cache & Trigger lazy extractions
+        const initialCache: Record<string, ExtractedColors> = {};
+        
+        validShows.forEach((show) => {
+          if (show.backdrop) {
+            if (show.extracted_color) {
+              // A. If color exists in DB, use it immediately
+              initialCache[show.backdrop] = { 
+                barColor: show.extracted_color, 
+                glowColor: show.extracted_color 
+              };
+            } else {
+              // 👇 B. FIX: Pass 'show.title' as the 3rd argument
+              extractAndSaveColor(show.id, show.backdrop, show.title);
+            }
+          }
         });
+
+        if (Object.keys(initialCache).length > 0) {
+            setColorCache(prev => ({ ...prev, ...initialCache }));
+        }
+
       } catch (error) {
         console.error(error);
         setIsLoading(false);
@@ -79,22 +98,36 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
     fetchWatchList();
   }, []);
 
-  const prefetchColor = async (backdropUrl: string) => {
-    if (colorCache[backdropUrl]) return;
-
+  // 👇 FIX: Update signature to accept 'title'
+  const extractAndSaveColor = async (id: number, backdropUrl: string, title: string) => {
     try {
-      const response = await fetch(
-        `/api/spotify/extract-color?imageUrl=${encodeURIComponent(backdropUrl)}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setColorCache((prev) => ({
+      if (colorCache[backdropUrl]) return;
+
+      const res = await fetch(`/api/spotify/extract-color?imageUrl=${encodeURIComponent(backdropUrl)}`);
+      if (!res.ok) return;
+      
+      const { barColor } = await res.json(); 
+
+      if (barColor) {
+        await fetch('/api/save-color', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                table: 'watch_list', 
+                id, 
+                title: title, // 👈 FIX: Use the passed title argument
+                color: barColor 
+            })
+        });
+
+        setColorCache(prev => ({
           ...prev,
-          [backdropUrl]: data,
+          [backdropUrl]: { barColor, glowColor: barColor }
         }));
+        
+        setShows(prev => prev.map(s => s.id === id ? { ...s, extracted_color: barColor } : s));
       }
-    } catch (error) {
-      console.error('Prefetch failed for:', backdropUrl);
+    } catch (err) {
+      console.error('Extraction failed:', err);
     }
   };
 
@@ -118,15 +151,13 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
 
   const currentShow = shows[currentIndex];
 
-  // 👇 Determine Active Colors
   const activeColors =
     currentShow?.backdrop && colorCache[currentShow.backdrop]
       ? colorCache[currentShow.backdrop]
       : DEFAULT_COLORS;
 
-  // 👇 Handle Hover Logic
   const handleMouseEnter = () => {
-    onHoverColor?.(activeColors.barColor, '#ffffff'); // Use barColor as fill
+    onHoverColor?.(activeColors.barColor, '#ffffff'); 
   };
 
   const LoadingState = () => (
@@ -165,7 +196,6 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
   }
 
   return (
-    // Wrapper to capture Hover Events
     <div
       className="w-full h-full"
       onMouseEnter={handleMouseEnter}
@@ -255,9 +285,9 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
 
                 {currentShow.myrating !== null && currentShow.myrating !== undefined && (
                   <div className="group/rating relative flex items-center gap-1 cursor-default w-fit">
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-zinc-800/90 border border-zinc-700/50 backdrop-blur-md text-[10px] font-medium uppercase tracking-widest text-zinc-300 rounded-full shadow-xl opacity-0 translate-y-2 group-hover/rating:opacity-100 group-hover/rating:translate-y-0 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-zinc-800/40 border border-zinc-700/50 backdrop-blur-xl text-[10px] font-medium uppercase tracking-widest text-zinc-300 rounded-full shadow-xl opacity-0 translate-y-2 group-hover/rating:opacity-100 group-hover/rating:translate-y-0 transition-all duration-300 pointer-events-none whitespace-nowrap z-20">
                       My Rating
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800/90" />
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-800/40" />
                     </div>
                     {[...Array(10)].map((_, i) => (
                       <div key={i} className="relative w-3 h-3 md:w-4 md:h-4">

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import BubblingFlask from '@/components/ui/BubblingFlask';
 import { useState } from 'react';
+import { SmoothCursor } from '@/components/layout/SmoothCursor';
+
 
 export default function NotFound() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -12,6 +14,9 @@ export default function NotFound() {
     <main className="bg-black min-h-screen flex flex-col">
       {/* Keep the Header so they can navigate away */}
       <Header onMobileMenuToggle={setIsMobileMenuOpen} />
+
+      {/* 👇 2. Insert SmoothCursor with Black Fill / White Stroke */}
+      <SmoothCursor cursorColor="#39FF14" cursorStrokeColor="#000000" />
 
       <section className="flex-1 flex flex-col items-center justify-center px-6 text-center py-32 relative overflow-hidden">
         

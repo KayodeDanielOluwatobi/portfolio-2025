@@ -57,7 +57,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
         // Wrapper to capture Hover Events
         <div 
             className="w-full h-full"
-            onMouseEnter={() => onHoverColor?.(CYAN_COLOR, '#ffffff')}
+            onMouseEnter={() => onHoverColor?.(CYAN_COLOR)}
             onMouseLeave={() => onLeaveColor?.()}
         >
             <Squircle

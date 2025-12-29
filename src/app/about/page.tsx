@@ -3,28 +3,27 @@
 import { useState } from 'react';
 import Header from '@/components/layout/Header';
 import Bottom from '@/components/layout/Bottom';
-import ViewportIndicator from '@/components/layout/ViewportIndicator';
 import AboutHero from '@/components/about/AboutHero';
 import AboutContent from '@/components/about/AboutContent';
 import Footer3 from '@/components/layout/Footer3';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
+// 👇 1. Import the color utility
+import { darkenColor } from '@/utils/colorUtils'; 
 
 export default function About() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     
-    // Default cursor color (Black/White theme)
-    // FIX 1: Initial state set to Black fill / White stroke to match your design
+    // Default: Black Fill / White Stroke
     const [cursorColor, setCursorColor] = useState('#000000'); 
     const [cursorStrokeColor, setCursorStrokeColor] = useState('#ffffff'); 
 
-    // Helper to change color on hover
-    const handleColorChange = (fill: string, stroke: string = '#ffffff') => {
+    // 👇 2. Update this handler to Auto-Darken
+    const handleColorChange = (fill: string, stroke?: string) => {
         setCursorColor(fill);
-        setCursorStrokeColor(stroke);
+        // If 'stroke' is provided, use it. If NOT, darken the fill by 40%.
+        setCursorStrokeColor(stroke || darkenColor(fill, 40)); 
     };
 
-    // Helper to reset to default (Bio/Background)
-    // FIX 2: Reset function matches the initial Black/White state
     const handleResetColor = () => {
         setCursorColor('#000000'); 
         setCursorStrokeColor('#ffffff');
@@ -44,7 +43,6 @@ export default function About() {
 
             <AboutHero />
             
-            {/* Pass the handlers down to the content */}
             <AboutContent 
                 onHoverColor={handleColorChange} 
                 onLeaveColor={handleResetColor} 
@@ -52,7 +50,6 @@ export default function About() {
             
             <Footer3 />
             <Bottom />
-            {/* <ViewportIndicator /> */}
         </main>
     );
 }

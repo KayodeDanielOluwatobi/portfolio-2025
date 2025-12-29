@@ -1,113 +1,130 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Squircle } from '@squircle-js/react';
-import { Plus, Minus, ChevronsUpDown } from 'lucide-react';
-import { useSquircleRadius } from '@/hooks/useSquircleRadius';
+import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Typewriter } from '@/components/ui/Typewriter';
 
-interface BioCardProps {
-  onHoverColor?: (fill: string, stroke?: string) => void;
-  onLeaveColor?: () => void;
-}
-
-// 1. CONTENT CONFIGURATION
+// --- DATA ---
 const SECTIONS = [
   {
     id: 'origin',
     title: '+ THE ORIGIN',
-    content: (
-      <>
-        <p>
-          I come from a place where the definition of success is narrow: Medicine
-          or nothing. I chose the third option.
-        </p>
-        <p>
-          As a child, I didn't play with toys; I dismantled them. I wanted to
-          know how the ghost in the machine worked. That curiosity cost me every
-          gadget in my house, but it bought me a way of seeing the world that
-          schools couldn't teach.
-        </p>
-      </>
-    ),
+    lines: [
+      "I did not arrive at design by choice.",
+      "It surfaced.",
+      "Long before tools or titles, there was an instinct to notice. To question structure. To care about how things feel, not just how they work.",
+      "Design became the language my mind defaulted to. A way of thinking. A way of resolving chaos into meaning."
+    ]
   },
   {
     id: 'evolution',
     title: '+ THE EVOLUTION',
-    content: (
-      <>
-        <p>
-          My path wasn't paved with MacBooks. It was carved through Microsoft
-          Word and Paint. It was a war of attrition against the Adobe Pen Tool
-          (a battle I almost lost, but eventually won).
-        </p>
-        <p>
-          I learned design in the trenches of low specs. This taught me the most
-          valuable lesson: Great art doesn't come from the equipment. It comes
-          from the intent.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'synthesis',
-    title: '+ THE SYNTHESIS',
-    content: (
-      <>
-        <p>
-          I am a final-year EEE student. My left brain deals in circuits and
-          logic. My right brain deals in rhythm and the "Spirit."
-        </p>
-        <p>
-          A broken form without an error message isn't just a bug; it is a lack
-          of empathy. I code to ensure the user never feels lost. I design to
-          ensure they feel understood.
-        </p>
-      </>
-    ),
+    lines: [
+      "I did not start with fancy tools. I started with curiosity, stubbornness, and software that had no business producing good design (Microsoft Word and Paint, Lol.)",
+      "It was a war of attrition against the Adobe Pen Tool (a battle I almost lost, but eventually won).", 
+      "The Pen Tool almost broke our friendship. Almost.",
+      "What kept me going was that moment when a concept clicks. When everything aligns and you just know this is it.",
+      "When people later describe the work as elegant, atmospheric, or full of presence, I smile quietly. Because I know where it came from."
+    ]
   },
   {
     id: 'frequency',
     title: '+ THE FREQUENCY',
-    content: (
-      <>
-        <p>
-          My workflow is powered by heavy bass K-Pop (which shifts the
-          atmosphere) and a pursuit of the 'Eureka.'
-        </p>
-        <p>
-          I don't force design. I wait for the alignment. That specific moment
-          when a concept stops being a file and starts being a feeling. Some call
-          it "user experience." I call it stewardship.
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'reality',
-    title: '+ THE REALITY',
-    content: (
-      <>
-        <p>
-          I do not create from a glass office. I create from the edge of unstable
-          connectivity and improvisation.
-        </p>
-        <p>
-          My toxic trait is a perfectionism that sometimes demands too much time,
-          but refuses to let a single pixel drift out of place. I am comfortable
-          with the difficult. I am obsessed with the exceptional.
-        </p>
-      </>
-    ),
+    lines: [
+      "Design and code are not separate in my mind. They hum together. Each amplifying the other.",
+      "I chase that perfect moment when a concept clicks, the aura is just right and the work feels alive.",
+      "Good design has a frequency. It’s subtle, almost spiritual. You may not name it, but you feel it: people notice it without knowing why."
+    ]
   },
 ];
 
-export default function BioCard({ onHoverColor, onLeaveColor }: BioCardProps) {
-  const squircleRadius = useSquircleRadius();
+// --- INDIVIDUAL CARD COMPONENT ---
+const BioSectionCard = ({
+  title,
+  lines,
+  isOpen,
+  onToggle,
+}: {
+  title: string;
+  lines: string[];
+  isOpen: boolean;
+  onToggle: () => void;
+}) => {
+  return (
+    <div
+      className={`w-full rounded-lg md:rounded-xl relative overflow-hidden transition-all duration-500 border border-white/5 border-t-white/10 ${
+        isOpen
+          ? 'bg-zinc-900/0 shadow-2xl'
+          : 'bg-zinc-900/0 hover:bg-zinc-900/40'
+      }`}
+    >
+      <div
+        className={`absolute inset-0 bg-gradient-to-b from-white/3 via-transparent to-black/60 pointer-events-none transition-opacity duration-500 ${
+          isOpen ? 'opacity-100' : 'opacity-60'
+        }`}
+      />
+
+      <div className="relative z-10 p-5 md:p-6">
+        <button
+          onClick={onToggle}
+          className="flex items-center justify-between w-full text-left group"
+        >
+          <span
+            className={`font-space text-xs sm:text-sm tracking-widest uppercase transition-colors duration-300 ${
+              isOpen ? 'text-white/20' : 'text-white/20 group-hover:text-zinc-200/40'
+            }`}
+          >
+            {title}
+          </span>
+          <span
+            className={`transition-colors duration-300 ${
+              isOpen ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-300'
+            }`}
+          >
+            {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </span>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="pt-6 text-sm sm:text-base uppercase leading-relaxed font-space tracking-wide text-zinc-300">
+                <Typewriter 
+                  lines={lines}
+                  wait={0}        // Immediate start
+                  speed={5}       // Fast typing for readabilty
+                  pause={400}     // Quick pause between paragraphs
+                  spacing="mb-6"  // Relaxed spacing for content
+                  withPrompt={true} // Optional: Add ">>" here too
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN PARENT COMPONENT ---
+export default function BioStack() {
   const [openSections, setOpenSections] = useState<string[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
-  // 2. PERSISTENCE LOGIC
+  const BIO_LINES = [
+    "I design the way some people pray.",
+    "Slowly..",
+    "Intentionally...",
+    "With attention to what others overlook...."
+  ];
+
   useEffect(() => {
     setIsMounted(true);
     const saved = sessionStorage.getItem('bio_sections_state');
@@ -125,7 +142,6 @@ export default function BioCard({ onHoverColor, onLeaveColor }: BioCardProps) {
     }
   }, [openSections, isMounted]);
 
-  // 3. HANDLERS
   const toggleSection = (id: string) => {
     setOpenSections((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
@@ -143,95 +159,51 @@ export default function BioCard({ onHoverColor, onLeaveColor }: BioCardProps) {
   const allOpen = openSections.length === SECTIONS.length;
 
   return (
-    <div
-      // CRITICAL FIX: Changed from h-full to h-auto (or just remove height).
-      // This forces the container to grow with the Framer Motion animation.
-      className="w-full h-auto"
-      onMouseEnter={() => onHoverColor?.('#000000', '#ffffff')}
-      onMouseLeave={() => onLeaveColor?.()}
-    >
-      <Squircle
-        cornerRadius={squircleRadius}
-        cornerSmoothing={0.7}
-        // CRITICAL FIX: The Squircle itself must also be h-auto (or fit-content).
-        className="w-full h-auto min-h-full bg-zinc-900/50 px-6 py-8 md:p-10 relative"
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-900 to-black opacity-100" />
+    <div className="w-full space-y-3">
+      {/* 1. HEADER CARD */}
+      <div className="w-full rounded-xl md:rounded-2xl p-6 md:p-8 relative overflow-hidden border border-white/5 border-t-white/10 bg-zinc-900/40">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-transparent to-black/100 pointer-events-none" />
 
-        <div className="relative z-10 space-y-8 text-justify">
-          {/* Header Row */}
+        <div className="relative z-10 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xs md:text-sm opacity-55 font-extralight text-zinc-50 tracking-wider">
               Bio
             </h3>
             <button
               onClick={toggleAll}
-              className="flex items-center gap-1.5 text-[10px] sm:text-xs tracking-wider uppercase text-zinc-500 hover:text-zinc-200 transition-colors"
+              className="font-space flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs tracking-wider uppercase text-zinc-500 hover:text-zinc-200 transition-colors"
             >
-              <ChevronsUpDown size={12} />
+              <ChevronsUpDown className="w-2 h-2 sm:w-3 sm:h-3 mb-0.5" />
               {allOpen ? 'Collapse All' : 'Expand All'}
             </button>
           </div>
-
-          {/* Intro Text */}
-          <div className="text-sm sm:text-base md:text-lg font-extralight tracking-wide leading-relaxed text-zinc-100/90">
-            <p>
-              I speak two languages that usually don't talk to each other: The
-              rigid logic of code, and the fluid intuition of design.
-            </p>
-            <p className="mt-2 text-zinc-400">
-              I don't just build interfaces; I orchestrate how they feel.
-            </p>
-          </div>
-
-          {/* 4. SECTIONS WITH FRAMER MOTION */}
-          <div className="space-y-6">
-            {SECTIONS.map((section) => {
-              const isOpen = openSections.includes(section.id);
-
-              return (
-                <div key={section.id} className="space-y-3 group">
-                  <button
-                    onClick={() => toggleSection(section.id)}
-                    className="flex items-center gap-3 text-left w-full"
-                  >
-                    <span
-                      className={`text-zinc-400 group-hover:text-white transition-colors duration-300 ${
-                        isOpen ? 'text-white' : ''
-                      }`}
-                    >
-                      {isOpen ? (
-                        <Minus size={16} strokeWidth={1.5} />
-                      ) : (
-                        <Plus size={16} strokeWidth={1.5} />
-                      )}
-                    </span>
-                    <span className="font-space font-mono text-xs sm:text-sm tracking-widest uppercase text-zinc-100/80 group-hover:text-white transition-colors duration-300">
-                      {section.title}
-                    </span>
-                  </button>
-
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pl-7 text-sm sm:text-base leading-relaxed font-extralight tracking-wide text-zinc-300 space-y-3 pb-2">
-                          {section.content}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </div>
+          
+          {/* ... inside header card ... */}
+            <div className="text-sm sm:text-base md:text-base font-space uppercase tracking-wide leading-tight min-h-[160px] sm:min-h-[140px]">
+            <Typewriter 
+                lines={BIO_LINES}
+                wait={3} 
+                speed={40}
+                pause={1000} 
+                spacing="mb-1"
+                withPrompt={true}
+            />
+            </div>
         </div>
-      </Squircle>
+      </div>
+
+      {/* 2. THE STACK OF SECTIONS */}
+      <div className="flex flex-col gap-2">
+        {SECTIONS.map((section) => (
+          <BioSectionCard
+            key={section.id}
+            title={section.title}
+            lines={section.lines}
+            isOpen={openSections.includes(section.id)}
+            onToggle={() => toggleSection(section.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

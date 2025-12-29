@@ -76,7 +76,7 @@ export default function TypewriterLink({
       </div>
 
       <span 
-        className={`ml-1 inline-block w-1 h-2.5 min-[350px]:w-1.5 min-[350px]:h-3 md:w-2 md:h-5 align-middle ${cursorClass} ${
+        className={`ml-1 mb-0.5 inline-block w-1 h-2.5 min-[350px]:w-1.5 min-[350px]:h-3 md:w-2 md:h-5 align-middle ${cursorClass} ${
           displayedText.length === text.length ? 'animate-pulse' : 'opacity-100'
         }`} 
       />

@@ -1,26 +1,37 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { table, id, color } = await req.json();
+    const body = await request.json();
+    const { table, id, color } = body; 
 
-    // ⚠️ IMPORTANT: We use the SERVICE_ROLE_KEY here.
-    // This gives this specific API route "Super Admin" powers to bypass RLS and write data.
+    // Admin Client
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY! 
+      process.env.SUPABASE_SERVICE_ROLE_KEY! 
     );
 
-    const { error } = await supabaseAdmin
+    // 👇 SIMPLIFIED LOGIC: Always match by ID
+    // Since you fixed the GET API, 'id' is now the correct Supabase ID (1, 2, 3...)
+    // This works perfectly for watch_list, featuredbrands, etc.
+    const { data, error } = await supabaseAdmin
       .from(table)
       .update({ extracted_color: color })
-      .eq('id', id);
+      .eq('id', id) // 👈 Always match the Primary Key
+      .select();
 
-    if (error) throw error;
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!data || data.length === 0) {
+      console.warn(`⚠️ No rows updated for ${table} ID: ${id}.`);
+    }
+
+    return NextResponse.json({ success: true, data });
+
+  } catch (error) {
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -1,5 +1,3 @@
-//watch-list/route.ts
-
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
@@ -21,7 +19,7 @@ export async function GET() {
   // 1. Fetch list from Supabase
   const { data: watchList, error } = await supabase
     .from('watch_list')
-    .select('*')
+    .select('*') // This fetches extracted_color
     .eq('is_active', true)
     .order('id', { ascending: false });
 
@@ -51,7 +49,6 @@ export async function GET() {
         const providersUrl = `https://api.themoviedb.org/3/${item.type}/${show.id}/watch/providers?api_key=${apiKey}`;
         const providersRes = await fetch(providersUrl);
         const providersData = await providersRes.json();
-        // Get US provider, fallback to first available if needed, or specific region
         const provider = providersData.results?.NG?.flatrate?.[0] || providersData.results?.US?.flatrate?.[0];
         const providerLogo = provider?.logo_path;
 
@@ -70,13 +67,20 @@ export async function GET() {
         }
 
         enrichedList.push({
-          id: show.id,
+          // 👇 FIX 1: Use 'item.id' (Supabase ID) instead of 'show.id' (TMDB ID)
+          // This ensures your frontend IDs match your database IDs!
+          id: item.id, 
+          
           title: finalTitle,
           backdrop: finalBackdrop,
           logo: logoPath ? `https://image.tmdb.org/t/p/w500${logoPath}` : null,
-          provider_logo: providerLogo ? `https://image.tmdb.org/t/p/w92${providerLogo}` : null, // Small size is enough
+          provider_logo: providerLogo ? `https://image.tmdb.org/t/p/w92${providerLogo}` : null,
           progress: item.progress,
-          myrating: item.myrating // <--- ADDED: Passing the rating to the frontend
+          myrating: item.myrating,
+
+          // 👇 FIX 2: PASS THE EXTRACTED COLOR! 
+          // Without this, the frontend thinks it's missing and keeps re-extracting.
+          extracted_color: item.extracted_color 
         });
       }
     } catch (err) {

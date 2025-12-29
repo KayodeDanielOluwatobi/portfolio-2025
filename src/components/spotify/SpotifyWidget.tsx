@@ -128,7 +128,7 @@ export default function SpotifyWidget({
  const handleMouseEnter = () => {
   // If no track exists, default to Green
   if (!track) {
-    onHoverColor?.('#1DB954', '#ffffff');
+    onHoverColor?.('#1DB954');
     return;
   }
 
