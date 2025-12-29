@@ -1,12 +1,13 @@
 'use client';
 
-import { motion, Variants } from 'framer-motion';
 import BioCard from './BioCard';
 import SpotifyWidget from '@/components/spotify/SpotifyWidget';
 import CurrentlyReading from './CurrentlyReading';
 import CurrentlyWatching from './CurrentlyWatching';
 import DuolingoWidget from './DuolingoWidget';
 import PresentSchool from './PresentSchool';
+// 👇 Import the wrapper
+import FadeUp from '@/components/animations/FadeUp';
 
 interface AboutContentProps {
     onHoverColor: (fill: string, stroke?: string) => void;
@@ -14,74 +15,50 @@ interface AboutContentProps {
 }
 
 export default function AboutContent({ onHoverColor, onLeaveColor }: AboutContentProps) {
-    
-    // 👇 Explicitly typed as Variants to fix the TS error
-    const containerVariants: Variants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-        }
-    };
-
-    // 👇 Explicitly typed as Variants
-    const itemVariants: Variants = {
-        hidden: { opacity: 0, y: 20 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.6, ease: "easeOut" }
-        }
-    };
-
     return (
         <section className="w-full pb-32 bg-black text-white overflow-hidden">
             <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
-                    className="flex flex-col gap-12 md:gap-24"
-                >
+                
+                {/* Standard Flex Container (No motion wrapper needed here anymore) */}
+                <div className="flex flex-col gap-12 md:gap-24">
+                    
                     {/* Row 1: Bio (Left) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-7/12 self-start">
-                        {/* Bio stays default, so we force a leave/reset when entering it */}
+                    <FadeUp className="w-full md:w-7/12 self-start">
                         <div onMouseEnter={onLeaveColor}>
                             <BioCard />
                         </div>
-                    </motion.div>
+                    </FadeUp>
 
                     {/* Row 2: Present School (Right) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-6/12 self-end">
+                    <FadeUp className="w-full md:w-6/12 self-end">
                         <PresentSchool onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
-                    </motion.div>
+                    </FadeUp>
 
                     {/* Row 3: Spotify (Left) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-5/12 self-start h-[250px] md:h-[300px]">
+                    <FadeUp className="w-full md:w-5/12 self-start h-[250px] md:h-[300px]">
                         <SpotifyWidget 
                             pollInterval={60000}
                             onHoverColor={onHoverColor}
                             onLeaveColor={onLeaveColor}
                         />
-                    </motion.div>
+                    </FadeUp>
 
                     {/* Row 4: Currently Reading (Right) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-5/12 self-end h-full">
+                    <FadeUp className="w-full md:w-5/12 self-end h-full">
                         <CurrentlyReading onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
-                    </motion.div>
+                    </FadeUp>
 
                     {/* Row 5: Currently Watching (Left) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-8/12 self-start h-full">
+                    <FadeUp className="w-full md:w-8/12 self-start h-full">
                         <CurrentlyWatching onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
-                    </motion.div>
+                    </FadeUp>
 
                     {/* Row 6: Duolingo (Right) */}
-                    <motion.div variants={itemVariants} className="w-full md:w-4/12 self-end md:h-full">
+                    <FadeUp className="w-full md:w-4/12 self-end md:h-full">
                         <DuolingoWidget onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
-                    </motion.div>
+                    </FadeUp>
 
-                </motion.div>
+                </div>
             </div>
         </section>
     );

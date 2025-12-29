@@ -53,7 +53,7 @@ export default function Bottom() {
   }, [])
 
   return (
-    <footer className="bg-black text-white border-t border-white/0">
+    <footer className="bg-black text-white border-t border-white/0 ">
       <div className="container mx-auto px-2 pb-8 pt-24 max-w-none">
         <div className="flex flex-col gap-12">
           {/* Social Links - Horizontal on desktop, vertical stacked on mobile */}

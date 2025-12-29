@@ -24,13 +24,23 @@ export default function TypewriterLink({
 
   useEffect(() => {
     if (isInView && displayedText.length < text.length) {
+      // 1. Calculate how far we are (0.0 to 1.0)
+      const progress = displayedText.length / text.length;
+
+      // 2. Easing Logic (Cubic Ease-Out for time)
+      // - Start fast (min 20ms)
+      // - Slow down exponentially as we reach the end (up to 120ms)
+      const dynamicDelay = Math.max(20, 150 * Math.pow(progress, 3));
+
       const timeout = setTimeout(() => {
         setDisplayedText(text.slice(0, displayedText.length + 1));
-      }, 45); // 👈 30ms Speed (Faster/Snappier)
+      }, dynamicDelay); 
+      
       return () => clearTimeout(timeout);
     }
   }, [isInView, displayedText, text]);
 
+  // Keep the smooth fluid layout transition
   const fluidTransition = { duration: 0.6, ease: [0.25, 1, 0.5, 1] as const };
 
   return (
@@ -39,11 +49,6 @@ export default function TypewriterLink({
       href={href}
       initial="idle"
       whileHover="hover"
-      // 👇 RESPONSIVE TEXT SIZING:
-      // text-[10px]           = Base for tiny screens (<350px)
-      // min-[350px]:text-xs   = Normal phones (12px)
-      // sm:text-sm            = Tablets (14px)
-      // md:text-base          = Desktop (16px)
       className="inline-flex items-center font-space text-[10px] min-[350px]:text-xs sm:text-sm md:text-base text-white/60 hover:text-white transition-colors duration-300 uppercase tracking-widest mt-6 md:mt-8 group relative"
     >
       <motion.span 

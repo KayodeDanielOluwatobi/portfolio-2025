@@ -18,6 +18,8 @@ import KeycapMapper from '@/components/ui/KeyCaps';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
 import { supabase } from '@/utils/supabase/client';
+// 👇 1. Import FadeUp
+import FadeUp from '@/components/animations/FadeUp';
 
 // Dynamic import for the cursor
 const SmoothCursor = dynamic(
@@ -33,7 +35,6 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   // 2. Cursor Override State (For Hover Interactions)
-  // When null, we fall back to the Hero/Default logic
   const [hoverCursorColor, setHoverCursorColor] = useState<{ fill: string; stroke: string } | null>(null);
 
   // 3. Handlers for Child Components
@@ -110,7 +111,6 @@ export default function Home() {
       };
 
   // 6. MASTER CURSOR LOGIC 🧠
-  // Priority: Mobile Menu > Hover Override (Keycaps/Cards) > Hero Section > Default Black
   let cursorFillColor = DEFAULT_CURSOR_COLOR;
   let cursorStrokeColor = DEFAULT_CURSOR_STROKE;
 
@@ -118,15 +118,12 @@ export default function Home() {
     cursorFillColor = DEFAULT_CURSOR_COLOR;
     cursorStrokeColor = DEFAULT_CURSOR_STROKE;
   } else if (hoverCursorColor) {
-    // If hovering over a card or keycap, use that color
     cursorFillColor = hoverCursorColor.fill;
     cursorStrokeColor = hoverCursorColor.stroke;
   } else if (cursorInHeroHeader) {
-    // If inside Hero section, use Brand color
     cursorFillColor = currentBrand.cursorColor;
     cursorStrokeColor = darkenColor(currentBrand.cursorColor);
   } else {
-    // Rest of the document (Bio, Footer, etc.) -> Black Fill / White Stroke
     cursorFillColor = '#000000';
     cursorStrokeColor = '#ffffff';
   }
@@ -154,41 +151,57 @@ export default function Home() {
         isTransitioning={isTransitioning}
       />
 
-      {/* Bio Section - Resets cursor if dragging from Hero */}
-      <div onMouseEnter={handleResetColor}>
-        <Bio />
-      </div>
+      {/* 👇 Animated Sections Start Here */}
+      
+      {/* 1. Bio (Resets cursor) */}
+      <FadeUp>
+        <div onMouseEnter={handleResetColor}>
+          <Bio />
+        </div>
+      </FadeUp>
 
-      <MoreBio />
+      {/* 2. More Bio */}
+      <FadeUp>
+        <MoreBio />
+      </FadeUp>
 
-      {/* For these sections, you need to update them to accept:
+      {/* 3. Featured Work Sections */}
+      <FadeUp>
+        <FeaturedBrands 
           onHoverColor={handleHoverColor} 
-          onLeaveColor={handleResetColor}
-          and implement the onMouseEnter logic inside them (like we did for About widgets)
-      */}
-      <FeaturedBrands 
-        onHoverColor={handleHoverColor} 
-        onLeaveColor={handleResetColor} 
-      />
-      <FeaturedSocials 
-        onHoverColor={handleHoverColor} 
-        onLeaveColor={handleResetColor} 
-      />
-      <FeaturedChurch 
-        onHoverColor={handleHoverColor} 
-        onLeaveColor={handleResetColor} 
-      />
+          onLeaveColor={handleResetColor} 
+        />
+      </FadeUp>
+
+      <FadeUp>
+        <FeaturedSocials 
+          onHoverColor={handleHoverColor} 
+          onLeaveColor={handleResetColor} 
+        />
+      </FadeUp>
+
+      <FadeUp>
+        <FeaturedChurch 
+          onHoverColor={handleHoverColor} 
+          onLeaveColor={handleResetColor} 
+        />
+      </FadeUp>
       
-      {/* Keycaps: Pass the handlers so hovering a keycap sets the color */}
-      <KeycapMapper 
-        onHoverColor={handleHoverColor} 
-        onLeaveColor={handleResetColor} 
-      /> 
+      {/* 4. Keycaps */}
+      <FadeUp>
+        <KeycapMapper 
+          onHoverColor={handleHoverColor} 
+          onLeaveColor={handleResetColor} 
+        /> 
+      </FadeUp>
       
-      <div onMouseEnter={handleResetColor}>
-        <Footer3 />
-        <Bottom />
-      </div>
+      {/* 5. Footer (Resets cursor) */}
+      <FadeUp>
+        <div onMouseEnter={handleResetColor}>
+          <Footer3 />
+          <Bottom />
+        </div>
+      </FadeUp>
       
       {/* <ViewportIndicator /> */}
     </main>
