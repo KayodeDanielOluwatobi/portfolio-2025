@@ -9,6 +9,8 @@ import Footer3 from '@/components/layout/Footer3';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
 // 👇 1. Import the color utility
 import { darkenColor } from '@/utils/colorUtils'; 
+import FadeUp from '@/components/animations/FadeUp';
+
 
 export default function About() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,15 +43,24 @@ export default function About() {
                 cursorStrokeColor={cursorStrokeColor} 
             />
 
-            <AboutHero />
+            <FadeUp delay={0.4}>
+                <AboutHero />
+            </FadeUp>
             
-            <AboutContent 
+            <FadeUp delay={0.4}>
+                <AboutContent 
                 onHoverColor={handleColorChange} 
                 onLeaveColor={handleResetColor} 
-            />
+                />
+            </FadeUp>
             
-            <Footer3 />
-            <Bottom />
+            <FadeUp delay={0.4}>
+                <Footer3 />
+            </FadeUp>
+
+            <FadeUp delay={0.4}>
+                <Bottom />
+            </FadeUp>
         </main>
     );
 }
