@@ -38,7 +38,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   // 2. Preloader State 🛑
-  const [isPreloaderActive, setIsPreloaderActive] = useState(true);
+  // FIX: Initialized with a function to check sessionStorage BEFORE the first render
+  // This prevents the "split second" flash on return visits.
+  const [isPreloaderActive, setIsPreloaderActive] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hasSeen = sessionStorage.getItem('hasSeenPreloader');
+      return !hasSeen;
+    }
+    return true;
+  });
 
   // 3. Cursor Override State (For Hover Interactions)
   const [hoverCursorColor, setHoverCursorColor] = useState<{ fill: string; stroke: string } | null>(null);
@@ -146,6 +154,12 @@ export default function Home() {
     cursorStrokeColor = '#ffffff';
   }
 
+  // Handler passed to Preloader to save session
+  const handlePreloaderComplete = () => {
+    sessionStorage.setItem('hasSeenPreloader', 'true');
+    setIsPreloaderActive(false);
+  };
+  
   // NOTE: We don't return early for loading anymore, 
   // because we want the Preloader to render on top instead.
   
@@ -155,7 +169,7 @@ export default function Home() {
       {/* 🛑 PRELOADER LAYER */}
       <AnimatePresence mode="wait">
         {isPreloaderActive && (
-          <Preloader onComplete={() => setIsPreloaderActive(false)} />
+          <Preloader onComplete={handlePreloaderComplete} />
         )}
       </AnimatePresence>
 
@@ -228,6 +242,11 @@ export default function Home() {
           <FadeUp delay={0.4}>
             <div onMouseEnter={handleResetColor}>
               <Footer3 />
+            </div>
+          </FadeUp>
+
+          <FadeUp delay={0.4}>
+            <div onMouseEnter={handleResetColor}>
               <Bottom />
             </div>
           </FadeUp>

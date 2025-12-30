@@ -91,12 +91,10 @@ const BioSectionCard = ({
           {isOpen && (
             <motion.div
               initial={{ height: 0 }}
-              // 1. OPENING (Standard speed)
               animate={{ 
                 height: 'auto',
                 transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } 
               }}
-              // 2. COLLAPSING (Slower duration here)
               exit={{ 
                 height: 0,
                 transition: { duration: 0.4, ease: "easeInOut" } 
@@ -106,30 +104,23 @@ const BioSectionCard = ({
               <div className="pt-6 text-sm sm:text-base leading-relaxed font-light tracking-wide text-zinc-300">
                 <motion.div
                   initial={{ 
-                    // Start: Transparent part covers text
                     WebkitMaskPosition: "100% 100%", 
                     maskPosition: "100% 100%" 
                   } as any}
                   animate={{ 
-                    // End: Visible part covers text
                     WebkitMaskPosition: "0% 0%", 
                     maskPosition: "0% 0%" 
                   } as any}
                   transition={{ 
-                    // 👇 UPDATED: Very slow diagonal reveal (3.5s)
                     duration: 3, 
                     ease: "easeOut",
                     delay: 0.2 
                   }}
                   style={{
-                    // Gradient: Black (visible) -> Transparent (invisible)
                     WebkitMaskImage: "linear-gradient(170deg, black 40%, transparent 60%)",
                     maskImage: "linear-gradient(170deg, black 40%, transparent 60%)",
-                    
-                    // Large mask to create smooth sliding edge
                     WebkitMaskSize: "250% 250%",
                     maskSize: "250% 250%",
-                    
                     WebkitMaskRepeat: "no-repeat",
                     maskRepeat: "no-repeat"
                   }}
@@ -205,12 +196,28 @@ export default function BioStack() {
             <h3 className="text-xs md:text-sm opacity-55 font-extralight text-zinc-50 tracking-wider">
               Bio
             </h3>
+            
+            {/* 👇 BUTTON WITH COORDINATED FADE FOR ICON + TEXT */}
             <button
               onClick={toggleAll}
-              className="font-space flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs tracking-wider uppercase text-zinc-500 hover:text-zinc-200 transition-colors"
+              className="font-space group flex items-center text-[10px] sm:text-xs tracking-wider uppercase text-zinc-500 hover:text-zinc-200 transition-colors"
             >
-              <ChevronsUpDown className="w-2 h-2 sm:w-3 sm:h-3 mb-0.5" />
-              {allOpen ? 'Collapse All' : 'Expand All'}
+              <div className="relative h-4 flex items-center gap-1 sm:gap-1.5 min-w-[100px] sm:min-w-[120px] justify-end">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={allOpen ? 'collapse' : 'expand'}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    // 👇 Increased duration to 0.6s for more atmosphere
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap"
+                  >
+                    <ChevronsUpDown className="w-2.5 h-2.5 sm:w-3.3 sm:h-3.3 mb-0.5" />
+                    <span>{allOpen ? 'Collapse All' : 'Expand All'}</span>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </button>
           </div>
           

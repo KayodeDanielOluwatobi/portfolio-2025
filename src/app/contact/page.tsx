@@ -148,7 +148,7 @@ export default function Contact() {
               </div>
 
               <FadeUp delay={0.9} className="mt-auto hidden md:block">
-                <div className="hidden md:block">
+                <div className="invisible md:block">
                   <p className="text-white/40 text-xs font-space tracking-widest mb-4 uppercase">Connect</p>
                   <div className="flex gap-6 items-center">
                     {socialLinks.map((social) => (

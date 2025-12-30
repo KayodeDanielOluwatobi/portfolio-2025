@@ -294,8 +294,8 @@ export default function Hero({
       className="
         relative w-full overflow-hidden 
         h-[85vh] 
-        md:h-[calc(95vh-0px)] 
-        min-h-[600px] 
+        md:h-[calc(90vh-0px)] 
+        min-h-[400px] 
         max-h-[1080px]
         group
       "

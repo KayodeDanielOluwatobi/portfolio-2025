@@ -21,7 +21,6 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [count, setCount] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  // Determine which section text to show based on percentage
   const sectionIndex = Math.min(
     Math.floor((count / 100) * SECTIONS.length),
     SECTIONS.length - 1
@@ -78,21 +77,18 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       }}
       className="fixed inset-0 z-[9999] bg-[#09090b] flex flex-col items-center justify-center cursor-none"
     >
-      {/* TOP LEFT TEXT */}
       <div className="absolute top-4 left-4 md:top-4 md:left-4">
         <span className="font-space text-[10px] md:text-xs text-zinc-500 uppercase tracking-[0em]">
-          FAKE LOADER
+          SYSTEM BOOT
         </span>
       </div>
 
-      {/* CENTER NUMBER */}
       <div className="flex flex-col items-center gap-2">
         <h1 className="font-space text-8xl md:text-9xl text-white leading-none select-none tracking-0">
           {count}%
         </h1>
       </div>
       
-      {/* BOTTOM RIGHT INFO */}
       <div className="absolute bottom-4 right-4 md:bottom-4 md:right-4 text-[7.5px] md:text-[10px] text-zinc-500 font-mono text-right uppercase tracking-[0.1em] space-y-0.5">
         <p>Status: <span className="text-zinc-300">Online</span></p>
         <p>Processing: <span className="text-green-500">{SECTIONS[sectionIndex]}</span></p>
