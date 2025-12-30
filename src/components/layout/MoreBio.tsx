@@ -17,9 +17,9 @@ export default function MoreBio() {
   }, []);
 
   // Don't render on mobile devices
-  if (isMobileDevice) {
-    return null;
-  }
+  // if (isMobileDevice) {
+  //   return null;
+  // }
 
   return (
     <section className="bg-black text-white py-16 md:py-24">

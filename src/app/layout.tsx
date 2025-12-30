@@ -80,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html className="bg-black min-h-screen" lang="en" suppressHydrationWarning>
     <Analytics />
     <SpeedInsights/>
 

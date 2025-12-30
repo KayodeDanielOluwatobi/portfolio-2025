@@ -7,27 +7,24 @@ import Header from '@/components/layout/Header';
 import { WORK_CATEGORIES } from '@/data/workCategories';
 import CategoryNav from '@/components/works/CategoryNav';
 import WorksGrid from '@/components/works/WorksGrid';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion'; // Added AnimatePresence
 import TextPressure from '@/components/TextPressure';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
-// 👇 NEW IMPORTS FOR CURSOR
 import { CursorProvider, useCursor } from '@/context/CursorContext';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
+import FadeUp from '@/components/animations/FadeUp'; 
 
-// 1. Initialize Supabase
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// 👇 CURSOR CONTROLLER: Reads context and passes colors to SmoothCursor
 function CursorController() {
   const { cursorColor, cursorStrokeColor } = useCursor();
   return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
 }
 
-// 👇 MAIN CONTENT LOGIC
 function WorksContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,7 +35,6 @@ function WorksContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [pressureFontSize, setPressureFontSize] = useState(192);
 
-  // Sync URL
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
     if (categoryFromUrl && ['brands', 'socials', 'church'].includes(categoryFromUrl)) {
@@ -51,7 +47,6 @@ function WorksContent() {
     router.push(`/works?category=${categoryId}`, { scroll: false });
   };
 
-  // FETCH DATA & AUTO-FIX COLORS
   useEffect(() => {
     const fetchWorks = async () => {
       setLoading(true);
@@ -72,49 +67,8 @@ function WorksContent() {
           .order('rank', { ascending: true });
 
         if (error) throw error;
+        if (data) setWorks(data);
 
-        if (data) {
-          setWorks(data);
-
-          // AUTO-FIX MISSING COLORS
-          const missingColors = data.filter((item: any) => !item.brand_color || item.brand_color === '');
-          
-          if (missingColors.length > 0) {
-            console.log(`🎨 Auto-fixing ${missingColors.length} colors in ${tableName}...`);
-            
-            missingColors.forEach(async (item: any) => {
-              const mediaUrl = Array.isArray(item.media) ? item.media[0] : item.media;
-              
-              if (mediaUrl) {
-                try {
-                  const response = await fetch('/api/works/update-color', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      id: item.id,
-                      imageUrl: mediaUrl,
-                      tableName: tableName
-                    })
-                  });
-
-                  const result = await response.json();
-
-                  if (result.success && result.color) {
-                    setWorks(prevWorks => 
-                      prevWorks.map(work => 
-                        work.id === item.id 
-                          ? { ...work, brand_color: result.color } 
-                          : work
-                      )
-                    );
-                  }
-                } catch (err) {
-                  console.error('Auto-fix failed for item', item.id, err);
-                }
-              }
-            });
-          }
-        }
       } catch (error) {
         console.error(`Error loading ${activeCategory}:`, error);
       } finally {
@@ -135,6 +89,12 @@ function WorksContent() {
   }, []);
 
   const activeCategory_obj = WORK_CATEGORIES.find(cat => cat.id === activeCategory);
+  
+  // 👇 Animation Variants for the Typing Effect
+  const charVariants = {
+    hidden: { opacity: 0 },
+    reveal: { opacity: 1 },
+  };
 
   return (
     <main>
@@ -151,16 +111,8 @@ function WorksContent() {
           >
             <TextPressure
               text="My Works!"
-              flex={false}
-              alpha={false}
-              stroke={false}
-              width={true}
-              weight={true}
-              italic={true}
-              textColor="#ffffff"
-              strokeColor="#ff0000"
-              minFontSize={36}
-              fixedFontSize={pressureFontSize}
+              flex={false} alpha={false} stroke={false} width={true} weight={true} italic={true}
+              textColor="#ffffff" minFontSize={36} fixedFontSize={pressureFontSize}
             />
           </motion.div>
 
@@ -171,15 +123,32 @@ function WorksContent() {
             />
           </div>
 
-          <motion.p 
-            key={activeCategory}
-            className="text-white/60 font-thin text-lg md:text-2xl tracking-wide mb-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            {activeCategory_obj?.subtitle}
-          </motion.p>
+          {/* 👇 BUTTERY SMOOTH TYPING SUBTITLE */}
+          <div className="min-h-[2em] mb-12"> {/* Height anchor to prevent layout jump */}
+            <AnimatePresence mode="wait">
+              <motion.p 
+                key={activeCategory}
+                className="text-white/60 font-thin text-lg md:text-2xl tracking-wide leading-relaxed"
+                initial="hidden"
+                animate="reveal"
+                exit="hidden"
+                variants={{
+                  hidden: { opacity: 0 },
+                  reveal: { opacity: 1, transition: { staggerChildren: 0.02, delayChildren: 0.1 } }
+                }}
+              >
+                {activeCategory_obj?.subtitle.split("").map((char, index) => (
+                  <motion.span
+                    key={`${activeCategory}-${index}`}
+                    variants={charVariants}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
           <WorksGrid 
             works={works} 
@@ -190,22 +159,23 @@ function WorksContent() {
         </div>
       </section>
 
-      <Footer3 />
-      <Bottom />
+      <FadeUp delay={0.4}>
+        <Footer3 />
+      </FadeUp>
+      
+      <FadeUp delay={0.4}>
+        <Bottom />
+      </FadeUp>
 
     </main>
   );
 }
 
-// 👇 ROOT EXPORT: Wraps everything in Context & Suspense
 export default function Works() {
   return (
     <Suspense fallback={<div className="min-h-screen w-full bg-black" />}>
       <CursorProvider>
-        {/* The Controller sits here to grab the context values */}
         <CursorController />
-        
-        {/* The Page Content sits here to trigger context updates */}
         <WorksContent />
       </CursorProvider>
     </Suspense>

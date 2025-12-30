@@ -13,7 +13,7 @@ interface TypewriterProps {
   withPrompt?: boolean;
 }
 
-// 1. Define Cursor Logic OUTSIDE so it is stable
+// 1. GLITCH CURSOR (Updated for Mobile Sizes)
 const GlitchCursor = ({ shape }: { shape: 'line' | 'block' | 'underscore' }) => {
   return (
     <motion.span
@@ -24,10 +24,11 @@ const GlitchCursor = ({ shape }: { shape: 'line' | 'block' | 'underscore' }) => 
         times: [0, 0.5, 0.5, 1],
         ease: "linear",
       }}
+      // Responsive widths: smaller by default (mobile), larger on md: screens
       className={`inline-block align-middle ml-1 bg-green-500 ${
-        shape === 'line' ? 'w-[2.5px] h-[1.2em] translate-y-[-4px]' : 
-        shape === 'block' ? 'w-[0.6em] h-[1.2em] translate-y-[-4px]' : 
-        'w-[1.2em] h-[4px] translate-y-[4px]' 
+        shape === 'line' ? 'w-[1.5px] md:w-[2.5px] h-[1.2em] translate-y-[-2px] md:translate-y-[-4px]' : 
+        shape === 'block' ? 'w-[0.45em] md:w-[0.6em] h-[1.2em] translate-y-[-2px] md:translate-y-[-4px]' : 
+        'w-[0.8em] md:w-[1.2em] h-[3px] md:h-[4px] translate-y-[3px] md:translate-y-[4px]' 
       }`}
     />
   );
@@ -48,8 +49,7 @@ export const Typewriter = ({
   const [isWaiting, setIsWaiting] = useState(true);
   const [isPausing, setIsPausing] = useState(false);
 
-  // 2. Pick the cursor shape ONCE per Typewriter instance
-  // This ensures it stays consistent across all lines for this specific card
+  // Pick cursor shape once on mount
   const [cursorShape] = useState<'line' | 'block' | 'underscore'>(() => {
     const shapes: ('line' | 'block' | 'underscore')[] = ['line', 'block', 'underscore'];
     return shapes[Math.floor(Math.random() * shapes.length)];
@@ -58,7 +58,6 @@ export const Typewriter = ({
   const typeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initial Waiting Period
   useEffect(() => {
     const startTimeout = setTimeout(() => {
       setIsWaiting(false);
@@ -68,7 +67,6 @@ export const Typewriter = ({
     return () => clearTimeout(startTimeout);
   }, [wait]);
 
-  // Typing Logic
   useEffect(() => {
     if (isWaiting || isPausing) return;
     if (activeLineIndex >= lines.length) return;
@@ -76,7 +74,6 @@ export const Typewriter = ({
     const currentLineFullText = lines[activeLineIndex];
     const currentDisplayedText = displayedLines[activeLineIndex] || '';
 
-    // Check if line finished
     if (currentDisplayedText.length === currentLineFullText.length) {
       if (activeLineIndex < lines.length - 1) {
         setDisplayedLines((prev) => [...prev, '']);
@@ -90,7 +87,6 @@ export const Typewriter = ({
       return; 
     }
 
-    // Typing Algorithm
     const randomJitter = (Math.random() - 0.5) * speed * 1.5;
     let punctuationDelay = 0;
     const lastChar = currentDisplayedText.slice(-1);
@@ -121,10 +117,8 @@ export const Typewriter = ({
     };
   }, []);
 
-  // --- STYLES ---
-
   const Prompt = () => (
-    <span className="text-white mr-3 select-none font-mono font-normal text-xs md:text-sm tracking-tighter opacity-100">
+    <span className="text-white mr-2 md:mr-3 select-none font-mono font-normal text-xs md:text-sm tracking-tighter opacity-100">
       &gt;
     </span>
   );
@@ -137,7 +131,7 @@ export const Typewriter = ({
           100% { filter: hue-rotate(360deg); }
         }
         .animate-hue-cycle {
-          animation: hueCycle 60s infinite linear;
+          animation: hueCycle 120s infinite linear;
         }
       `}</style>
 
@@ -151,7 +145,6 @@ export const Typewriter = ({
             </span>
             
             {index === activeLineIndex && (
-               /* Pass the stable random shape down */
                <GlitchCursor shape={cursorShape} />
             )}
           </p>

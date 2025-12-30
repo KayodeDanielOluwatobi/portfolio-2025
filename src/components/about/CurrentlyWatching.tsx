@@ -40,8 +40,11 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
 
+  // 👇 Dynamic Sizing Flags based on your Hook
   const squircleRadius = useSquircleRadius();
-  const isMobile = squircleRadius <= 16;
+  const isTiny = squircleRadius <= 12;   // < 380px
+  const isMobile = squircleRadius <= 16;  // < 640px
+  const isTablet = squircleRadius <= 22;  // < 1024px
 
   const [colorCache, setColorCache] = useState<Record<string, ExtractedColors>>({});
 
@@ -53,7 +56,6 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  // 👇 Updated Fetch Logic
   useEffect(() => {
     const fetchWatchList = async () => {
       setIsLoading(true);
@@ -68,19 +70,16 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
         setFadeOut(true);
         setTimeout(() => setIsLoading(false), 500);
 
-        // Initialize Cache & Trigger lazy extractions
         const initialCache: Record<string, ExtractedColors> = {};
         
         validShows.forEach((show) => {
           if (show.backdrop) {
             if (show.extracted_color) {
-              // A. If color exists in DB, use it immediately
               initialCache[show.backdrop] = { 
                 barColor: show.extracted_color, 
                 glowColor: show.extracted_color 
               };
             } else {
-              // 👇 B. FIX: Pass 'show.title' as the 3rd argument
               extractAndSaveColor(show.id, show.backdrop, show.title);
             }
           }
@@ -98,7 +97,6 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
     fetchWatchList();
   }, []);
 
-  // 👇 FIX: Update signature to accept 'title'
   const extractAndSaveColor = async (id: number, backdropUrl: string, title: string) => {
     try {
       if (colorCache[backdropUrl]) return;
@@ -114,7 +112,7 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
             body: JSON.stringify({ 
                 table: 'watch_list', 
                 id, 
-                title: title, // 👈 FIX: Use the passed title argument
+                title: title,
                 color: barColor 
             })
         });
@@ -157,6 +155,7 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
       : DEFAULT_COLORS;
 
   const handleMouseEnter = () => {
+    // Passing only the color to allow parent auto-darkening for stroke
     onHoverColor?.(activeColors.barColor, '#ffffff'); 
   };
 
@@ -313,15 +312,16 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
                   <div className="flex-1">
                     <LinearWaveProgress
                       progress={currentShow.progress}
-                      height={4}
-                      trackHeight={isMobile ? 8 : 9}
-                      waveHeight={isMobile ? 8 : 9}
+                      height={isTiny ? 2.5 : 4}
+                      trackHeight={isTiny ?8 : isMobile ? 8 : 9}
+                      waveHeight={isTiny ? 8 : isMobile ? 8 : 9}
                       trackColor={hexToRgba(activeColors.barColor, 0.2)}
                       waveColor={activeColors.barColor}
-                      waveAmplitude={3}
-                      maxWaveFrequency={isMobile ? 5 : 12}
-                      undulationSpeed={1}
-                      edgeGap={isMobile ? 9 : 10}
+                      // 👇 Optimized Wave Density for Tiny Phones
+                      waveAmplitude={isTiny ? 3 : isMobile ? 2 : 3}
+                      maxWaveFrequency={isTiny ? 5 : isMobile ? 9 : 9}
+                      undulationSpeed={isTiny ? 0.2 : isMobile ? 0.3 : 0.3}
+                      edgeGap={isTiny ? 8 : 10}
                     />
                   </div>
                   <span className="text-xs text-white/60 font-light whitespace-nowrap">

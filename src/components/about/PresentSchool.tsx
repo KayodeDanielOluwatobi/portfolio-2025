@@ -4,7 +4,7 @@ import { Squircle } from '@squircle-js/react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import LinearWaveProgress from './LinearWaveProgress';
-import { useSquircleRadius } from '@/hooks/useSquircleRadius'; // 👈 Hook import
+import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 
 // Helper Hook for smooth easing animation
 const useProgressAnimation = (targetValue: number, duration: number = 1500) => {
@@ -19,7 +19,6 @@ const useProgressAnimation = (targetValue: number, duration: number = 1500) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Ease-out quart function for a smooth "landing"
       const ease = 1 - Math.pow(1 - progress, 4);
       
       setValue(startValue + (targetValue - startValue) * ease);
@@ -35,29 +34,25 @@ const useProgressAnimation = (targetValue: number, duration: number = 1500) => {
   return value;
 };
 
-// 👇 Props Interface
 interface PresentSchoolProps {
     onHoverColor?: (fill: string, stroke?: string) => void;
     onLeaveColor?: () => void;
 }
 
 export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSchoolProps) {
-    // Smoothly animate to 80%
     const progress = useProgressAnimation(80);
     
-    // 👇 Using the hook with DEFAULT values (no arguments)
+    // 👇 Dynamic Sizing Flags based on your Hook
     const squircleRadius = useSquircleRadius();
-    
-    // Derived state for conditional rendering (optional, based on hook defaults)
-    const isMobile = squircleRadius <= 16; 
+    const isTiny = squircleRadius <= 12;   // < 380px
+    const isMobile = squircleRadius <= 16;  // < 640px
 
     const CYAN_COLOR = '#3BA2DE';
 
     return (
-        // Wrapper to capture Hover Events
         <div 
             className="w-full h-full"
-            onMouseEnter={() => onHoverColor?.(CYAN_COLOR)}
+            onMouseEnter={() => onHoverColor?.(CYAN_COLOR, '#ffffff')}
             onMouseLeave={() => onLeaveColor?.()}
         >
             <Squircle
@@ -72,19 +67,14 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                     className="object-cover scale-103 " 
                 />
 
-                {/* Gradient Overlay for text visibility */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" />
 
-                {/* Content */}
                 <div className="relative z-10 space-y-12 md:space-y-12">
-                    {/* Header */}
                     <h3 className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
                         Currently studying . . .
                     </h3>
 
-                    {/* School Info Row */}
                     <div className="flex items-center gap-4">
-                        {/* Avatar */}
                         <div className="flex-shrink-0">
                             <div className="w-12 h-12 md:w-12 md:h-12 rounded-full overflow-hidden bg-white/10 flex items-center justify-center">
                                 <Image
@@ -97,7 +87,6 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                             </div>
                         </div>
 
-                        {/* Course Info */}
                         <div className="flex-1 space-y-1.5">
                             <h4 className="text-sm md:text-base text-zinc-100 font-light leading-tight">
                                 Electrical & Electronics Engineering
@@ -113,19 +102,19 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                         </div>
                     </div>
 
-                    {/* Progress Bar (Animation is passed here) */}
                     <div className="space-y-2">
                         <LinearWaveProgress 
                             progress={progress}
-                            height={6}
-                            trackHeight={isMobile ? 8 : 9}
-                            waveHeight={isMobile ? 8 : 9}
+                            // 👇 EXACT SETTINGS AS REQUESTED
+                            height={isTiny ? 2.5 : 4}
+                            trackHeight={isTiny ? 8 : isMobile ? 8 : 9}
+                            waveHeight={isTiny ? 8 : isMobile ? 8 : 9}
                             trackColor="#ffffff4D"
                             waveColor={CYAN_COLOR}
-                            waveAmplitude={3}
-                            maxWaveFrequency={isMobile ? 9 : 14}
-                            undulationSpeed={1}
-                            edgeGap={isMobile ? 7 : 9}
+                            waveAmplitude={isTiny ? 3 : isMobile ? 2 : 3}
+                            maxWaveFrequency={isTiny ? 9 : isMobile ? 12 : 12}
+                            undulationSpeed={isTiny ? 0.2 : isMobile ? 0.3 : 0.3}
+                            edgeGap={isTiny ? 8 : 10}
                         />
                     </div>
                 </div>

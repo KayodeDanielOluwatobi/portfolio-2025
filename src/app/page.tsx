@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+// 👇 New Import for Animations
+import { AnimatePresence } from 'framer-motion';
+
 import Header from '@/components/layout/Header';
 import Hero from '@/components/layout/Hero';
 import Bio from '@/components/layout/Bio';
@@ -18,8 +21,8 @@ import KeycapMapper from '@/components/ui/KeyCaps';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
 import { supabase } from '@/utils/supabase/client';
-// 👇 1. Import FadeUp
 import FadeUp from '@/components/animations/FadeUp';
+import Preloader from '@/components/layout/Preloader';
 
 // Dynamic import for the cursor
 const SmoothCursor = dynamic(
@@ -34,10 +37,25 @@ export default function Home() {
   const [showcases, setShowcases] = useState<BrandShowcase[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. Cursor Override State (For Hover Interactions)
+  // 2. Preloader State 🛑
+  const [isPreloaderActive, setIsPreloaderActive] = useState(true);
+
+  // 3. Cursor Override State (For Hover Interactions)
   const [hoverCursorColor, setHoverCursorColor] = useState<{ fill: string; stroke: string } | null>(null);
 
-  // 3. Handlers for Child Components
+  // 4. Scroll Lock Effect 🔒
+  // Prevents scrolling while the "System Boot" is active
+  useEffect(() => {
+    if (isPreloaderActive) {
+      document.body.style.overflow = 'hidden';
+      // Optional: scroll to top to ensure clean start
+      window.scrollTo(0, 0); 
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isPreloaderActive]);
+
+  // 5. Handlers for Child Components
   const handleHoverColor = (fill: string, stroke?: string) => {
     setHoverCursorColor({
       fill,
@@ -49,7 +67,7 @@ export default function Home() {
     setHoverCursorColor(null);
   };
 
-  // 4. Fetch Data
+  // 6. Fetch Data
   useEffect(() => {
     const fetchShowcases = async () => {
       try {
@@ -86,7 +104,7 @@ export default function Home() {
     fetchShowcases();
   }, []);
 
-  // 5. Hero Rotation Logic
+  // 7. Hero Rotation Logic
   const { currentIndex, setCurrentIndex, isTransitioning } = useBrandRotation({ 
     totalBrands: showcases.length > 0 ? showcases.length : 1,
     intervalDuration: 15000,
@@ -110,7 +128,7 @@ export default function Home() {
         cursorColor: DEFAULT_CURSOR_COLOR
       };
 
-  // 6. MASTER CURSOR LOGIC 🧠
+  // 8. MASTER CURSOR LOGIC 🧠
   let cursorFillColor = DEFAULT_CURSOR_COLOR;
   let cursorStrokeColor = DEFAULT_CURSOR_STROKE;
 
@@ -128,82 +146,100 @@ export default function Home() {
     cursorStrokeColor = '#ffffff';
   }
 
-  if (loading) {
-    return <div className="h-screen w-full bg-black" />;
-  }
-
+  // NOTE: We don't return early for loading anymore, 
+  // because we want the Preloader to render on top instead.
+  
   return (
     <main className="bg-black min-h-screen">
-      <SmoothCursor 
-        cursorColor={cursorFillColor}
-        cursorStrokeColor={cursorStrokeColor}
-      />
       
-      <Header 
-        currentBrand={currentBrand.logoVariant}
-        onMobileMenuToggle={setIsMobileMenuOpen}
-      />
-      
-      <Hero 
-        currentIndex={currentIndex}
-        setCurrentIndex={setCurrentIndex}
-        brandShowcases={showcases}
-        isTransitioning={isTransitioning}
-      />
+      {/* 🛑 PRELOADER LAYER */}
+      <AnimatePresence mode="wait">
+        {isPreloaderActive && (
+          <Preloader onComplete={() => setIsPreloaderActive(false)} />
+        )}
+      </AnimatePresence>
 
-      {/* 👇 Animated Sections Start Here */}
-      
-      {/* 1. Bio (Resets cursor) */}
-      <FadeUp>
-        <div onMouseEnter={handleResetColor}>
-          <Bio />
-        </div>
-      </FadeUp>
+      {/* 🚀 MAIN CONTENT LAYER */}
+      {/* Only render the heavy stuff once data is loaded (or render behind preloader) */}
+      {!loading && (
+        <>
+          <SmoothCursor 
+            cursorColor={cursorFillColor}
+            cursorStrokeColor={cursorStrokeColor}
+          />
+          
+          <Header 
+            currentBrand={currentBrand.logoVariant}
+            onMobileMenuToggle={setIsMobileMenuOpen}
+          />
+          
+          <Hero 
+            currentIndex={currentIndex}
+            setCurrentIndex={setCurrentIndex}
+            brandShowcases={showcases}
+            isTransitioning={isTransitioning}
+          />
 
-      {/* 2. More Bio */}
-      <FadeUp>
-        <MoreBio />
-      </FadeUp>
+          {/* 👇 Animated Sections Start Here */}
+          
+          {/* 1. Bio (Resets cursor) */}
+          <FadeUp delay={0.4}>
+            <div onMouseEnter={handleResetColor}>
+              <Bio />
+            </div>
+          </FadeUp>
 
-      {/* 3. Featured Work Sections */}
-      <FadeUp>
-        <FeaturedBrands 
-          onHoverColor={handleHoverColor} 
-          onLeaveColor={handleResetColor} 
-        />
-      </FadeUp>
+          {/* 2. More Bio */}
+          <FadeUp delay={0.4}>
+            <MoreBio />
+          </FadeUp>
 
-      <FadeUp>
-        <FeaturedSocials 
-          onHoverColor={handleHoverColor} 
-          onLeaveColor={handleResetColor} 
-        />
-      </FadeUp>
+          {/* 3. Featured Work Sections */}
+          <FadeUp delay={0.4}>
+            <FeaturedBrands 
+              onHoverColor={handleHoverColor} 
+              onLeaveColor={handleResetColor} 
+            />
+          </FadeUp>
 
-      <FadeUp>
-        <FeaturedChurch 
-          onHoverColor={handleHoverColor} 
-          onLeaveColor={handleResetColor} 
-        />
-      </FadeUp>
-      
-      {/* 4. Keycaps */}
-      <FadeUp>
-        <KeycapMapper 
-          onHoverColor={handleHoverColor} 
-          onLeaveColor={handleResetColor} 
-        /> 
-      </FadeUp>
-      
-      {/* 5. Footer (Resets cursor) */}
-      <FadeUp>
-        <div onMouseEnter={handleResetColor}>
-          <Footer3 />
-          <Bottom />
-        </div>
-      </FadeUp>
-      
-      {/* <ViewportIndicator /> */}
+          <FadeUp delay={0.4}>
+            <FeaturedSocials 
+              onHoverColor={handleHoverColor} 
+              onLeaveColor={handleResetColor} 
+            />
+          </FadeUp>
+
+          <FadeUp delay={0.4}>
+            <FeaturedChurch 
+              onHoverColor={handleHoverColor} 
+              onLeaveColor={handleResetColor} 
+            />
+          </FadeUp>
+          
+          {/* 4. Keycaps */}
+          <FadeUp delay={0.4}>
+            <KeycapMapper 
+              onHoverColor={handleHoverColor} 
+              onLeaveColor={handleResetColor} 
+            /> 
+          </FadeUp>
+          
+          {/* 5. Footer (Resets cursor) */}
+          <FadeUp delay={0.4}>
+            <div onMouseEnter={handleResetColor}>
+              <Footer3 />
+              <Bottom />
+            </div>
+          </FadeUp>
+          
+          {/* <ViewportIndicator /> */}
+        </>
+      )}
+
+      {/* Fallback background while Supabase loads (if Preloader finishes early) */}
+      {loading && !isPreloaderActive && (
+        <div className="h-screen w-full bg-black" />
+      )}
     </main>
   );
 }

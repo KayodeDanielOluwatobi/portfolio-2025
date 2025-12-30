@@ -51,12 +51,13 @@ const BioSectionCard = ({
   isOpen: boolean;
   onToggle: () => void;
 }) => {
+  
   return (
     <div
       className={`w-full rounded-lg md:rounded-xl relative overflow-hidden transition-all duration-500 border border-white/5 border-t-white/10 ${
         isOpen
-          ? 'bg-zinc-900/0 shadow-2xl'
-          : 'bg-zinc-900/0 hover:bg-zinc-900/40'
+          ? 'bg-zinc-900/20 shadow-2xl'
+          : 'bg-zinc-900/20 hover:bg-zinc-900/40'
       }`}
     >
       <div
@@ -89,21 +90,56 @@ const BioSectionCard = ({
         <AnimatePresence initial={false}>
           {isOpen && (
             <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ height: 0 }}
+              // 1. OPENING (Standard speed)
+              animate={{ 
+                height: 'auto',
+                transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } 
+              }}
+              // 2. COLLAPSING (Slower duration here)
+              exit={{ 
+                height: 0,
+                transition: { duration: 0.4, ease: "easeInOut" } 
+              }}
               className="overflow-hidden"
             >
-              <div className="pt-6 text-sm sm:text-base uppercase leading-relaxed font-space tracking-wide text-zinc-300">
-                <Typewriter 
-                  lines={lines}
-                  wait={0}        // Immediate start
-                  speed={5}       // Fast typing for readabilty
-                  pause={400}     // Quick pause between paragraphs
-                  spacing="mb-6"  // Relaxed spacing for content
-                  withPrompt={true} // Optional: Add ">>" here too
-                />
+              <div className="pt-6 text-sm sm:text-base leading-relaxed font-light tracking-wide text-zinc-300">
+                <motion.div
+                  initial={{ 
+                    // Start: Transparent part covers text
+                    WebkitMaskPosition: "100% 100%", 
+                    maskPosition: "100% 100%" 
+                  } as any}
+                  animate={{ 
+                    // End: Visible part covers text
+                    WebkitMaskPosition: "0% 0%", 
+                    maskPosition: "0% 0%" 
+                  } as any}
+                  transition={{ 
+                    // 👇 UPDATED: Very slow diagonal reveal (3.5s)
+                    duration: 3, 
+                    ease: "easeOut",
+                    delay: 0.2 
+                  }}
+                  style={{
+                    // Gradient: Black (visible) -> Transparent (invisible)
+                    WebkitMaskImage: "linear-gradient(170deg, black 40%, transparent 60%)",
+                    maskImage: "linear-gradient(170deg, black 40%, transparent 60%)",
+                    
+                    // Large mask to create smooth sliding edge
+                    WebkitMaskSize: "250% 250%",
+                    maskSize: "250% 250%",
+                    
+                    WebkitMaskRepeat: "no-repeat",
+                    maskRepeat: "no-repeat"
+                  }}
+                >
+                  {lines.map((line, index) => (
+                    <p key={index} className="mb-6 last:mb-0">
+                      {line}
+                    </p>
+                  ))}
+                </motion.div>
               </div>
             </motion.div>
           )}
@@ -119,10 +155,10 @@ export default function BioStack() {
   const [isMounted, setIsMounted] = useState(false);
 
   const BIO_LINES = [
-    "I design the way some people pray.",
-    "Slowly..",
-    "Intentionally...",
-    "With attention to what others overlook...."
+    "I design the way some people pray",
+    "Slowly.",
+    "Intentionally..",
+    "With attention to what others overlook..."
   ];
 
   useEffect(() => {
@@ -160,9 +196,9 @@ export default function BioStack() {
 
   return (
     <div className="w-full space-y-3">
-      {/* 1. HEADER CARD */}
+      {/* HEADER CARD */}
       <div className="w-full rounded-xl md:rounded-2xl p-6 md:p-8 relative overflow-hidden border border-white/5 border-t-white/10 bg-zinc-900/40">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/100 via-transparent to-black/100 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/3 via-transparent to-black/100 pointer-events-none" />
 
         <div className="relative z-10 flex flex-col gap-6">
           <div className="flex items-center justify-between">
@@ -178,21 +214,20 @@ export default function BioStack() {
             </button>
           </div>
           
-          {/* ... inside header card ... */}
-            <div className="text-sm sm:text-base md:text-base font-space uppercase tracking-wide leading-tight min-h-[160px] sm:min-h-[140px]">
+          <div className="text-sm sm:text-base md:text-base font-space font-extralight uppercase tracking-wide leading-tight min-h-[160px] sm:min-h-[140px]">
             <Typewriter 
-                lines={BIO_LINES}
-                wait={3} 
-                speed={40}
-                pause={1000} 
-                spacing="mb-1"
-                withPrompt={true}
+              lines={BIO_LINES}
+              wait={3} 
+              speed={40}
+              pause={1000} 
+              spacing="mb-1"
+              withPrompt={true}
             />
-            </div>
+          </div>
         </div>
       </div>
 
-      {/* 2. THE STACK OF SECTIONS */}
+      {/* STACK */}
       <div className="flex flex-col gap-2">
         {SECTIONS.map((section) => (
           <BioSectionCard

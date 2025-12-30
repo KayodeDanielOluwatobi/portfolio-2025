@@ -39,7 +39,10 @@
 }
 
 
-
+html {
+  /* Reserves space for the scrollbar to prevent layout shift */
+  scrollbar-gutter: stable;
+}
 
 :root {
   --background: #ffffff;
@@ -57,9 +60,14 @@ body {
   font-family: var(--font-dm-sans), Arial, sans-serif;
 }
 
-* {
-  cursor: none !important;
+/* In your globals.css */
+html, body {
+  background-color: #000000; /* Use your specific black hex */
 }
+
+/* * {
+  cursor: none !important;
+} */
 
 
 .social-icon {

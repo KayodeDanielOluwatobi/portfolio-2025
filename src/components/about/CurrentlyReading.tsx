@@ -8,7 +8,7 @@ import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MarqueeText } from '@/components/ui/MarqueeText';
-import { useSquircleRadius } from '@/hooks/useSquircleRadius'; // 👈 Hook import
+import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 
 interface Book {
   id: string;
@@ -30,7 +30,6 @@ interface ExtractedColors {
 
 const DEFAULT_COLORS = { barColor: '#FFFFFF', glowColor: '#FFFFFF' };
 
-// 👇 Props Interface
 interface CurrentlyReadingProps {
   onHoverColor?: (fill: string, stroke?: string) => void;
   onLeaveColor?: () => void;
@@ -43,8 +42,8 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
   const [loaderProgress, setLoaderProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
 
-  // 👇 Using the hook with DEFAULT values
   const squircleRadius = useSquircleRadius();
+  const isTiny = squircleRadius <= 12;
   const isMobile = squircleRadius <= 16;
 
   const [colorCache, setColorCache] = useState<Record<string, ExtractedColors>>({});
@@ -122,7 +121,6 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
         setIsLoading(false);
       }, 500);
 
-      // --- PREFETCH LOOP ---
       fetchedBooks.forEach((book) => {
         if (book.cover && !book.cover.includes('placeholder')) {
           prefetchColor(book.cover);
@@ -171,15 +169,13 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
 
   const currentBook = books[currentIndex];
 
-  // 👇 DETERMINE ACTIVE COLORS
   const activeColors =
     currentBook?.cover && colorCache[currentBook.cover]
       ? colorCache[currentBook.cover]
       : DEFAULT_COLORS;
 
-  // 👇 HANDLE MOUSE HOVER
   const handleMouseEnter = () => {
-    onHoverColor?.(activeColors.barColor, '#ffffff'); // Use barColor as fill, White stroke
+    onHoverColor?.(activeColors.barColor , '#ffffff'); 
   };
 
   const LoadingState = () => (
@@ -218,7 +214,6 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
   }
 
   return (
-    // Wrapper to capture Hover Events
     <div
       className="w-full h-full"
       onMouseEnter={handleMouseEnter}
@@ -258,8 +253,7 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
                   (prev) => (prev - 1 + books.length) % books.length
                 )
               }
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 backdrop-blur-sm 
-                               opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 backdrop-blur-sm opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out"
               aria-label="Previous book"
             >
               <ChevronLeft size={isMobile ? 15 : 20} className="text-zinc-300" />
@@ -269,8 +263,7 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
               onClick={() =>
                 setCurrentIndex((prev) => (prev + 1) % books.length)
               }
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 backdrop-blur-sm 
-                               opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-2 rounded-full bg-black/40 hover:bg-black/60 border border-white/10 backdrop-blur-sm opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 ease-out"
               aria-label="Next book"
             >
               <ChevronRight
@@ -302,7 +295,7 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
                     alt={currentBook.title}
                     width={64}
                     height={96}
-                    className="w-full h-full object-cover "
+                    className="w-full h-full object-cover"
                     unoptimized
                   />
                 </div>
@@ -326,15 +319,16 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
                   <div className="flex-1">
                     <LinearWaveProgress
                       progress={currentBook.progress}
-                      height={6}
-                      trackHeight={isMobile ? 8 : 9}
-                      waveHeight={isMobile ? 8 : 9}
+                      // 👇 EXACT SETTINGS REQUESTED
+                      height={isTiny ? 2.5 : 4}
+                      trackHeight={isTiny ? 8 : isMobile ? 8 : 9}
+                      waveHeight={isTiny ? 8 : isMobile ? 8 : 9}
                       trackColor={hexToRgba(activeColors.barColor, 0.2)}
                       waveColor={activeColors.barColor}
-                      waveAmplitude={3}
-                      maxWaveFrequency={isMobile ? 5 : 12}
-                      undulationSpeed={1}
-                      edgeGap={isMobile ? 9 : 10}
+                      waveAmplitude={isTiny ? 3 : isMobile ? 2 : 3}
+                      maxWaveFrequency={isTiny ? 5 : isMobile ? 9 : 9}
+                      undulationSpeed={isTiny ? 0.2 : isMobile ? 0.3 : 0.3}
+                      edgeGap={isTiny ? 8 : 10}
                     />
                   </div>
                   <span className="text-xs text-white/60 whitespace-nowrap font-light">
