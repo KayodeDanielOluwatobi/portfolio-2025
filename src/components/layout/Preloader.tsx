@@ -79,7 +79,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
     >
       <div className="absolute top-4 left-4 md:top-4 md:left-4">
         <span className="font-space text-[10px] md:text-xs text-zinc-500 uppercase tracking-[0em]">
-          SYSTEM BOOT
+          FAKE LOADER
         </span>
       </div>
 
