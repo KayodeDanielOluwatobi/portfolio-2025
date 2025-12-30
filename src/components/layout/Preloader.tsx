@@ -88,12 +88,12 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       {/* CENTER NUMBER */}
       <div className="flex flex-col items-center gap-2">
         <h1 className="font-space text-8xl md:text-9xl text-white leading-none select-none tracking-0">
-          {count}
+          {count}%
         </h1>
       </div>
       
       {/* BOTTOM RIGHT INFO */}
-      <div className="absolute bottom-4 right-4 md:bottom-4 md:right-4 text-[10px] text-zinc-500 font-mono text-right uppercase tracking-[0.1em] space-y-1">
+      <div className="absolute bottom-4 right-4 md:bottom-4 md:right-4 text-[7.5px] md:text-[10px] text-zinc-500 font-mono text-right uppercase tracking-[0.1em] space-y-0.5">
         <p>Status: <span className="text-zinc-300">Online</span></p>
         <p>Processing: <span className="text-green-500">{SECTIONS[sectionIndex]}</span></p>
       </div>
