@@ -84,7 +84,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       </div>
 
       <div className="flex flex-col items-center gap-2">
-        <h1 className="font-space text-8xl md:text-9xl text-white leading-none select-none tracking-0">
+        <h1 className="font-space text-3xl md:text-7xl text-white leading-none select-none tracking-0">
           {count}%
         </h1>
       </div>
