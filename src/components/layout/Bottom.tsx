@@ -87,7 +87,7 @@ export default function Bottom() {
                 </a>
               </span>{' '}
               {/* 👇 The Fix: Wrapped 'é' in a span using a standard font */}
-              — Ingredients: Nescaf<span className="font-sans font-medium">é</span>, Midnight Inspiration And Kpop Instrumentals On Repeat...
+              — Ingredients: Nescaf<span className="font-sans font-medium">é</span>, Midnight Inspiration And Bassy Instrumentals On Repeat...
             </p>
           </div>
 
