@@ -73,7 +73,7 @@ export default function Contact() {
   return (
     <main>
       <Header />
-      <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" />
+      {/* <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" /> */}
 
       <section className="w-full pt-32 pb-20 bg-black min-h-screen overflow-x-hidden">
         <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">

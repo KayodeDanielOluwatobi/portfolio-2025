@@ -20,10 +20,10 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-function CursorController() {
-  const { cursorColor, cursorStrokeColor } = useCursor();
-  return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
-}
+// function CursorController() {
+//   const { cursorColor, cursorStrokeColor } = useCursor();
+//   return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
+// }
 
 function WorksContent() {
   const router = useRouter();
@@ -175,7 +175,7 @@ export default function Works() {
   return (
     <Suspense fallback={<div className="min-h-screen w-full bg-black" />}>
       <CursorProvider>
-        <CursorController />
+        {/* <CursorController /> */}
         <WorksContent />
       </CursorProvider>
     </Suspense>

@@ -38,10 +38,10 @@ export default function About() {
                 onMobileMenuToggle={setIsMobileMenuOpen}
             />
 
-            <SmoothCursor 
+            {/* <SmoothCursor 
                 cursorColor={cursorColor} 
                 cursorStrokeColor={cursorStrokeColor} 
-            />
+            /> */}
 
             <FadeUp delay={0.4}>
                 <AboutHero />

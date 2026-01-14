@@ -25,10 +25,10 @@ import FadeUp from '@/components/animations/FadeUp';
 import Preloader from '@/components/layout/Preloader';
 
 // Dynamic import for the cursor
-const SmoothCursor = dynamic(
-  () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
-  { ssr: false }
-);
+// const SmoothCursor = dynamic(
+//   () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
+//   { ssr: false }
+// );
 
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -177,10 +177,10 @@ export default function Home() {
       {/* Only render the heavy stuff once data is loaded (or render behind preloader) */}
       {!loading && (
         <>
-          <SmoothCursor 
+          {/* <SmoothCursor 
             cursorColor={cursorFillColor}
             cursorStrokeColor={cursorStrokeColor}
-          />
+          /> */}
           
           <Header 
             currentBrand={currentBrand.logoVariant}

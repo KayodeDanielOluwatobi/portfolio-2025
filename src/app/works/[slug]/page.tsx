@@ -58,7 +58,7 @@ export default function CaseStudyPage() {
 
   return (
     <main className="bg-black min-h-screen">
-      <SmoothCursor cursorColor="#ffffff" cursorStrokeColor="#333333" />
+      {/* <SmoothCursor cursorColor="#ffffff" cursorStrokeColor="#333333" /> */}
       <Header onMobileMenuToggle={() => {}} />
 
       {/* 1. HERO IMAGE SECTION (16/9) */}
