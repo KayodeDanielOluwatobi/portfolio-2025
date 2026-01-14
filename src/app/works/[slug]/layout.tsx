@@ -1,16 +1,32 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { getProjectBySlug } from '@/utils/projectFetcher';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const project = await getProjectBySlug(params.slug);
+// Next.js 15 requires params to be a Promise
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}): Promise<Metadata> {
+  // 1. Await params to get the slug
+  const { slug } = await params;
+  const project = await getProjectBySlug(slug);
 
+  // Fallback if the project isn't found in Supabase
   if (!project) {
+    console.error(`[Metadata Error] No project found for slug: ${slug}`);
     return {
       title: 'Project Not Found | Everdann',
     };
   }
 
-  // Pick the first image from your media array for the preview
+  // 2. Await the headers to get the current host (everdann.vercel.app or preview URL)
+  const headerList = await headers();
+  const host = headerList.get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const currentUrl = `${protocol}://${host}/works/${slug}`;
+
+  // Use the first image from your media array
   const ogImage = Array.isArray(project.media) ? project.media[0] : project.media;
 
   return {
@@ -19,7 +35,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     openGraph: {
       title: project.title,
       description: project.tagline,
-      url: `https://everdann.vercel.app/works/${params.slug}`, //
+      url: currentUrl,
       siteName: 'Everdann Portfolio',
       images: [
         {
