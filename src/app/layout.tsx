@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     siteName: 'everdann designs',
     images: [
       {
-        url: 'https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.avif',
+        url: 'https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og-x.png',
         width: 1200,
         height: 630,
         alt: 'everdann designs portfolio preview',
