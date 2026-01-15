@@ -69,17 +69,17 @@ const din = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'everdann designs - Visual Designer',
+  title: 'Everdann Designs - Visual Designer',
   description: 'Graphic design portfolio by Daniel Kayode',
   metadataBase: new URL('https://everdann.vercel.app'), //
   openGraph: {
-    title: 'everdann designs - Visual Designer',
+    title: 'Everdann Designs - Visual Designer',
     description: 'Building brands that stand out, socials that engage and spirit-led church media that uplift.', //
     url: 'https://everdann.vercel.app', //
     siteName: 'everdann designs',
     images: [
       {
-        url: 'https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.png',
+        url: 'https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.avif',
         width: 1200,
         height: 630,
         alt: 'everdann designs portfolio preview',
@@ -90,9 +90,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'everdann designs - Visual Designer',
+    title: 'Everdann Designs - Visual Designer',
     description: 'Graphic design portfolio by Daniel Kayode',
-    images: ['https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.png'],
+    images: ['https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.avif'],
   },
 }
 
