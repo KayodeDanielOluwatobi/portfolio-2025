@@ -73,6 +73,15 @@ export const metadata: Metadata = {
   description: 'Graphic design portfolio by Daniel Kayode',
   metadataBase: new URL('https://everdann.vercel.app'), //
 
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'everdann',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -81,7 +90,7 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
 
-  
+
   openGraph: {
     title: 'Everdann Designs - Visual Designer',
     description: 'Building brands that stand out, socials that engage and spirit-led church media that uplift.', //

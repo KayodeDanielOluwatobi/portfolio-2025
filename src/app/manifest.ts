@@ -2,13 +2,13 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'everdann designs', //
-    short_name: 'Everdann',
+    name: 'everdann designs', // The full name on the splash screen
+    short_name: 'Everdann', // The name under the icon on the home screen
     description: 'Multidisciplinary design portfolio by Daniel Kayode', //
     start_url: '/',
-    display: 'standalone',
-    background_color: '#000000', // Matches your bg-black
-    theme_color: '#39FF14', // Your brand green
+    display: 'standalone', // Makes it look like a native app without a browser bar
+    background_color: '#000000', // Matches your site background
+    theme_color: '#39FF14', // Your brand green for the status bar
     icons: [
       {
         src: '/icon-192.png',
