@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     display: 'standalone', // Makes it look like a native app without a browser bar
     background_color: '#000000', // Matches your site background
-    theme_color: '#39FF14', // Your brand green for the status bar
+    theme_color: '#000000', // Your brand green for the status bar
     icons: [
       {
         src: '/icon-192.png',
