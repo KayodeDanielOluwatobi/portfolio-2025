@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Everdann Designs - Visual Designer',
     description: 'Graphic design portfolio by Daniel Kayode',
-    images: ['https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og@300x.avif'],
+    images: ['https://wnkbjxsnjquryyojfxmx.supabase.co/storage/v1/object/public/hero-assets/og-x.avif'],
   },
 }
 
