@@ -199,10 +199,12 @@ export default function CaseStudyPage() {
         categoryTable={project?.originTable} // Ensure your project data includes which table it came from
       />
 
-      <ViewCounter 
-        slug={slug} 
-        table={project?.originTable} 
-      />
+      {project?.originTable && (
+        <ViewCounter 
+          slug={slug} 
+          table={project.originTable} 
+        />
+      )}
 
       {/* <Footer3 /> */}
       {/* <Bottom /> */}
