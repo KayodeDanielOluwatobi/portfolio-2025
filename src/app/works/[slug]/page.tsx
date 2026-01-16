@@ -1,3 +1,6 @@
+//src/app/works/[slug]/page.tsx <--fgs dont remove this comment
+
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -79,10 +82,10 @@ export default function CaseStudyPage() {
         </div>
       </section>
 
-      {/* 2. BRAND HEADER SECTION */}
+      {/* 2. BRAND NAME HEADER SECTION */}
       <section className="pt-16 pb-8 px-0.5 sm:px-4 md:px-4 lg:px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-0 md:gap-2">
             <div className="flex items-center justify-between">
               <motion.h1 
                 initial={{ opacity: 0, x: -10 }}
@@ -94,23 +97,29 @@ export default function CaseStudyPage() {
               </motion.h1>
 
               {/* Actions Cluster */}
-              <div className="flex items-center gap-3 md:gap-6">
+              <div className="flex items-center gap-2 md:gap-6">
                 
+               
                 {/* View Counter with Dynamic Eye Icon */}
                 <div 
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border transition-colors duration-500"
+                  className="flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 border transition-colors duration-500"
                   style={{ borderColor: `${project?.brand_color}40` || '#39FF1440' }}
                 >
-                  <svg 
-                    width="18" height="18" viewBox="0 0 24 24" fill="none" 
-                    stroke={project?.brand_color || '#39FF14'} 
-                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                  >
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
+                  {/* Wrap icon in a div to force absolute vertical centering */}
+                  <div className="flex items-center justify-center flex-shrink-0">
+                    <svg 
+                      viewBox="0 0 24 24" fill="none" 
+                      stroke={project?.brand_color || '#39FF14'} 
+                      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      className="w-[14px] h-[14px] md:w-[18px] md:h-[18px]"
+                    >
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  </div>
+
                   <span 
-                    className="font-space text-sm md:text-base font-bold tracking-tighter"
+                    className="font-space text-xs md:text-base tracking-tighter leading-none translate-y-[1px] md:translate-y-0"
                     style={{ color: project?.brand_color || '#ffffff' }}
                   >
                     {project?.views || 0}
@@ -154,7 +163,7 @@ export default function CaseStudyPage() {
                       }
                     }
                   }}
-                  className="p-2.5 md:p-3 rounded-full border border-white/20 bg-white/5 transition-all duration-300 group"
+                  className="p-2 md:p-3 rounded-full border border-white/20 bg-white/5 transition-all duration-300 group"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = project?.brand_color || '#39FF14';
                     e.currentTarget.style.borderColor = project?.brand_color || '#39FF14';
@@ -165,9 +174,9 @@ export default function CaseStudyPage() {
                   }}
                 >
                   <svg 
-                    width="20" height="20" viewBox="0 0 24 24" fill="none" 
+                    viewBox="0 0 24 24" fill="none" 
                     stroke="white" strokeWidth="2" 
-                    className="group-hover:stroke-black transition-colors"
+                    className="w-[16px] h-[16px] md:w-[20px] md:h-[20px] group-hover:stroke-black transition-colors"
                   >
                     <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
                   </svg>
@@ -203,6 +212,10 @@ export default function CaseStudyPage() {
         <ViewCounter 
           slug={slug} 
           table={project.originTable} 
+          onUpdate={(newCount) => {
+          // This updates the local 'project' state with the fresh count
+          setProject((prev: any) => ({ ...prev, views: newCount }));
+        }}
         />
       )}
 

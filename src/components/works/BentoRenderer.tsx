@@ -1,3 +1,5 @@
+//src/components/works/BentoRenderer.tsx
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -8,6 +10,7 @@ interface BentoAsset {
   src?: string;
   content?: string;
   title?: string;
+  titleColor?: string; 
 }
 
 interface BentoRowProps {
@@ -30,7 +33,6 @@ export default function BentoRenderer({ rows }: { rows: BentoRowProps[] }) {
 function BentoRow({ row }: { row: BentoRowProps }) {
   const { layout, assets } = row;
 
-  // Pattern 1: FULL (16:9 - Spans full width)
   if (layout === 'full') {
     return (
       <div className="w-full">
@@ -39,7 +41,6 @@ function BentoRow({ row }: { row: BentoRowProps }) {
     );
   }
 
-  // Pattern 2: TWIN (Always 2 columns)
   if (layout === 'twin') {
     return (
       <div className="grid grid-cols-2 gap-1 md:gap-2">
@@ -49,16 +50,12 @@ function BentoRow({ row }: { row: BentoRowProps }) {
     );
   }
 
-  // Pattern 3: BIG-LEFT (Always 2 columns: Tall Left, Stacked Right)
   if (layout === 'big-left') {
     return (
       <div className="grid grid-cols-2 gap-1 md:gap-2 items-start">
-        {/* Left: 4:5 aspect ratio card */}
         <div className="w-full aspect-[4/5]">
           <MediaCard asset={assets[0]} className="w-full h-full" />
         </div>
-        
-        {/* Right: Two cards that split the height equally */}
         <div className="w-full aspect-[4/5] grid grid-rows-2 gap-1 md:gap-2">
           <MediaCard asset={assets[1]} className="w-full h-full" />
           <MediaCard asset={assets[2]} className="w-full h-full" />
@@ -67,17 +64,13 @@ function BentoRow({ row }: { row: BentoRowProps }) {
     );
   }
 
-  // Pattern 4: BIG-RIGHT (Always 2 columns: Stacked Left, Tall Right)
   if (layout === 'big-right') {
     return (
       <div className="grid grid-cols-2 gap-1 md:gap-2 items-start">
-        {/* Left: Two cards that split the height equally */}
         <div className="w-full aspect-[4/5] grid grid-rows-2 gap-1 md:gap-2">
           <MediaCard asset={assets[0]} className="w-full h-full" />
           <MediaCard asset={assets[1]} className="w-full h-full" />
         </div>
-        
-        {/* Right: 4:5 aspect ratio card */}
         <div className="w-full aspect-[4/5]">
           <MediaCard asset={assets[2]} className="w-full h-full" />
         </div>
@@ -89,9 +82,17 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 }
 
 function MediaCard({ asset, className }: { asset: BentoAsset; className?: string }) {
+  const isText = asset.type === 'text';
+
   return (
     <FadeUp className="h-full">
-      <div className={`group relative overflow-hidden rounded-lg md:rounded-2xl bg-zinc-900/40 border border-white/5 h-full ${className}`}>
+      <div 
+        className={`group relative overflow-hidden h-full transition-all duration-500 ${className} ${
+          isText 
+            ? 'bg-transparent border-none' 
+            : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl'
+        }`}
+      >
         {asset.type === 'image' && (
           <img 
             src={asset.src} 
@@ -109,13 +110,13 @@ function MediaCard({ asset, className }: { asset: BentoAsset; className?: string
         )}
 
         {asset.type === 'text' && (
-          <div className="p-4 md:p-12 flex flex-col justify-center h-full bg-zinc-900/10">
+          <div className="flex flex-col justify-center items-start h-full py-4 md:py-8 px-2">
             {asset.title && (
-              <h4 className="font-space text-[8px] md:text-xs uppercase tracking-[0.4em] text-zinc-600 mb-2 md:mb-6">
+              <h4 className="font-space text-[9px] md:text-sm uppercase tracking-[0.1em] md:tracking-[0.2em] text-white/50 mb-3 md:mb-8">
                 {asset.title}
               </h4>
             )}
-            <p className="text-[10px] sm:text-xs md:text-xl font-light text-zinc-300 leading-tight md:leading-relaxed">
+            <p className="text-sm md:text-4xl font-extralight md:font-thin tracking-wider md:tracking-wide text-white leading-snug md:leading-[1.1] max-w-[100%]">
               {asset.content}
             </p>
           </div>
