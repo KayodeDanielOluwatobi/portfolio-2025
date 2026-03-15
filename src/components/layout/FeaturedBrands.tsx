@@ -31,7 +31,7 @@ interface FeaturedBrandsProps {
   onLeaveColor?: () => void;
 }
 
-export default function FeaturedBrands({ limit = 6, onHoverColor, onLeaveColor }: FeaturedBrandsProps) {
+export default function FeaturedBrands({ limit = 9, onHoverColor, onLeaveColor }: FeaturedBrandsProps) {
   const [brands, setBrands] = useState<Brands[]>([]);
   const [loading, setLoading] = useState(true);
 

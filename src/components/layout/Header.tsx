@@ -81,7 +81,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   }, []);
 
   const navItems = [
-    //{ name: 'HOME', href: '/' },
+    { name: 'HOME', href: '/' },
     { name: 'WORKS', href: '/works' },
     { name: 'LAB', href: '/lab' },
     { name: 'ABOUT', href: '/about' },
