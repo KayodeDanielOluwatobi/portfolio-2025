@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Everdann Designs — Portfolio 2025
+
+A personal portfolio website for **Kayode Daniel Oluwatobi** — Visual Designer and Frontend Developer. Built to showcase design work, frontend projects, and the intersection of both disciplines.
+
+🔗 **Live Site:** [everdann.vercel.app](https://everdann.vercel.app)
+
+---
+
+## About
+
+This portfolio reflects a unique perspective — that of a graphic designer who codes. Rather than separating design from development, this site treats them as a single craft. Every layout decision, animation, and interaction is deliberate.
+
+The site opens with a custom loader sequence before revealing a dark, minimal interface across four sections: **About**, **Projects**, **Skills**, and **Contact**.
+
+---
+
+## Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| [Next.js 15](https://nextjs.org/) | React framework & routing |
+| [TypeScript](https://www.typescriptlang.org/) | Type-safe JavaScript |
+| [Tailwind CSS](https://tailwindcss.com/) | Utility-first styling |
+| [Vercel](https://vercel.com/) | Deployment & hosting |
+
+---
+
+## Features
+
+- **Custom loader animation** — branded entry experience before the main content renders
+- **Dark, minimal aesthetic** — high contrast, intentional whitespace, design-first layout
+- **Responsive design** — optimised across mobile, tablet, and desktop
+- **Project showcase** — curated selection of visual design and frontend work
+- **Skills section** — honest overview of tools and technologies
+- **Contact section** — direct line for collaboration and opportunities
+
+---
 
 ## Getting Started
 
-First, run the development server:
+To run this project locally:
 
 ```bash
+# Clone the repository
+git clone https://github.com/KayodeDanielOluwatobi/portfolio-2025.git
+
+# Navigate into the project
+cd portfolio-2025
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+```
+portfolio-2025/
+├── public/          # Static assets
+├── src/             # Application source code
+├── PNG/             # Design assets and images
+├── scripts/         # Utility scripts
+└── ...config files
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Kayode Daniel Oluwatobi**
+Visual Designer & Frontend Developer
 
-## Deploy on Vercel
+- GitHub: [@KayodeDanielOluwatobi](https://github.com/KayodeDanielOluwatobi)
+- Portfolio: [everdann.vercel.app](https://everdann.vercel.app)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+> Designed and built by Kayode Daniel Oluwatobi — 2025
