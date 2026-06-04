@@ -18,8 +18,27 @@
   
   --font-goth: var(--font-special-gothic);
   --font-din: var(--font-din);
-  --font-monoblock: var(--font-monoblock)
+  --font-monoblock: var(--font-monoblock);
 
+  /* Dynamic color mappings mapped to CSS variables */
+  --color-black: var(--black-val);
+  --color-white: var(--white-val);
+  
+  --color-zinc-950: var(--zinc-950-val);
+  --color-zinc-900: var(--zinc-900-val);
+  --color-zinc-800: var(--zinc-800-val);
+  --color-zinc-700: var(--zinc-700-val);
+  --color-zinc-600: var(--zinc-600-val);
+  --color-zinc-500: var(--zinc-500-val);
+  --color-zinc-400: var(--zinc-400-val);
+  --color-zinc-300: var(--zinc-300-val);
+  --color-zinc-200: var(--zinc-200-val);
+  --color-zinc-100: var(--zinc-100-val);
+  --color-zinc-5: var(--zinc-50-val);
+
+  /* Absolute colors that do NOT swap */
+  --color-pure-black: #000000;
+  --color-pure-white: #ffffff;
 } 
 
 
@@ -45,13 +64,99 @@ html {
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Default is Dark Mode */
+  --background: #000000;
+  --foreground: #ffffff;
+
+  --black-val: #000000;
+  --white-val: #ffffff;
+
+  --zinc-950-val: #09090b;
+  --zinc-900-val: #18181b;
+  --zinc-800-val: #27272a;
+  --zinc-700-val: #3f3f46;
+  --zinc-600-val: #52525b;
+  --zinc-500-val: #71717a;
+  --zinc-400-val: #a1a1aa;
+  --zinc-300-val: #d4d4d8;
+  --zinc-200-val: #e4e4e7;
+  --zinc-100-val: #f4f4f5;
+  --zinc-50-val: #fafafa;
+
+  --watch-color: #ffffff;
+
+  --tooltip-bg: rgba(255, 255, 255, 0.07);
+  --tooltip-border: rgba(255, 255, 255, 0.15);
+  --tooltip-text: #ffffff;
+  --tooltip-subtext: rgba(255, 255, 255, 0.5);
+
+  --chatgpt-track: #D1FAE5;
+  --chatgpt-wave: #10B981;
+  --chatgpt-stroke: #D1FAE5;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Explicit Dark Mode */
+  --background: #000000;
+  --foreground: #ffffff;
+
+  --black-val: #000000;
+  --white-val: #ffffff;
+
+  --zinc-950-val: #09090b;
+  --zinc-900-val: #18181b;
+  --zinc-800-val: #27272a;
+  --zinc-700-val: #3f3f46;
+  --zinc-600-val: #52525b;
+  --zinc-500-val: #71717a;
+  --zinc-400-val: #a1a1aa;
+  --zinc-300-val: #d4d4d8;
+  --zinc-200-val: #e4e4e7;
+  --zinc-100-val: #f4f4f5;
+  --zinc-50-val: #fafafa;
+
+  --watch-color: #ffffff;
+
+  --tooltip-bg: rgba(255, 255, 255, 0.07);
+  --tooltip-border: rgba(255, 255, 255, 0.15);
+  --tooltip-text: #ffffff;
+  --tooltip-subtext: rgba(255, 255, 255, 0.5);
+
+  --chatgpt-track: #D1FAE5;
+  --chatgpt-wave: #10B981;
+  --chatgpt-stroke: #D1FAE5;
+}
+
+.light {
+  /* Light Mode overrides */
+  --background: #ffffff;
+  --foreground: #18181b; /* Soft black/dark slate */
+
+  --black-val: #ffffff;
+  --white-val: #18181b; /* Soft black/dark slate */
+
+  --zinc-950-val: #fafafa;
+  --zinc-900-val: #f4f4f5;
+  --zinc-800-val: #e4e4e7;
+  --zinc-700-val: #d4d4d8;
+  --zinc-600-val: #a1a1aa;
+  --zinc-50-val: #09090b;
+  --zinc-100-val: #18181b; /* Soft black/dark slate */
+  --zinc-200-val: #27272a;
+  --zinc-300-val: #3f3f46;
+  --zinc-400-val: #52525b;
+  --zinc-500-val: #71717a;
+
+  --watch-color: #3f3f46; /* Watchface elements: Zinc-700, soft and premium */
+
+  --tooltip-bg: rgba(255, 255, 255, 0.6); /* Premium semi-opaque white glass */
+  --tooltip-border: rgba(0, 0, 0, 0.1);    /* Soft dark border */
+  --tooltip-text: #18181b;                 /* Soft black text */
+  --tooltip-subtext: rgba(24, 24, 27, 0.6); /* Soft black subtext */
+
+  --chatgpt-track: #A7F3D0;
+  --chatgpt-wave: #059669;
+  --chatgpt-stroke: #A7F3D0;
 }
 
 body {
@@ -62,7 +167,19 @@ body {
 
 /* In your globals.css */
 html, body {
-  background-color: #000000; /* Use your specific black hex */
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+}
+
+.light .menu-icon-invert,
+html.light .menu-icon-invert,
+[data-theme='light'] .menu-icon-invert,
+.light .logo-invert,
+html.light .logo-invert,
+[data-theme='light'] .logo-invert {
+  filter: invert(0.906) !important;
+  transition: filter 0.4s ease;
 }
 
 /* * {

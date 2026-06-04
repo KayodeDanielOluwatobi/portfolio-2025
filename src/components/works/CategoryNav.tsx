@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { WORK_CATEGORIES } from '@/data/workCategories';
 import { ChevronDown } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
+import { useTheme } from 'next-themes';
 
 // Initialize Client
 const supabase = createClient(
@@ -18,6 +19,9 @@ interface CategoryNavProps {
 }
 
 export default function CategoryNav({ activeCategory, onCategoryChange }: CategoryNavProps) {
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === 'light';
+
   const [isHovering, setIsHovering] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
@@ -79,7 +83,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
 
   // Helper component for the Number Tag
   const NumberTag = ({ count }: { count: number }) => (
-    <span className="align-top text-[0.6em] font-thin text-white/50 ml-1 -mt-1 inline-block">
+    <span className="align-top text-[0.6em] font-thin text-[var(--white-val)] opacity-50 ml-1 -mt-1 inline-block">
       {count}
     </span>
   );
@@ -92,7 +96,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           className="flex items-center gap-2 pb-3"
         >
-          <h2 className="text-white font-regular text-2xl flex items-start">
+          <h2 className="text-[var(--white-val)] font-regular text-2xl flex items-start">
             {activeCategory_obj?.label}
             {/* Mobile Number Tag */}
             <NumberTag count={counts[activeCategory] || 0} />
@@ -104,7 +108,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
               transition={{ duration: 0.3 }}
               className="absolute inset-0"
             >
-              <ChevronDown className="w-5 h-5 text-white" />
+              <ChevronDown className="w-5 h-5 text-[var(--white-val)]" />
             </motion.div>
             
             <motion.div
@@ -113,7 +117,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
               transition={{ duration: 0.3 }}
               className="absolute inset-0"
             >
-              <ChevronDown className="w-5 h-5 text-white rotate-180" />
+              <ChevronDown className="w-5 h-5 text-[var(--white-val)] rotate-180" />
             </motion.div>
           </div>
         </button>
@@ -126,7 +130,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="absolute top-full left-0 right-0 bg-black/80 backdrop-blur-md border border-white/10 mt-2 z-50 rounded-lg overflow-hidden"
+              className="absolute top-full left-0 right-0 bg-[var(--black-val)]/80 backdrop-blur-md border border-[var(--white-val)]/10 mt-2 z-50 rounded-lg overflow-hidden"
             >
               <div className="flex flex-col">
                 {WORK_CATEGORIES.map((category) => (
@@ -136,10 +140,10 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                       onCategoryChange(category.id);
                       setIsDropdownOpen(false);
                     }}
-                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-white/5 last:border-b-0 select-none flex items-start ${
+                    className={`px-4 py-3 text-left font-regular text-lg transition-colors duration-200 border-b border-[var(--white-val)]/5 last:border-b-0 select-none flex items-start ${
                       activeCategory === category.id
-                        ? 'text-white bg-white/10'
-                        : 'text-white/40 hover:text-white hover:bg-white/5'
+                        ? 'text-[var(--white-val)] bg-[var(--white-val)]/10'
+                        : 'text-[var(--white-val)] opacity-40 hover:opacity-100 hover:bg-[var(--white-val)]/5'
                     }`}
                   >
                     {category.label}
@@ -167,7 +171,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
           <motion.h2
             key={activeCategory_obj?.id}
             layoutId={activeCategory_obj?.id} 
-            className="font-regular text-3xl text-white hover:text-white/80 transition-colors duration-300 pb-1 whitespace-nowrap flex items-start"
+            className="font-regular text-3xl text-[var(--white-val)] hover:text-[var(--white-val)]/80 transition-colors duration-300 pb-1 whitespace-nowrap flex items-start"
             transition={{
               type: 'spring',
               stiffness: 200,
@@ -182,7 +186,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
 
           {/* Underline */}
           <motion.div
-            className="absolute bottom-0 left-0 h-0.5 bg-white origin-left"
+            className="absolute bottom-0 left-0 h-0.5 bg-[var(--white-val)] origin-left"
             style={{ width: '80%' }}
             layoutId="underline"
             transition={{
@@ -216,7 +220,7 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
                     delay: index * 0.1,
                     ease: 'easeOut',
                   }}
-                  className="font-extralight text-3xl text-white/40 hover:text-white/70 transition-colors duration-300 whitespace-nowrap select-none flex items-start"
+                  className="font-extralight text-3xl text-[var(--white-val)] opacity-40 hover:opacity-75 transition-all whitespace-nowrap select-none flex items-start"
                 >
                   {category.label}
                   {/* Desktop Hover Item Number Tag */}

@@ -13,22 +13,22 @@ import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
 import { CursorProvider, useCursor } from '@/context/CursorContext';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
-import FadeUp from '@/components/animations/FadeUp'; 
+import FadeUp from '@/components/animations/FadeUp';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// function CursorController() {
-//   const { cursorColor, cursorStrokeColor } = useCursor();
-//   return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
-// }
+function CursorController() {
+  const { cursorColor, cursorStrokeColor } = useCursor();
+  return <SmoothCursor cursorColor={cursorColor} cursorStrokeColor={cursorStrokeColor} />;
+}
 
 function WorksContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [activeCategory, setActiveCategory] = useState('brands');
   const [works, setWorks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +50,7 @@ function WorksContent() {
   useEffect(() => {
     const fetchWorks = async () => {
       setLoading(true);
-      setWorks([]); 
+      setWorks([]);
 
       try {
         let tableName = '';
@@ -89,7 +89,7 @@ function WorksContent() {
   }, []);
 
   const activeCategory_obj = WORK_CATEGORIES.find(cat => cat.id === activeCategory);
-  
+
   // 👇 Animation Variants for the Typing Effect
   const charVariants = {
     hidden: { opacity: 0 },
@@ -100,10 +100,10 @@ function WorksContent() {
     <main>
       <Header onMobileMenuToggle={setIsMobileMenuOpen} />
 
-      <section className="w-full py-32 bg-black min-h-screen">
+      <section className="w-full py-32 bg-[var(--background)] min-h-screen transition-colors duration-400">
         <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
-          
-          <motion.div 
+
+          <motion.div
             className="mb-20"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,12 +112,12 @@ function WorksContent() {
             <TextPressure
               text="My Works!"
               flex={false} alpha={false} stroke={false} width={true} weight={true} italic={true}
-              textColor="#ffffff" minFontSize={36} fixedFontSize={pressureFontSize}
+              textColor="var(--white-val)" minFontSize={36} fixedFontSize={pressureFontSize}
             />
           </motion.div>
 
           <div className="mb-0 md:mb-6">
-            <CategoryNav 
+            <CategoryNav
               activeCategory={activeCategory}
               onCategoryChange={handleCategoryChange}
             />
@@ -126,7 +126,7 @@ function WorksContent() {
           {/* 👇 BUTTERY SMOOTH TYPING SUBTITLE */}
           <div className="min-h-[2em] mb-12"> {/* Height anchor to prevent layout jump */}
             <AnimatePresence mode="wait">
-              <motion.p 
+              <motion.p
                 key={activeCategory}
                 className="text-white/60 font-thin text-lg md:text-2xl tracking-wide leading-relaxed"
                 initial="hidden"
@@ -150,10 +150,10 @@ function WorksContent() {
             </AnimatePresence>
           </div>
 
-          <WorksGrid 
-            works={works} 
-            activeCategory={activeCategory} 
-            isLoading={loading} 
+          <WorksGrid
+            works={works}
+            activeCategory={activeCategory}
+            isLoading={loading}
           />
 
         </div>
@@ -162,7 +162,7 @@ function WorksContent() {
       <FadeUp delay={0.4}>
         <Footer3 />
       </FadeUp>
-      
+
       <FadeUp delay={0.4}>
         <Bottom />
       </FadeUp>
@@ -173,9 +173,9 @@ function WorksContent() {
 
 export default function Works() {
   return (
-    <Suspense fallback={<div className="min-h-screen w-full bg-black" />}>
+    <Suspense fallback={<div className="min-h-screen w-full bg-[var(--background)]" />}>
       <CursorProvider>
-        {/* <CursorController /> */}
+        <CursorController />
         <WorksContent />
       </CursorProvider>
     </Suspense>

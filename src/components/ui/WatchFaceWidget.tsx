@@ -139,7 +139,7 @@ export default function WatchfaceWidget({
 
   // Get dynamic weather icon
   const isDay = weather ? isDayTime(weather.icon) : true;
-  const weatherIcon = weather ? getWeatherIcon(weather.weatherId, isDay, { size: displaySize * 0.09, color: '#ffffff' }) : null;
+  const weatherIcon = weather ? getWeatherIcon(weather.weatherId, isDay, { size: displaySize * 0.09, color: 'currentColor' }) : null;
 
   return (
     <div
@@ -148,6 +148,7 @@ export default function WatchfaceWidget({
       style={{
         width: `100%`,
         height: `${displaySize}px`,
+        color: 'var(--watch-color)',
       }}
     >
       {/* SVG for clock face and hands */}
@@ -169,7 +170,7 @@ export default function WatchfaceWidget({
               y1={centerY - Math.cos(angle) * (radius - 20)}
               x2={centerX + Math.sin(angle) * innerRadius}
               y2={centerY - Math.cos(angle) * innerRadius}
-              stroke="#ffffff"
+              stroke="currentColor"
               strokeWidth={isMainTick ? 2 : 1}
               opacity={isMainTick ? 0.4 : 0.4}
             />
@@ -181,7 +182,7 @@ export default function WatchfaceWidget({
           y1={centerY}
           x2={centerX + Math.sin((hoursAngle) * (Math.PI / 180)) * (radius * 0.40)}
           y2={centerY - Math.cos((hoursAngle) * (Math.PI / 180)) * (radius * 0.40)}
-          stroke="#ffffff"
+          stroke="currentColor"
           strokeWidth={displaySize * 0.035}
           strokeLinecap="butt"
           opacity="0.9"
@@ -193,7 +194,7 @@ export default function WatchfaceWidget({
           y1={centerY}
           x2={centerX + Math.sin((hoursAngle + 180) * (Math.PI / 180)) * (radius * 0.14)}
           y2={centerY - Math.cos((hoursAngle + 180) * (Math.PI / 180)) * (radius * 0.14)}
-          stroke="#ffffff"
+          stroke="currentColor"
           strokeWidth={displaySize * 0.035}
           strokeLinecap="butt"
           opacity="0.9"
@@ -205,7 +206,7 @@ export default function WatchfaceWidget({
           y1={centerY}
           x2={centerX + Math.sin((minutesAngle) * (Math.PI / 180)) * (radius * 0.70)}
           y2={centerY - Math.cos((minutesAngle) * (Math.PI / 180)) * (radius * 0.70)}
-          stroke="#ffffff"
+          stroke="currentColor"
           strokeWidth={displaySize * 0.025}
           strokeLinecap="butt"
           opacity="0.85"
@@ -216,7 +217,7 @@ export default function WatchfaceWidget({
           y1={centerY}
           x2={centerX + Math.sin((minutesAngle + 180) * (Math.PI / 180)) * (radius * 0.12)}
           y2={centerY - Math.cos((minutesAngle + 180) * (Math.PI / 180)) * (radius * 0.12)}
-          stroke="#ffffff"
+          stroke="currentColor"
           strokeWidth={displaySize * 0.025}
           strokeLinecap="butt"
           opacity="0.85"

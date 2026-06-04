@@ -25,7 +25,7 @@ export default function AboutHero() {
     }, []);
 
     return (
-        <section className="w-full pt-32 pb-20 bg-black">
+        <section className="w-full pt-32 pb-20 bg-[var(--background)] transition-colors duration-400">
             <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -40,7 +40,7 @@ export default function AboutHero() {
                         width={true}
                         weight={true}
                         italic={true}
-                        textColor="#ffffff"
+                        textColor="var(--white-val)"
                         strokeColor="#ff0000"
                         minFontSize={36}
                         fixedFontSize={pressureFontSize}

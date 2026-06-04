@@ -6,6 +6,7 @@ import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
 import { motion } from 'framer-motion'; 
 import { darkenColor } from '@/utils/colorUtils';
+import { useTheme } from 'next-themes';
 
 // --- Interfaces ---
 interface Keycap {
@@ -41,6 +42,13 @@ const keycapProficiencies: Record<string, 'Expert' | 'Advanced' | 'Intermediate'
   'Be': 'Advanced',
 };
 
+const toolDisplayNames: Record<string, { main: string; sub?: string }> = {
+  'ChatGPT': { main: 'ChatGPT', sub: 'for Image Generation' },
+  'Spline': { main: 'Spline', sub: 'for 3D Design' },
+  'Gemini': { main: 'Gemini', sub: '(Nanobanana)' },
+  'Be': { main: 'Adobe Portfolio' },
+};
+
 const proficiencyProgress = {
   'Expert': 95,
   'Advanced': 90,
@@ -60,19 +68,19 @@ const toolProgressOverrides: Record<string, number> = {
 };
 
 // 🎨 Tool Colors
-const keycapColors: Record<string, { track: string; wave: string }> = {
+const keycapColors: Record<string, { track: string; wave: string; stroke?: string; lightWave?: string }> = {
   'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, 
   'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, 
   'Premiere Pro':   { track: '#E3E3FF', wave: '#9999FF' }, 
   'After Effects':  { track: '#F2D9FF', wave: '#D999FF' }, 
   'InDesign':       { track: '#FFC2D1', wave: '#FF3366' }, 
-  'Be':             { track: '#EAEAEA', wave: '#ffffff' }, 
+  'Be':             { track: 'var(--zinc-800-val)', wave: 'var(--white-val)' }, 
   'Figma':          { track: '#C2F2E3', wave: '#0ACF83' }, 
   'Spline':         { track: '#EAD9FF', wave: '#B388FF' }, 
-  'ChatGPT':        { track: '#D9EDE8', wave: '#74AA9C' }, 
-  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8' }, 
+  'ChatGPT':        { track: 'var(--chatgpt-track)', wave: 'var(--chatgpt-wave)', stroke: 'var(--chatgpt-stroke)' }, 
+  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8', stroke: '#1B60E2', lightWave: '#1B60E2' }, 
   'Affinity':       { track: '#E4FFD1', wave: '#A8FF71' }, 
-  'default':        { track: '#EEEEEE', wave: '#cccccc' }, 
+  'default':        { track: 'var(--zinc-800-val)', wave: 'var(--zinc-400-val)' }, 
 };
 
 // 🎨 Special Key Colors
@@ -85,7 +93,7 @@ const specialKeyColors: Record<string, string> = {
 
 const KEYBOARD_BASE_COLOR = '#F3EFE0'; 
 
-const getKeycapColor = (tool: string): { track: string; wave: string } => {
+const getKeycapColor = (tool: string): { track: string; wave: string; stroke?: string; lightWave?: string } => {
   return keycapColors[tool] || keycapColors['default'];
 };
 
@@ -116,6 +124,9 @@ const AnimatedCircularProgress = ({ targetProgress, duration = 2000, ...props }:
 
 // --- Main Component ---
 export default function KeycapInteractive({ onHoverColor, onLeaveColor }: KeycapInteractiveProps) {
+  const { resolvedTheme } = useTheme();
+  const isLightMode = resolvedTheme === 'light';
+
   const [keycaps, setKeycaps] = useState<KeycapWithProficiency[]>([]);
   const [hoveredKeycap, setHoveredKeycap] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -316,7 +327,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
           <TextPressure className='ml-2 mb-8'
             text="MY DESIGN STACK"
             flex={false} alpha={false} stroke={false} width={true} weight={true} italic={true}
-            textColor="#ffffff" strokeColor="#ff0000"
+            textColor="var(--white-val)" strokeColor="#ff0000"
             minFontSize={36} fixedFontSize={pressureFontSize}
           />
           <p className="text-white/60 pl-2 md:pl-3 text-sm font-extralight sm:text-base">
@@ -338,6 +349,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
 
           {/* 👇 KEYBOARD IMAGE CONTAINER 👇 */}
           <div 
+            data-section="keycap-image"
             className="relative w-full"
             onMouseEnter={() => triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40))}
             onMouseLeave={() => onLeaveColor?.()}
@@ -384,7 +396,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                         setHoveredKeycap(keycap.name);
                         const colors = getKeycapColor(keycap.tool);
                         const fillColor = colors.wave; 
-                        const strokeColor = darkenColor(fillColor, 40);
+                        const strokeColor = colors.stroke || darkenColor(fillColor, 40);
                         triggerCursorColor(fillColor, strokeColor);
                       }
                     }}
@@ -406,16 +418,27 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                           : { top: `${(keycap.y - getTooltipOffset()) * imageScale + OFFSET_Y * imageScale}px` }),
                         transform: 'translateX(-50%)',
                         // Normal mode styles (overridden in wrapper if wireframe)
-                        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        background: isWireframe
+                          ? 'rgba(0, 0, 0, 0.8)'
+                          : 'var(--tooltip-bg)',
+                        border: isWireframe
+                          ? '1px solid #ffffff'
+                          : '1px solid var(--tooltip-border)',
                         backdropFilter: 'blur(12px)',
                         padding: keycap.tool === 'Be' ? `calc(${tooltipSize.padding} + 10px)` : tooltipSize.padding,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: tooltipSize.gap, minWidth: tooltipSize.minWidth,
                       }}
                     >
-                      <h3 className="font-sans tracking-normal text-center font-bold text-white" style={{ fontSize: tooltipSize.toolNameSize }}>
-                        {keycap.tool === 'Be' ? 'Adobe Portfolio' : keycap.tool}
-                      </h3>
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <h3 className="font-sans tracking-normal font-bold" style={{ fontSize: tooltipSize.toolNameSize, color: 'var(--tooltip-text)' }}>
+                          {toolDisplayNames[keycap.tool]?.main || keycap.tool}
+                        </h3>
+                        {toolDisplayNames[keycap.tool]?.sub && (
+                          <span className="font-sans tracking-normal font-light block" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)', marginTop: '2px' }}>
+                            {toolDisplayNames[keycap.tool].sub}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex flex-col items-center gap-2">
                         <AnimatedCircularProgress
                           targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
@@ -427,19 +450,25 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                           waveWidth={isWireframe ? 2 : tooltipSize.waveWidth}
                           // 👇 Track is now more visible (0.4 opacity)
                           trackColor={isWireframe ? 'rgba(255,255,255,0.4)' : getKeycapColor(keycap.tool).track}
-                          waveColor={isWireframe ? '#ffffff' : getKeycapColor(keycap.tool).wave}
+                          waveColor={
+                            isWireframe 
+                              ? 'var(--white-val)' 
+                              : (isLightMode && getKeycapColor(keycap.tool).lightWave) 
+                                ? getKeycapColor(keycap.tool).lightWave 
+                                : getKeycapColor(keycap.tool).wave
+                          }
                           
                           waveAmplitude={0} maxWaveFrequency={0} undulationSpeed={0} edgeGap={20}
                         />
 
                         {keycap.tool !== 'Be' ? (
                           <div className="text-center">
-                            <p className="text-white/40 font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>Proficiency Level</p>
-                            <p className="text-white/90 font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize }}>{keycap.proficiency}</p>
+                            <p className="font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)' }}>Proficiency Level</p>
+                            <p className="font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize, color: 'var(--tooltip-text)' }}>{keycap.proficiency}</p>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <p className="text-white/50 font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize }}>My Behance Portfolio</p>
+                            <p className="font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)' }}>My Behance Portfolio</p>
                           </div>
                         )}
                       </div>

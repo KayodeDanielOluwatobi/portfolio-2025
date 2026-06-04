@@ -8,7 +8,7 @@ import TextPressure from '@/components/TextPressure';
 import Bottom from '@/components/layout/Bottom';
 import Footer3 from '@/components/layout/Footer3';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
-import FadeUp from '@/components/animations/FadeUp'; 
+import FadeUp from '@/components/animations/FadeUp';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,7 +25,7 @@ const socialLinks = [
 export default function Contact() {
   const [pressureFontSize, setPressureFontSize] = useState(120);
   const [emailCopied, setEmailCopied] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     name: '', email: '', service_type: 'Branding', subject: '', message: ''
   });
@@ -73,22 +73,22 @@ export default function Contact() {
   return (
     <main>
       <Header />
-      {/* <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" /> */}
+      <SmoothCursor cursorColor="var(--black-val)" cursorStrokeColor="var(--white-val)" />
 
       <section className="w-full pt-32 pb-20 bg-black min-h-screen overflow-x-hidden">
         <div className="container mx-auto max-w-none px-4 sm:px-6 md:px-8 lg:px-8">
-          
+
           <div className="mb-16 md:mb-24">
             <FadeUp>
               <TextPressure
                 text="LET'S TALK!"
                 flex={false} alpha={false} stroke={false} width={true} weight={true} italic={true}
-                textColor="#ffffff" minFontSize={36} fixedFontSize={pressureFontSize}
+                textColor="var(--white-val)" minFontSize={36} fixedFontSize={pressureFontSize}
               />
             </FadeUp>
-            
+
             {/* 👇 CONTINUOUS BUTTERY TYPING REVEAL */}
-            <motion.p 
+            <motion.p
               className="mt-8 text-white/60 font-thin text-lg md:text-2xl tracking-wide max-w-2xl leading-relaxed"
               initial="hidden"
               whileInView="reveal"
@@ -108,7 +108,7 @@ export default function Contact() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 xl:gap-24">
-            
+
             {/* LEFT COLUMN */}
             <div className="md:col-span-5 flex flex-col gap-12">
               <div className="flex flex-col gap-18">
@@ -141,7 +141,7 @@ export default function Contact() {
                   <div>
                     <p className="text-white/40 text-xs font-space tracking-widest mb-2 uppercase">Working Hours</p>
                     <p className="text-lg uppercase font-space tracking-wide font-bold text-white/80">
-                      Mon - Fri <br/> 09:00 - 17:00 (WAT)
+                      Mon - Fri <br /> 09:00 - 17:00 (WAT)
                     </p>
                   </div>
                 </FadeUp>
@@ -155,7 +155,7 @@ export default function Contact() {
                       !social.hidden && (
                         <a key={social.name} href={social.url} target="_blank" className="text-white/40 hover:text-white transition-all hover:scale-110">
                           <svg className="w-6 h-6 md:w-7 md:h-7" fill="currentColor" viewBox="0 0 24 24">
-                            <path d={social.path} transform={social.name === 'Threads' ? "scale(0.125)" : ""} /> 
+                            <path d={social.path} transform={social.name === 'Threads' ? "scale(0.125)" : ""} />
                           </svg>
                         </a>
                       )
@@ -172,31 +172,31 @@ export default function Contact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex flex-col gap-2">
                       <label className="text-xs text-white/40 font-space uppercase tracking-wider">Name</label>
-                      <input type="text" required name="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
+                      <input type="text" required name="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
                     </div>
                     <div className="flex flex-col gap-2">
                       <label className="text-xs text-white/40 font-space uppercase tracking-wider">Email</label>
-                      <input type="email" required name="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
+                      <input type="email" required name="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-3">
-                    <label className="text-xs text-white/40 font-space uppercase tracking-wider">I'm interested in...</label>
+                    <label className="text-xs text-white/40 font-space uppercase tracking-wider">I&apos;m interested in...</label>
                     <div className="flex flex-wrap gap-2">
                       {SERVICE_TYPES.map((service) => (
-                        <button key={service} type="button" onClick={() => setFormData({...formData, service_type: service})} className={`px-3 py-1.5 pt-[9px] md:pt-[13px] md:px-4 md:py-2 text-[10px] md:text-xs rounded-full font-space uppercase tracking-wider transition-all border ${formData.service_type === service ? 'bg-white text-black border-white' : 'bg-transparent text-white/50 border-white/20 hover:border-white/50 hover:text-white'}`}>{service}</button>
+                        <button key={service} type="button" onClick={() => setFormData({ ...formData, service_type: service })} className={`px-3 py-1.5 pt-[9px] md:pt-[13px] md:px-4 md:py-2 text-[10px] md:text-xs rounded-full font-space uppercase tracking-wider transition-all border ${formData.service_type === service ? 'bg-white text-black border-white' : 'bg-transparent text-white/50 border-white/20 hover:border-white/50 hover:text-white'}`}>{service}</button>
                       ))}
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-2">
                     <label className="text-xs text-white/40 font-space uppercase tracking-wider">Subject</label>
-                    <input type="text" name="subject" value={formData.subject} onChange={(e) => setFormData({...formData, subject: e.target.value})} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
+                    <input type="text" name="subject" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors placeholder:text-white/20" />
                   </div>
 
                   <div className="flex flex-col gap-2">
                     <label className="text-xs text-white/40 font-space uppercase tracking-wider">Message</label>
-                    <textarea required name="message" rows={4} value={formData.message} onChange={(e) => setFormData({...formData, message: e.target.value})} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors resize-none placeholder:text-white/20" />
+                    <textarea required name="message" rows={4} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} className="bg-transparent border-b border-white/20 pb-2 text-white outline-none focus:border-white transition-colors resize-none placeholder:text-white/20" />
                   </div>
 
                   <div className="pt-4">
@@ -212,7 +212,7 @@ export default function Contact() {
       </section>
 
       <FadeUp delay={0.4}>
-        <Footer3 className='pt-19'/>
+        <Footer3 className='pt-19' />
       </FadeUp>
       <FadeUp delay={0.4}>
         <Bottom />

@@ -13,8 +13,8 @@ const CursorContext = createContext<CursorContextType | undefined>(undefined);
 
 export function CursorProvider({ children }: { children: ReactNode }) {
   // 1. Default Colors (Black Fill, White Stroke)
-  const [cursorColor, setCursorColor] = useState('#000000');
-  const [cursorStrokeColor, setCursorStrokeColor] = useState('#ffffff');
+  const [cursorColor, setCursorColor] = useState('var(--black-val)');
+  const [cursorStrokeColor, setCursorStrokeColor] = useState('var(--white-val)');
 
   // 2. Action to update colors (called on hover)
   const setCursorTheme = (fill: string, stroke: string) => {
@@ -24,8 +24,8 @@ export function CursorProvider({ children }: { children: ReactNode }) {
 
   // 3. Action to reset (called on mouse leave)
   const resetCursorTheme = () => {
-    setCursorColor('#000000');
-    setCursorStrokeColor('#ffffff');
+    setCursorColor('var(--black-val)');
+    setCursorStrokeColor('var(--white-val)');
   };
 
   return (

@@ -135,6 +135,7 @@ export default function SmoothWatchface({
       style={{
         width: `${size}px`,
         height: `${size}px`,
+        color: 'var(--watch-color)',
       }}
     >
       {/* Loader - Fades out when data arrives */}
@@ -181,7 +182,7 @@ export default function SmoothWatchface({
             y1={centerY}
             x2={hourX2}
             y2={hourY2}
-            stroke="#ffffff"
+            stroke="currentColor"
             strokeWidth={size * 0.06}
             strokeLinecap="round"
             opacity="1"
@@ -193,7 +194,7 @@ export default function SmoothWatchface({
             y1={minuteY1}
             x2={minuteX2}
             y2={minuteY2}
-            stroke="#ffffff"
+            stroke="currentColor"
             strokeWidth={size * 0.027}
             strokeLinecap="round"
             opacity="1"
@@ -204,7 +205,7 @@ export default function SmoothWatchface({
             cx={secondsX}
             cy={secondsY}
             r={size * 0.023}
-            fill="#ffffff"
+            fill="currentColor"
             opacity="1"
           />
 
@@ -214,7 +215,7 @@ export default function SmoothWatchface({
             cy={centerY}
             r={radius - 2}
             fill="none"
-            stroke="#ffffff"
+            stroke="currentColor"
             strokeWidth="0.6"
             opacity="0.2"
           />

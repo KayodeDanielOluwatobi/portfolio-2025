@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
+import { useTheme } from 'next-themes';
+import { Sun, Moon, Github } from 'lucide-react';
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -40,9 +42,13 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
   const [isInHeroSection, setIsInHeroSection] = useState(true);
+  const [isHeroPresent, setIsHeroPresent] = useState(true);
+  const [isInKeycapsSection, setIsInKeycapsSection] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrollVelocity, setScrollVelocity] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
+  
+  const { theme, setTheme } = useTheme();
 
   // 2. Dynamic State for Themes
   const [brandThemes, setBrandThemes] = useState<Record<string, BrandTheme>>({
@@ -60,7 +66,13 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
         if (data) {
           const themesMap: Record<string, BrandTheme> = {};
           
-          data.forEach((theme: any) => {
+          data.forEach((theme: {
+            brand_key: string;
+            logo_url: string;
+            text_color: string;
+            icon_color: string;
+            menu_icon_url: string;
+          }) => {
             themesMap[theme.brand_key] = {
               logo: theme.logo_url,
               textColor: theme.text_color,
@@ -100,6 +112,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   // Set mounted state
   useEffect(() => {
     setIsMounted(true);
+    const heroSection = document.querySelector('[data-cursor-brand]');
+    setIsHeroPresent(!!heroSection);
   }, []);
 
   // Notify parent component
@@ -113,6 +127,13 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   const currentTheme = isInHeroSection 
     ? (brandThemes[currentBrand] || brandThemes.default || DEFAULT_THEME)
     : (brandThemes.default || DEFAULT_THEME);
+
+  // Dynamic text/icon color: force white inside keycaps, brand color inside hero, theme foreground past hero
+  const headerTextColor = isInKeycapsSection
+    ? '#ffffff'
+    : (isInHeroSection && isHeroPresent)
+      ? currentTheme.textColor 
+      : 'var(--foreground)';
 
   // Enhanced scroll handling
   useEffect(() => {
@@ -136,6 +157,24 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
         if (isHeaderInHero !== isInHeroSection) {
           setIsInHeroSection(isHeaderInHero);
         }
+      } else {
+        const isAtTop = window.scrollY === 0;
+        if (isAtTop !== isInHeroSection) {
+          setIsInHeroSection(isAtTop);
+        }
+      }
+
+      const keycapsSection = document.querySelector('[data-section="keycap-image"]');
+      if (keycapsSection) {
+        const rect = keycapsSection.getBoundingClientRect();
+        const isHeaderInKeycaps = rect.top <= 80 && rect.bottom >= 0;
+        if (isHeaderInKeycaps !== isInKeycapsSection) {
+          setIsInKeycapsSection(isHeaderInKeycaps);
+        }
+      } else {
+        if (isInKeycapsSection) {
+          setIsInKeycapsSection(false);
+        }
       }
 
       const velocityThreshold = 0.5;
@@ -158,7 +197,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(scrollTimeout);
     };
-  }, [lastScrollY, isInHeroSection]);
+  }, [lastScrollY, isInHeroSection, isInKeycapsSection]);
 
   // Close mobile menu on resize
   useEffect(() => {
@@ -229,7 +268,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
               src={currentTheme.logo}
               alt="everdann"
               fill
-              className="object-contain"
+              className={`object-contain ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'logo-invert' : ''}`}
               priority
             />
           </Link>
@@ -246,51 +285,108 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
             <Link
               key={item.name}
               href={item.href}
-              className="hover:opacity-85 transition-opacity font-space text-[0.8rem] tracking-wider"
-              style={{ color: currentTheme.textColor }}
+              className="hover:opacity-85 transition-colors duration-300 font-space text-[0.8rem] tracking-wider"
+              style={{ color: headerTextColor }}
             >
               {item.name}
             </Link>
           ))}
+          {/* Desktop Github Link */}
+          <a
+            href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
+            aria-label="View Github Repository"
+            style={{ color: headerTextColor }}
+          >
+            <Github className="w-5 h-5" />
+          </a>
+
+          {/* Desktop Theme Switcher */}
+          {isMounted && (
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
+              aria-label="Toggle theme"
+              style={{ color: headerTextColor }}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
+          )}
         </motion.nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden relative w-5 h-5 z-50 transition-transform duration-200 ease-in-out hover:scale-110"
-          aria-label="Toggle menu"
-        >
+        {/* Mobile Right Cluster (Toggle + Menu Button) */}
+        <div className="md:hidden flex items-center gap-5 z-50">
+          {/* Mobile Github Link */}
+          <a
+            href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
+            aria-label="View Github Repository"
+            style={{ color: headerTextColor }}
+          >
+            <Github className="w-5 h-5" />
+          </a>
+
+          {/* Mobile Theme Switcher */}
           {isMounted && (
-            <>
-              <motion.div 
-                className="absolute inset-0"
-                initial={{ opacity: 1, rotate: 0, scale: 1 }}
-                animate={isMenuOpen ? { opacity: 0, rotate: 90, scale: 0 } : { opacity: 1, rotate: 0, scale: 1 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-              >
-                <Image
-                  src={currentTheme.menuIcon}
-                  alt="Menu"
-                  fill
-                  className="object-contain"
-                />
-              </motion.div>
-              <motion.div 
-                className="absolute inset-0"
-                initial={{ opacity: 0, rotate: -90, scale: 0 }}
-                animate={isMenuOpen ? { opacity: 1, rotate: 0, scale: 1 } : { opacity: 0, rotate: -90, scale: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-              >
-                <Image
-                  src="/close.svg"
-                  alt="Close"
-                  fill
-                  className="object-contain"
-                />
-              </motion.div>
-            </>
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
+              aria-label="Toggle theme"
+              style={{ color: headerTextColor }}
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
           )}
-        </button>
+
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="relative w-5 h-5 transition-transform duration-200 ease-in-out hover:scale-110"
+            aria-label="Toggle menu"
+          >
+            {isMounted && (
+              <>
+                <motion.div 
+                  className="absolute inset-0"
+                  initial={{ opacity: 1, rotate: 0, scale: 1 }}
+                  animate={isMenuOpen ? { opacity: 0, rotate: 90, scale: 0 } : { opacity: 1, rotate: 0, scale: 1 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                >
+                  <Image
+                    src={currentTheme.menuIcon}
+                    alt="Menu"
+                    fill
+                    className={`object-contain ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'menu-icon-invert' : ''}`}
+                  />
+                </motion.div>
+                <motion.div 
+                  className="absolute inset-0"
+                  initial={{ opacity: 0, rotate: -90, scale: 0 }}
+                  animate={isMenuOpen ? { opacity: 1, rotate: 0, scale: 1 } : { opacity: 0, rotate: -90, scale: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                >
+                  <Image
+                    src="/close.svg"
+                    alt="Close"
+                    fill
+                    className="object-contain"
+                  />
+                </motion.div>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu - full screen overlay */}

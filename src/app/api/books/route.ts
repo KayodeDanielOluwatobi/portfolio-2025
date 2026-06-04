@@ -10,9 +10,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`
-    );
+    const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
+    const url = apiKey
+      ? `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1&key=${apiKey}`
+      : `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=1`;
+
+    const response = await fetch(url);
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {

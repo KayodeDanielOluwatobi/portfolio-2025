@@ -22,7 +22,7 @@ export default function MoreBio() {
   // }
 
   return (
-    <section className="bg-black text-white py-16 md:py-24">
+    <section className="bg-black text-zinc-200 py-16 md:py-24">
       <div className="container mx-auto px-8 max-w-none">
         
         {/* 12 column grid - content starts at column 7 on desktop */}
@@ -43,8 +43,8 @@ export default function MoreBio() {
           <div className="space-y-4 md:col-span-3">
             <p className="text-xs md:text-xs lg:text-xs text-justify font-extralight leading-tight tracking-wider">
               What drives me most is purpose-driven work. 
-              I'm drawn to projects where design becomes a bridge 
-              between intention and impact, between a brand's heartbeat 
+              I&apos;m drawn to projects where design becomes a bridge 
+              between intention and impact, between a brand&apos;s heartbeat 
               and the people who need to hear it.
             </p>
           </div>

@@ -178,7 +178,7 @@ export default function SpotifyWidget({
         )}
 
         {/* Gradient Overlay for text visibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/70 via-[#000000]/60 to-[#000000]/90" />
 
         {/* Loader - Fades out when data arrives */}
         {isLoading && (

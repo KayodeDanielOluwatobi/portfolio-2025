@@ -94,7 +94,7 @@ export default function DuolingoWidget({ onHoverColor, onLeaveColor }: DuolingoW
         cornerSmoothing={0.7}
         className="w-full min-h-[320px] bg-zinc-900/50 relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/85 to-zinc-900/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#000000]/90 via-[#000000]/85 to-[#000000]/90" />
         <div
           className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${
             fadeOut ? 'opacity-0' : 'opacity-100'

@@ -67,7 +67,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                     className="object-cover scale-103 " 
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/70 to-black/90" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/90 via-[#000000]/70 to-[#000000]/90" />
 
                 <div className="relative z-10 space-y-12 md:space-y-12">
                     <h3 className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
@@ -92,7 +92,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                                 Electrical & Electronics Engineering
                             </h4>
                             <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-xs font-space md:text-sm text-zinc-400">
+                                <span className="text-xs font-space md:text-sm text-white">
                                     <span style={{ fontFamily: 'var(--font-space-mono)' }}>@</span>FUTA
                                 </span>
                                 <span className="pt-[7px] md:pt-[7px] px-3 py-0.5 font-space uppercase bg-[#3BA2DE]/10 text-[#3BA2DE] font-medium text-xs rounded-full border border-[#3BA2DE]/20">

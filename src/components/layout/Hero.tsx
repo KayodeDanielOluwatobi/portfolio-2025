@@ -327,7 +327,7 @@ export default function Hero({
         {/* --- Linear Gradient Overlay --- */}
         {/* Supports checking both hasOverlay (camelCase) and has_overlay (snake_case) */}
         {(currentBrand.hasOverlay !== false && currentBrand.has_overlay !== false) && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#000000]/70 to-transparent opacity" />
         )}
 
         {/* --- Navigation Chevrons with Glassmorphism --- */}

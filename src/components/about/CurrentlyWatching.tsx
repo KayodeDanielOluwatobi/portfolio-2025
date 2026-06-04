@@ -165,7 +165,7 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
       cornerSmoothing={0.7}
       className="w-full min-h-[350px] bg-zinc-900/50 p-6 text-white relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/85 to-zinc-900/90" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#000000]/90 via-[#000000]/85 to-[#000000]/90" />
       <div
         className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${
           fadeOut ? 'opacity-0' : 'opacity-100'
@@ -225,7 +225,7 @@ export default function CurrentlyWatching({ onHoverColor, onLeaveColor }: Curren
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#000000]/95 via-[#000000]/80 to-transparent z-10" />
 
         {shows.length > 1 && (
           <>

@@ -25,14 +25,14 @@ import FadeUp from '@/components/animations/FadeUp';
 import Preloader from '@/components/layout/Preloader';
 
 // Dynamic import for the cursor
-// const SmoothCursor = dynamic(
-//   () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
-//   { ssr: false }
-// );
+const SmoothCursor = dynamic(
+  () => import('@/components/layout/SmoothCursor').then(mod => ({ default: mod.SmoothCursor })),
+  { ssr: false }
+);
 
 export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   // 1. Data State
   const [showcases, setShowcases] = useState<BrandShowcase[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function Home() {
     if (isPreloaderActive) {
       document.body.style.overflow = 'hidden';
       // Optional: scroll to top to ensure clean start
-      window.scrollTo(0, 0); 
+      window.scrollTo(0, 0);
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -113,28 +113,28 @@ export default function Home() {
   }, []);
 
   // 7. Hero Rotation Logic
-  const { currentIndex, setCurrentIndex, isTransitioning } = useBrandRotation({ 
+  const { currentIndex, setCurrentIndex, isTransitioning } = useBrandRotation({
     totalBrands: showcases.length > 0 ? showcases.length : 1,
     intervalDuration: 15000,
-    fadeDuration: 400 
+    fadeDuration: 400
   });
-  
+
   const cursorInHeroHeader = useCursorPosition();
-  
-  const currentBrand = showcases.length > 0 
-    ? showcases[currentIndex] 
+
+  const currentBrand = showcases.length > 0
+    ? showcases[currentIndex]
     : { // Fallback
-        id: 'loading',
-        brandName: '',
-        tagline: '',
-        chips: [],
-        textColor: '#ffffff',
-        everdannLogo: '',
-        backgroundImage: '',
-        backgroundColor: '#000000',
-        logoVariant: 'default',
-        cursorColor: DEFAULT_CURSOR_COLOR
-      };
+      id: 'loading',
+      brandName: '',
+      tagline: '',
+      chips: [],
+      textColor: '#ffffff',
+      everdannLogo: '',
+      backgroundImage: '',
+      backgroundColor: '#000000',
+      logoVariant: 'default',
+      cursorColor: DEFAULT_CURSOR_COLOR
+    };
 
   // 8. MASTER CURSOR LOGIC 🧠
   let cursorFillColor = DEFAULT_CURSOR_COLOR;
@@ -150,8 +150,8 @@ export default function Home() {
     cursorFillColor = currentBrand.cursorColor;
     cursorStrokeColor = darkenColor(currentBrand.cursorColor);
   } else {
-    cursorFillColor = '#000000';
-    cursorStrokeColor = '#ffffff';
+    cursorFillColor = 'var(--black-val)';
+    cursorStrokeColor = 'var(--white-val)';
   }
 
   // Handler passed to Preloader to save session
@@ -159,13 +159,13 @@ export default function Home() {
     sessionStorage.setItem('hasSeenPreloader', 'true');
     setIsPreloaderActive(false);
   };
-  
+
   // NOTE: We don't return early for loading anymore, 
   // because we want the Preloader to render on top instead.
-  
+
   return (
     <main className="bg-black min-h-screen">
-      
+
       {/* 🛑 PRELOADER LAYER */}
       <AnimatePresence mode="wait">
         {isPreloaderActive && (
@@ -177,17 +177,17 @@ export default function Home() {
       {/* Only render the heavy stuff once data is loaded (or render behind preloader) */}
       {!loading && (
         <>
-          {/* <SmoothCursor 
+          <SmoothCursor
             cursorColor={cursorFillColor}
             cursorStrokeColor={cursorStrokeColor}
-          /> */}
-          
-          <Header 
+          />
+
+          <Header
             currentBrand={currentBrand.logoVariant}
             onMobileMenuToggle={setIsMobileMenuOpen}
           />
-          
-          <Hero 
+
+          <Hero
             currentIndex={currentIndex}
             setCurrentIndex={setCurrentIndex}
             brandShowcases={showcases}
@@ -195,7 +195,7 @@ export default function Home() {
           />
 
           {/* 👇 Animated Sections Start Here */}
-          
+
           {/* 1. Bio (Resets cursor) */}
           <FadeUp delay={0.4}>
             <div onMouseEnter={handleResetColor}>
@@ -210,34 +210,34 @@ export default function Home() {
 
           {/* 3. Featured Work Sections */}
           <FadeUp delay={0.4}>
-            <FeaturedBrands 
-              onHoverColor={handleHoverColor} 
-              onLeaveColor={handleResetColor} 
+            <FeaturedBrands
+              onHoverColor={handleHoverColor}
+              onLeaveColor={handleResetColor}
             />
           </FadeUp>
 
           <FadeUp delay={0.4}>
-            <FeaturedSocials 
-              onHoverColor={handleHoverColor} 
-              onLeaveColor={handleResetColor} 
+            <FeaturedSocials
+              onHoverColor={handleHoverColor}
+              onLeaveColor={handleResetColor}
             />
           </FadeUp>
 
           <FadeUp delay={0.4}>
-            <FeaturedChurch 
-              onHoverColor={handleHoverColor} 
-              onLeaveColor={handleResetColor} 
+            <FeaturedChurch
+              onHoverColor={handleHoverColor}
+              onLeaveColor={handleResetColor}
             />
           </FadeUp>
-          
+
           {/* 4. Keycaps */}
           <FadeUp delay={0.4}>
-            <KeycapMapper 
-              onHoverColor={handleHoverColor} 
-              onLeaveColor={handleResetColor} 
-            /> 
+            <KeycapMapper
+              onHoverColor={handleHoverColor}
+              onLeaveColor={handleResetColor}
+            />
           </FadeUp>
-          
+
           {/* 5. Footer (Resets cursor) */}
           <FadeUp delay={0.4}>
             <div onMouseEnter={handleResetColor}>
@@ -250,7 +250,7 @@ export default function Home() {
               <Bottom />
             </div>
           </FadeUp>
-          
+
           {/* <ViewportIndicator /> */}
         </>
       )}

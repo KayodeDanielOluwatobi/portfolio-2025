@@ -5,6 +5,7 @@ import { Squircle } from '@squircle-js/react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { darkenColor } from './ColorUtils';
+import { useTheme } from 'next-themes';
 import { MarqueeText } from '@/components/ui/MarqueeText';
 import { useCursor } from '@/context/CursorContext';
 import { useSquircleRadius } from '@/hooks/useSquircleRadius'; 
@@ -31,6 +32,9 @@ export default function WorkCard({
   brandColor,
   activeCategory
 }: WorkCardProps) {
+  const { resolvedTheme } = useTheme();
+  const isLight = resolvedTheme === 'light';
+
   const [isLoaded, setIsLoaded] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -74,9 +78,13 @@ export default function WorkCard({
     }
   };
 
+  const resolvedBrandColor = (isLight && (brandColor.toLowerCase() === '#ffffff' || brandColor.toLowerCase() === '#fff')) 
+    ? '#18181b' 
+    : brandColor;
+
   // Handle Mouse Events for Cursor
   const handleMouseEnter = () => {
-    const safeColor = brandColor || '#FFFFFF'; // Fallback
+    const safeColor = resolvedBrandColor || '#FFFFFF'; // Fallback
     setCursorTheme(safeColor, darkenColor(safeColor));
   };
 
@@ -175,7 +183,7 @@ export default function WorkCard({
         <div className="mt-4">
           <MarqueeText
             text={title}
-            className="text-lg font-regular text-white/90 group-hover:text-white/100 transition-colors"
+            className="text-lg font-regular text-[var(--white-val)] opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             speed={15}
             gap={30}
           />
@@ -185,7 +193,7 @@ export default function WorkCard({
       {/* Tagline */}
       <MarqueeText
         text={tagline}
-        className="text-sm font-extralight tracking-wide -mt-4 text-white/50"
+        className="text-sm font-extralight tracking-wide -mt-4 text-[var(--white-val)] opacity-50"
         speed={20}
         gap={30}
       />
@@ -194,23 +202,47 @@ export default function WorkCard({
       <div className="flex gap-2 flex-wrap">
         {tags.slice(0, 2).map((tag, index) => {
           const isFilled = index === 0;
+          
+          let textColor = '';
+          let bgColor = '';
+          let borderStyle = '';
+          
+          if (isLight) {
+            // LIGHT MODE STYLING ☀️
+            const isWhiteBrand = !brandColor || brandColor.toLowerCase() === '#ffffff' || brandColor.toLowerCase() === '#fff';
+            if (isFilled) {
+              // First pill: Invert fill and text (stroke) color
+              textColor = isWhiteBrand ? '#ffffff' : brandColor;
+              bgColor = isWhiteBrand ? '#18181b' : darkenColor(brandColor);
+              borderStyle = 'none';
+            } else {
+              // Second pill: use darkened color for stroke (border) and text
+              const darkColor = isWhiteBrand ? '#18181b' : darkenColor(brandColor);
+              textColor = darkColor;
+              bgColor = 'transparent';
+              borderStyle = `1.5px solid ${darkColor}`;
+            }
+          } else {
+            // DARK MODE STYLING 🌙 (Untouched)
+            if (isFilled) {
+              textColor = darkenColor(resolvedBrandColor || '#ffffff');
+              bgColor = resolvedBrandColor || '#ffffff';
+              borderStyle = 'none';
+            } else {
+              textColor = resolvedBrandColor || '#ffffff';
+              bgColor = 'transparent';
+              borderStyle = `1.5px solid ${resolvedBrandColor || '#ffffff'}`;
+            }
+          }
+
           return (
             <span
               key={tag}
               className="pt-[8.7px] md:pt-[9px] -ml-0 px-3 py-1 flex items-center text-center uppercase rounded-full text-xs font-space tracking-wider transition-all"
               style={{
-                ...(isFilled
-                  ? {
-                      color: darkenColor(brandColor || '#ffffff'),
-                      backgroundColor: brandColor || '#ffffff',
-                      border: 'none',
-                    }
-                  : {
-                      color: brandColor || '#ffffff',
-                      backgroundColor: 'transparent',
-                      border: `1.5px solid ${brandColor || '#ffffff'}`,
-                    }
-                )
+                color: textColor,
+                backgroundColor: bgColor,
+                border: borderStyle
               }}
             >
               {tag}

@@ -10,9 +10,9 @@ import Header from '@/components/layout/Header';
 import Footer3 from '@/components/layout/Footer3';
 import Bottom from '@/components/layout/Bottom';
 import { SmoothCursor } from '@/components/layout/SmoothCursor';
-import { getProjectBySlug } from '@/utils/projectFetcher'; 
-import  BentoRenderer from '@/components/works/BentoRenderer'
-import  RelatedProjects from '@/components/works/RelatedProjects'
+import { getProjectBySlug } from '@/utils/projectFetcher';
+import BentoRenderer from '@/components/works/BentoRenderer'
+import RelatedProjects from '@/components/works/RelatedProjects'
 import { supabase } from '@/utils/supabase/client';
 import ViewCounter from '@/components/works/ViewCounter';
 
@@ -27,12 +27,12 @@ export default function CaseStudyPage() {
   useEffect(() => {
     async function loadData() {
       const data = await getProjectBySlug(slug);
-      
+
       if (!data) {
         console.error("Project not found for slug:", slug);
         // MANUALLY PUSH TO 404
         // Next.js will catch this and show your not-found.tsx
-        router.replace('/404'); 
+        router.replace('/404');
         return;
       }
 
@@ -61,20 +61,20 @@ export default function CaseStudyPage() {
 
   return (
     <main className="bg-black min-h-screen">
-      {/* <SmoothCursor cursorColor="#ffffff" cursorStrokeColor="#333333" /> */}
-      <Header onMobileMenuToggle={() => {}} />
+      <SmoothCursor cursorColor="var(--white-val)" cursorStrokeColor="var(--zinc-800-val)" />
+      <Header onMobileMenuToggle={() => { }} />
 
       {/* 1. HERO IMAGE SECTION (16/9) */}
       <section className="pt-24 px-0.5 sm:px-4 md:px-4 lg:px-4">
         <div className="container mx-auto max-w-6xl">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             className="relative aspect-video w-full overflow-hidden rounded-xl md:rounded-2xl border border-white/5 bg-zinc-900"
           >
-            <img 
-              src={heroImage} 
+            <img
+              src={heroImage}
               alt={brandName}
               className="w-full h-full object-cover"
             />
@@ -87,7 +87,7 @@ export default function CaseStudyPage() {
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col gap-0 md:gap-2">
             <div className="flex items-center justify-between">
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3, duration: 0.8 }}
@@ -98,18 +98,18 @@ export default function CaseStudyPage() {
 
               {/* Actions Cluster */}
               <div className="flex items-center gap-2 md:gap-6">
-                
-               
+
+
                 {/* View Counter with Dynamic Eye Icon */}
-                <div 
+                <div
                   className="flex items-center justify-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-white/5 border transition-colors duration-500"
                   style={{ borderColor: `${project?.brand_color}40` || '#39FF1440' }}
                 >
                   {/* Wrap icon in a div to force absolute vertical centering */}
                   <div className="flex items-center justify-center flex-shrink-0">
-                    <svg 
-                      viewBox="0 0 24 24" fill="none" 
-                      stroke={project?.brand_color || '#39FF14'} 
+                    <svg
+                      viewBox="0 0 24 24" fill="none"
+                      stroke={project?.brand_color || '#39FF14'}
                       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                       className="w-[14px] h-[14px] md:w-[18px] md:h-[18px]"
                     >
@@ -118,7 +118,7 @@ export default function CaseStudyPage() {
                     </svg>
                   </div>
 
-                  <span 
+                  <span
                     className="font-space text-xs md:text-base tracking-tighter leading-none translate-y-[1px] md:translate-y-0"
                     style={{ color: project?.brand_color || '#ffffff' }}
                   >
@@ -127,7 +127,7 @@ export default function CaseStudyPage() {
                 </div>
 
                 {/* Fail-Safe Share Button */}
-                <button 
+                <button
                   onClick={async () => {
                     const shareData = {
                       title: brandName,
@@ -173,18 +173,18 @@ export default function CaseStudyPage() {
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
                   }}
                 >
-                  <svg 
-                    viewBox="0 0 24 24" fill="none" 
-                    stroke="white" strokeWidth="2" 
+                  <svg
+                    viewBox="0 0 24 24" fill="none"
+                    stroke="white" strokeWidth="2"
                     className="w-[16px] h-[16px] md:w-[20px] md:h-[20px] group-hover:stroke-black transition-colors"
                   >
-                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/>
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
@@ -199,23 +199,23 @@ export default function CaseStudyPage() {
       {/* 3. BENTO RENDERER */}
       <section className="pb-32 px-0.5 sm:px-4 md:px-4 lg:px-4">
         <div className="container mx-auto max-w-6xl">
-           <BentoRenderer rows={bentoRows} />
+          <BentoRenderer rows={bentoRows} />
         </div>
       </section>
 
-      <RelatedProjects 
-        currentSlug={slug} 
+      <RelatedProjects
+        currentSlug={slug}
         categoryTable={project?.originTable} // Ensure your project data includes which table it came from
       />
 
       {project?.originTable && (
-        <ViewCounter 
-          slug={slug} 
-          table={project.originTable} 
+        <ViewCounter
+          slug={slug}
+          table={project.originTable}
           onUpdate={(newCount) => {
-          // This updates the local 'project' state with the fresh count
-          setProject((prev: any) => ({ ...prev, views: newCount }));
-        }}
+            // This updates the local 'project' state with the fresh count
+            setProject((prev: any) => ({ ...prev, views: newCount }));
+          }}
         />
       )}
 
