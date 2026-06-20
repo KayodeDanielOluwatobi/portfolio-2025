@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import CircularWaveProgress from '@/components/ui/CircularWaveProgress';
 import { Squircle } from '@squircle-js/react';
 import TextPressure from '@/components/TextPressure';
-import { motion } from 'framer-motion'; 
+import { motion } from 'framer-motion';
 import { darkenColor } from '@/utils/colorUtils';
 import { useTheme } from 'next-themes';
 
@@ -69,29 +69,29 @@ const toolProgressOverrides: Record<string, number> = {
 
 // 🎨 Tool Colors
 const keycapColors: Record<string, { track: string; wave: string; stroke?: string; lightWave?: string }> = {
-  'Photoshop':      { track: '#BFE4FF', wave: '#31A8FF' }, 
-  'Illustrator':    { track: '#FFE4C2', wave: '#FF9A00' }, 
-  'Premiere Pro':   { track: '#E3E3FF', wave: '#9999FF' }, 
-  'After Effects':  { track: '#F2D9FF', wave: '#D999FF' }, 
-  'InDesign':       { track: '#FFC2D1', wave: '#FF3366' }, 
-  'Be':             { track: 'var(--zinc-800-val)', wave: 'var(--white-val)' }, 
-  'Figma':          { track: '#C2F2E3', wave: '#0ACF83' }, 
-  'Spline':         { track: '#EAD9FF', wave: '#B388FF' }, 
-  'ChatGPT':        { track: 'var(--chatgpt-track)', wave: 'var(--chatgpt-wave)', stroke: 'var(--chatgpt-stroke)' }, 
-  'Gemini':         { track: '#DFE9FC', wave: '#8AB4F8', stroke: '#1B60E2', lightWave: '#1B60E2' }, 
-  'Affinity':       { track: '#E4FFD1', wave: '#A8FF71' }, 
-  'default':        { track: 'var(--zinc-800-val)', wave: 'var(--zinc-400-val)' }, 
+  'Photoshop': { track: '#BFE4FF', wave: '#31A8FF' },
+  'Illustrator': { track: '#FFE4C2', wave: '#FF9A00' },
+  'Premiere Pro': { track: '#E3E3FF', wave: '#9999FF' },
+  'After Effects': { track: '#F2D9FF', wave: '#D999FF' },
+  'InDesign': { track: '#FFC2D1', wave: '#FF3366' },
+  'Be': { track: 'var(--zinc-800-val)', wave: 'var(--white-val)' },
+  'Figma': { track: '#C2F2E3', wave: '#0ACF83' },
+  'Spline': { track: '#EAD9FF', wave: '#B388FF' },
+  'ChatGPT': { track: 'var(--chatgpt-track)', wave: 'var(--chatgpt-wave)', stroke: 'var(--chatgpt-stroke)' },
+  'Gemini': { track: '#DFE9FC', wave: '#8AB4F8', stroke: '#1B60E2', lightWave: '#1B60E2' },
+  'Affinity': { track: '#E4FFD1', wave: '#A8FF71' },
+  'default': { track: 'var(--zinc-800-val)', wave: 'var(--zinc-400-val)' },
 };
 
 // 🎨 Special Key Colors
 const specialKeyColors: Record<string, string> = {
-  'Esc':   '#FF9AA2', 
-  'Shift': '#DCCEB2', 
-  'Space': '#BDD4E7', 
-  'Enter': '#D5C2D9', 
+  'Esc': '#FF9AA2',
+  'Shift': '#DCCEB2',
+  'Space': '#BDD4E7',
+  'Enter': '#D5C2D9',
 };
 
-const KEYBOARD_BASE_COLOR = '#F3EFE0'; 
+const KEYBOARD_BASE_COLOR = '#F3EFE0';
 
 const getKeycapColor = (tool: string): { track: string; wave: string; stroke?: string; lightWave?: string } => {
   return keycapColors[tool] || keycapColors['default'];
@@ -141,19 +141,19 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
   const OFFSET_X = -6;
   const OFFSET_Y = -15;
 
-  const tooltipSize = imageScale < 0.6 ? { 
-      progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
-      toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
-      cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
-    } : imageScale < 1 ? { 
-      progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
-      toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
-      cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
-    } : { 
-      progressSize: 60, padding: '20px', gap: '12px', minWidth: '180px',
-      toolNameSize: '14px', proficiencyLabelSize: '11px', proficiencyTextSize: '14px',
-      cornerRadius: 40, cornerSmoothing: 1, trackWidth: 6, waveWidth: 7
-    };
+  const tooltipSize = imageScale < 0.6 ? {
+    progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
+    toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
+    cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
+  } : imageScale < 1 ? {
+    progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
+    toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
+    cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
+  } : {
+    progressSize: 60, padding: '20px', gap: '12px', minWidth: '180px',
+    toolNameSize: '14px', proficiencyLabelSize: '11px', proficiencyTextSize: '14px',
+    cornerRadius: 40, cornerSmoothing: 1, trackWidth: 6, waveWidth: 7
+  };
 
   const getTooltipOffset = () => {
     if (imageScale < 0.40) return 250;
@@ -172,8 +172,8 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
   // 👇 HELPER: Centralized Color Logic
   const triggerCursorColor = (fill: string, stroke: string) => {
     if (isWireframe) {
-      // 💀 WIREFRAME MODE: Transparent White (better interpolation) + Beige Stroke
-      onHoverColor?.('rgba(255, 255, 255, 0)', '#F3EFE0');
+      // 💀 WIREFRAME MODE: Transparent (better interpolation) + Dynamic Stroke (Black in Light Mode, Beige in Dark Mode)
+      onHoverColor?.('rgba(255, 255, 255, 0)', isLightMode ? '#000000' : '#F3EFE0');
     } else {
       // NORMAL MODE: Requested colors
       onHoverColor?.(fill, stroke);
@@ -184,10 +184,10 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
     if (keycapName === 'Shift') {
       const nextState = !isWireframe;
       setIsWireframe(nextState);
-      
+
       // Update cursor immediately upon toggle
       if (nextState) {
-        onHoverColor?.('rgba(255, 255, 255, 0)', '#F3EFE0');
+        onHoverColor?.('rgba(255, 255, 255, 0)', isLightMode ? '#000000' : '#F3EFE0');
       } else {
         onHoverColor?.(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
       }
@@ -212,23 +212,23 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
       if (sectionRef.current) {
         const rect = sectionRef.current.getBoundingClientRect();
         const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-        if (!isVisible) return; 
+        if (!isVisible) return;
       }
 
       let targetKey = '';
       if (e.key === 'Escape') targetKey = 'Esc';
       else if (e.key === 'Shift') targetKey = 'Shift';
       else if (e.key === 'Enter') targetKey = 'Enter';
-      
+
       if (targetKey) {
         handleKeycapClick(targetKey);
-        
+
         const color = specialKeyColors[targetKey];
         if (color) {
-            triggerCursorColor(color, darkenColor(color, 40));
-            setTimeout(() => {
-                triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
-            }, 300);
+          triggerCursorColor(color, darkenColor(color, 40));
+          setTimeout(() => {
+            triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40));
+          }, 300);
         }
       }
     };
@@ -293,8 +293,8 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
   const TooltipWrapper = ({ children, style, className }: any) => {
     if (isWireframe) {
       return (
-        <div 
-          className={className} 
+        <div
+          className={className}
           style={{
             ...style,
             background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)', // Dynamic bg in wireframe
@@ -308,7 +308,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
       );
     }
     return (
-      <Squircle 
+      <Squircle
         cornerRadius={tooltipSize.cornerRadius}
         cornerSmoothing={tooltipSize.cornerSmoothing}
         className={className}
@@ -353,7 +353,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
           )}
 
           {/* 👇 KEYBOARD IMAGE CONTAINER 👇 */}
-          <div 
+          <div
             data-section="keycap-image"
             className="relative w-full"
             onMouseEnter={() => triggerCursorColor(KEYBOARD_BASE_COLOR, darkenColor(KEYBOARD_BASE_COLOR, 40))}
@@ -371,7 +371,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                 if (imgRef.current) setImageScale(imgRef.current.offsetWidth / 756);
               }}
             />
-            <motion.img 
+            <motion.img
               src="/keyboard-wireframe.png"
               alt="Keyboard Wireframe"
               className="absolute inset-0 w-full h-full object-cover z-0"
@@ -395,13 +395,13 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                     }}
                     onMouseEnter={() => {
                       if (specialKeyColors[keycap.name]) {
-                          const color = specialKeyColors[keycap.name];
-                          triggerCursorColor(color, darkenColor(color, 40));
-                      } 
+                        const color = specialKeyColors[keycap.name];
+                        triggerCursorColor(color, darkenColor(color, 40));
+                      }
                       else if (shouldShowTooltip(keycap.name)) {
                         setHoveredKeycap(keycap.name);
                         const colors = getKeycapColor(keycap.tool);
-                        const fillColor = colors.wave; 
+                        const fillColor = colors.wave;
                         const strokeColor = colors.stroke || darkenColor(fillColor, 40);
                         triggerCursorColor(fillColor, strokeColor);
                       }
@@ -448,22 +448,22 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                       <div className="flex flex-col items-center gap-2">
                         <AnimatedCircularProgress
                           targetProgress={toolProgressOverrides[keycap.tool] ?? proficiencyProgress[keycap.proficiency]}
-                          duration={2000} 
-                          size={tooltipSize.progressSize} 
-                          
+                          duration={2000}
+                          size={tooltipSize.progressSize}
+
                           // WIREFRAME LOGIC 💀
                           trackWidth={isWireframe ? 1 : tooltipSize.trackWidth}
                           waveWidth={isWireframe ? 2 : tooltipSize.waveWidth}
                           // 👇 Track is now more visible (0.4 opacity)
                           trackColor={isWireframe ? (isLightMode ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.4)') : getKeycapColor(keycap.tool).track}
                           waveColor={
-                            isWireframe 
-                              ? (isLightMode ? '#000000' : '#ffffff') 
-                              : (isLightMode && getKeycapColor(keycap.tool).lightWave) 
-                                ? getKeycapColor(keycap.tool).lightWave 
+                            isWireframe
+                              ? (isLightMode ? '#000000' : '#ffffff')
+                              : (isLightMode && getKeycapColor(keycap.tool).lightWave)
+                                ? getKeycapColor(keycap.tool).lightWave
                                 : getKeycapColor(keycap.tool).wave
                           }
-                          
+
                           waveAmplitude={0} maxWaveFrequency={0} undulationSpeed={0} edgeGap={20}
                         />
 
