@@ -200,7 +200,7 @@ export default function Contact() {
                   </div>
 
                   <div className="pt-4">
-                    <button type="submit" disabled={isSubmitting || submitStatus === 'success'} className={`w-full py-4 rounded-lg font-space font-bold uppercase tracking-widest text-sm transition-all ${submitStatus === 'success' ? 'bg-[#39FF14] text-black' : 'bg-white text-black hover:bg-gray-200'}`}>
+                    <button type="submit" disabled={isSubmitting || submitStatus === 'success'} className={`w-full py-4 rounded-lg font-space font-bold uppercase tracking-widest text-sm transition-all ${submitStatus === 'success' ? 'bg-[#39FF14] text-pure-black' : 'bg-white text-black hover:bg-white/90'}`}>
                       {isSubmitting ? 'Sending...' : submitStatus === 'success' ? 'Message Sent!' : 'Send Message'}
                     </button>
                   </div>

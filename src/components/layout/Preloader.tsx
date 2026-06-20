@@ -75,7 +75,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
         y: "-100%", 
         transition: { duration: 0.8, ease: [0.7, 0, 0.3, 1] } 
       }}
-      className="fixed inset-0 z-[9999] bg-[#09090b] flex flex-col items-center justify-center cursor-none"
+      className="dark fixed inset-0 z-[9999] bg-[#09090b] flex flex-col items-center justify-center cursor-none"
     >
       <div className="absolute top-4 left-4 md:top-4 md:left-4">
         <span className="font-space text-[10px] md:text-xs text-zinc-500 uppercase tracking-[0em]">
