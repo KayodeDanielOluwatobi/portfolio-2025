@@ -177,7 +177,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
 }) => {
   const controls = useAnimationControls();
   
-  const frameRef = useRef<number>();
+  const frameRef = useRef<number | undefined>(undefined);
   const startTimeRef = useRef<number>(Date.now());
   const previousHeightsRef = useRef<number[]>([]);
 

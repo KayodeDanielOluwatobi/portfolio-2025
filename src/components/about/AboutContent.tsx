@@ -2,6 +2,7 @@
 
 import BioCard from './BioCard';
 import SpotifyWidget from '@/components/spotify/SpotifyWidget';
+import YTMusicWidget from '@/components/yt-music/YTMusicWidget';
 import CurrentlyReading from './CurrentlyReading';
 import CurrentlyWatching from './CurrentlyWatching';
 import DuolingoWidget from './DuolingoWidget';
@@ -43,18 +44,27 @@ export default function AboutContent({ onHoverColor, onLeaveColor }: AboutConten
                         />
                     </FadeUp>
 
-                    {/* Row 4: Currently Reading (Right) */}
-                    <FadeUp delay={0.4} className="w-full md:w-5/12 self-end h-full dark text-white">
+                    {/* Row 4: YouTube Music (Right) */}
+                    <FadeUp delay={0.4} className="w-full md:w-5/12 self-end h-[250px] md:h-[300px] dark text-white">
+                        <YTMusicWidget 
+                            pollInterval={60000}
+                            onHoverColor={onHoverColor}
+                            onLeaveColor={onLeaveColor}
+                        />
+                    </FadeUp>
+
+                    {/* Row 5: Currently Reading (Left) */}
+                    <FadeUp delay={0.4} className="w-full md:w-5/12 self-start h-full dark text-white">
                         <CurrentlyReading onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
                     </FadeUp>
 
-                    {/* Row 5: Currently Watching (Left) */}
-                    <FadeUp delay={0.4} className="w-full md:w-8/12 self-start h-full dark text-white">
+                    {/* Row 6: Currently Watching (Right) */}
+                    <FadeUp delay={0.4} className="w-full md:w-8/12 self-end h-full dark text-white">
                         <CurrentlyWatching onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
                     </FadeUp>
 
-                    {/* Row 6: Duolingo (Right) */}
-                    <FadeUp delay={0.4} className="w-full md:w-4/12 self-end md:h-full dark text-white">
+                    {/* Row 7: Duolingo (Left) */}
+                    <FadeUp delay={0.4} className="w-full md:w-4/12 self-start md:h-full dark text-white">
                         <DuolingoWidget onHoverColor={onHoverColor} onLeaveColor={onLeaveColor} />
                     </FadeUp>
 

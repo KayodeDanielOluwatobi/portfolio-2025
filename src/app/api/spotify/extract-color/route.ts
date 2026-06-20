@@ -154,7 +154,7 @@ async function extractColors(imageUrl: string): Promise<ExtractedColors> {
     if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
     
     const arrayBuffer = await response.arrayBuffer();
-    let buffer = Buffer.from(arrayBuffer);
+    let buffer: any = Buffer.from(arrayBuffer);
 
     // 2. Convert to PNG using Sharp (The Robust Fix)
     // We resize to 200px to make extraction faster
@@ -168,7 +168,7 @@ async function extractColors(imageUrl: string): Promise<ExtractedColors> {
     }
 
     // 3. Pass the clean PNG buffer to Vibrant
-    const palette = await Vibrant.from(buffer).getPalette();
+    const palette = await Vibrant.from(buffer as any).getPalette();
 
     // --- YOUR ORIGINAL LOGIC BELOW (UNTOUCHED) ---
 

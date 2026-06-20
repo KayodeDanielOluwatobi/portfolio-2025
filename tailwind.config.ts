@@ -33,14 +33,6 @@ const config: Config = {
       },
     },
   },
-  variants: {
-    extend: {
-      textColor: ['hover'],
-      backgroundColor: ['hover'],
-      borderColor: ['hover'],
-      opacity: ['hover'],
-    },
-  },
   plugins: [],
 };
 

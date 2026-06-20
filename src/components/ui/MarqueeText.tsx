@@ -11,6 +11,8 @@ interface MarqueeTextProps {
   speed?: number; // pixels per second
   gap?: number; // gap between repeated text in pixels
   direction?: 'left' | 'right';
+  play?: boolean;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -24,6 +26,8 @@ interface MarqueeTextProps {
  * @param speed - Animation speed in pixels per second (default: 50)
  * @param gap - Gap between text repeats in pixels (default: 32)
  * @param direction - Scroll direction: 'left' or 'right' (default: 'left')
+ * @param play - Whether to animate the text (default: true)
+ * @param style - Custom styles for the outer container
  * 
  * @example
  * <MarqueeText 
@@ -38,6 +42,8 @@ export function MarqueeText({
   speed = 50,
   gap = 32,
   direction = 'left',
+  play = true,
+  style = {},
 }: MarqueeTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -77,13 +83,13 @@ export function MarqueeText({
   const duration = totalDistance / speed;
 
   // --- STATIC STATE ---
-  // Text fits in container, no animation needed
-  if (!isOverflowing) {
+  // Text fits in container or play is false, no animation needed
+  if (!isOverflowing || !play) {
     return (
       <div
         ref={containerRef}
         className={className}
-        style={{ overflow: 'hidden' }}
+        style={{ overflow: 'hidden', ...style }}
       >
         <span
           ref={textRef}
@@ -109,6 +115,7 @@ export function MarqueeText({
         // Fade effect: text fades at edges (10% and 90% of width)
         maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
         WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+        ...style,
       }}
     >
       <motion.div

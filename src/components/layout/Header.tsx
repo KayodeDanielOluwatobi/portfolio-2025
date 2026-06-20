@@ -213,8 +213,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
 
   // Animations
   const menuVariants = {
-    closed: { opacity: 0, transition: { duration: 0.4, ease: 'easeInOut' } },
-    open: { opacity: 1, transition: { duration: 0.4, ease: 'easeInOut' } },
+    closed: { opacity: 0, transition: { duration: 0.4, ease: 'easeInOut' as const } },
+    open: { opacity: 1, transition: { duration: 0.4, ease: 'easeInOut' as const } },
   };
 
   const navItemVariants = {
@@ -222,7 +222,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
     open: (i: number) => ({
       opacity: 1,
       x: 0,
-      transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' },
+      transition: { delay: i * 0.1, duration: 0.5, ease: 'easeOut' as const },
     }),
   };
 
@@ -231,18 +231,18 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
     open: {
       opacity: 1,
       y: 0,
-      transition: { delay: 0.4, duration: 0.6, ease: 'easeOut' },
+      transition: { delay: 0.4, duration: 0.6, ease: 'easeOut' as const },
     },
   };
 
   const headerVariants = {
-    visible: { opacity: 1, pointerEvents: 'auto' as const, transition: { duration: 0.5, ease: 'easeOut' } },
-    hidden: { opacity: 0, pointerEvents: 'none' as const, transition: { duration: 0.5, ease: 'easeInOut' } },
+    visible: { opacity: 1, pointerEvents: 'auto' as const, transition: { duration: 0.5, ease: 'easeOut' as const } },
+    hidden: { opacity: 0, pointerEvents: 'none' as const, transition: { duration: 0.5, ease: 'easeInOut' as const } },
   };
 
   const logoFadeVariants = {
-    visible: { opacity: 1, visibility: 'visible' as const, transition: { duration: 0.6, ease: 'easeOut' } },
-    hidden: { opacity: 0, visibility: 'hidden' as const, transition: { duration: 0.5, ease: 'easeInOut' } },
+    visible: { opacity: 1, visibility: 'visible' as const, transition: { duration: 0.6, ease: 'easeOut' as const } },
+    hidden: { opacity: 0, visibility: 'hidden' as const, transition: { duration: 0.5, ease: 'easeInOut' as const } },
   };
 
   const shouldShowHeader = !isScrollingDown;
