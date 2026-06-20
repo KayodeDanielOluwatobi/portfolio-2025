@@ -297,8 +297,8 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
           className={className} 
           style={{
             ...style,
-            background: 'rgba(0, 0, 0, 0.8)', // Dark solid background
-            border: '1px solid #ffffff',      // Crisp white border
+            background: isLightMode ? 'rgba(255, 255, 255, 0.95)' : 'rgba(0, 0, 0, 0.8)', // Dynamic bg in wireframe
+            border: isLightMode ? '1px solid #000000' : '1px solid #ffffff',               // Dynamic border in wireframe
             borderRadius: '0px',              // Sharp corners
             backdropFilter: 'none',
           }}
@@ -319,6 +319,11 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
     );
   };
 
+
+  const wireframeTextColor = isLightMode ? '#000000' : '#ffffff';
+  const wireframeSubtextColor = isLightMode ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.6)';
+  const tooltipTextColor = isWireframe ? wireframeTextColor : 'var(--tooltip-text)';
+  const tooltipSubtextColor = isWireframe ? wireframeSubtextColor : 'var(--tooltip-subtext)';
 
   return (
     <section ref={sectionRef} className="w-full py-20 bg-black">
@@ -370,6 +375,7 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
               src="/keyboard-wireframe.png"
               alt="Keyboard Wireframe"
               className="absolute inset-0 w-full h-full object-cover z-0"
+              style={{ filter: isLightMode ? 'invert(1)' : 'none' }}
               initial={false}
               animate={{ opacity: isWireframe ? 1 : 0 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
@@ -430,11 +436,11 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                       }}
                     >
                       <div className="flex flex-col items-center justify-center text-center">
-                        <h3 className="font-sans tracking-normal font-bold" style={{ fontSize: tooltipSize.toolNameSize, color: 'var(--tooltip-text)' }}>
+                        <h3 className="font-sans tracking-normal font-bold" style={{ fontSize: tooltipSize.toolNameSize, color: tooltipTextColor }}>
                           {toolDisplayNames[keycap.tool]?.main || keycap.tool}
                         </h3>
                         {toolDisplayNames[keycap.tool]?.sub && (
-                          <span className="font-sans tracking-normal font-light block" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)', marginTop: '2px' }}>
+                          <span className="font-sans tracking-normal font-light block" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: tooltipSubtextColor, marginTop: '2px' }}>
                             {toolDisplayNames[keycap.tool].sub}
                           </span>
                         )}
@@ -449,10 +455,10 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
                           trackWidth={isWireframe ? 1 : tooltipSize.trackWidth}
                           waveWidth={isWireframe ? 2 : tooltipSize.waveWidth}
                           // 👇 Track is now more visible (0.4 opacity)
-                          trackColor={isWireframe ? 'rgba(255,255,255,0.4)' : getKeycapColor(keycap.tool).track}
+                          trackColor={isWireframe ? (isLightMode ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.4)') : getKeycapColor(keycap.tool).track}
                           waveColor={
                             isWireframe 
-                              ? 'var(--white-val)' 
+                              ? (isLightMode ? '#000000' : '#ffffff') 
                               : (isLightMode && getKeycapColor(keycap.tool).lightWave) 
                                 ? getKeycapColor(keycap.tool).lightWave 
                                 : getKeycapColor(keycap.tool).wave
@@ -463,12 +469,12 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
 
                         {keycap.tool !== 'Be' ? (
                           <div className="text-center">
-                            <p className="font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)' }}>Proficiency Level</p>
-                            <p className="font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize, color: 'var(--tooltip-text)' }}>{keycap.proficiency}</p>
+                            <p className="font-regular mb-0" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: tooltipSubtextColor }}>Proficiency Level</p>
+                            <p className="font-medium" style={{ fontSize: tooltipSize.proficiencyTextSize, color: tooltipTextColor }}>{keycap.proficiency}</p>
                           </div>
                         ) : (
                           <div className="text-center">
-                            <p className="font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: 'var(--tooltip-subtext)' }}>My Behance Portfolio</p>
+                            <p className="font-mono" style={{ fontSize: tooltipSize.proficiencyLabelSize, color: tooltipSubtextColor }}>My Behance Portfolio</p>
                           </div>
                         )}
                       </div>
