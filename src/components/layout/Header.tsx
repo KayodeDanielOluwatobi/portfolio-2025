@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@supabase/supabase-js';
 import { useTheme } from 'next-themes';
 import { Sun, Moon, Github } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 // 1. Initialize Supabase
 const supabase = createClient(
@@ -42,13 +43,14 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
   const [isInHeroSection, setIsInHeroSection] = useState(true);
-  const [isHeroPresent, setIsHeroPresent] = useState(true);
   const [isInKeycapsSection, setIsInKeycapsSection] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [scrollVelocity, setScrollVelocity] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
   
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+  const isHeroPresent = pathname === '/';
 
   // 2. Dynamic State for Themes
   const [brandThemes, setBrandThemes] = useState<Record<string, BrandTheme>>({
@@ -112,8 +114,6 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   // Set mounted state
   useEffect(() => {
     setIsMounted(true);
-    const heroSection = document.querySelector('[data-cursor-brand]');
-    setIsHeroPresent(!!heroSection);
   }, []);
 
   // Notify parent component
