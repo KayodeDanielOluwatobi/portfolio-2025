@@ -22,7 +22,7 @@ const SECTIONS = [
     title: '+ THE EVOLUTION',
     lines: [
       "I did not start with fancy tools. I started with curiosity, stubbornness, and software that had no business producing good design (Microsoft Word and Paint, Lol.)",
-      "It was a war of attrition against the Adobe Pen Tool (a battle I almost lost, but eventually won).", 
+      "It was a war of attrition against the Adobe Pen Tool (a battle I almost lost, but eventually won).",
       "The Pen Tool almost broke our friendship. Almost.",
       "What kept me going was that moment when a concept clicks. When everything aligns and you just know this is it.",
       "When people later describe the work as elegant, atmospheric, or full of presence, I smile quietly. Because I know where it came from."
@@ -51,19 +51,17 @@ const BioSectionCard = ({
   isOpen: boolean;
   onToggle: () => void;
 }) => {
-  
+
   return (
     <div
-      className={`w-full rounded-lg md:rounded-xl relative overflow-hidden transition-all duration-500 border border-white/5 border-t-white/10 ${
-        isOpen
-          ? 'bg-zinc-900/20 shadow-2xl'
-          : 'bg-zinc-900/20 hover:bg-zinc-900/40'
-      }`}
+      className={`w-full rounded-lg md:rounded-xl relative overflow-hidden transition-all duration-500 border border-white/5 border-t-white/10 ${isOpen
+        ? 'bg-zinc-900/20 shadow-2xl'
+        : 'bg-zinc-900/20 hover:bg-zinc-900/40'
+        }`}
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-b from-white/3 via-transparent to-black/60 pointer-events-none transition-opacity duration-500 ${
-          isOpen ? 'opacity-100' : 'opacity-60'
-        }`}
+        className={`absolute inset-0 bg-gradient-to-b from-white/3 via-transparent to-black/60 pointer-events-none transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-60'
+          }`}
       />
 
       <div className="relative z-10 p-5 md:p-6">
@@ -72,16 +70,14 @@ const BioSectionCard = ({
           className="flex items-center justify-between w-full text-left group"
         >
           <span
-            className={`font-space text-xs sm:text-sm tracking-widest uppercase transition-colors duration-300 ${
-              isOpen ? 'text-white/20' : 'text-white/20 group-hover:text-zinc-200/40'
-            }`}
+            className={`font-space text-xs sm:text-sm tracking-widest uppercase transition-colors duration-300 ${isOpen ? 'text-white/20' : 'text-white/20 group-hover:text-zinc-200/40'
+              }`}
           >
             {title}
           </span>
           <span
-            className={`transition-colors duration-300 ${
-              isOpen ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-300'
-            }`}
+            className={`transition-colors duration-300 ${isOpen ? 'text-white' : 'text-zinc-500 group-hover:text-zinc-300'
+              }`}
           >
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
@@ -91,30 +87,30 @@ const BioSectionCard = ({
           {isOpen && (
             <motion.div
               initial={{ height: 0 }}
-              animate={{ 
+              animate={{
                 height: 'auto',
-                transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } 
+                transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
               }}
-              exit={{ 
+              exit={{
                 height: 0,
-                transition: { duration: 0.4, ease: "easeInOut" } 
+                transition: { duration: 0.4, ease: "easeInOut" }
               }}
               className="overflow-hidden"
             >
               <div className="pt-6 text-sm sm:text-base leading-relaxed font-light tracking-wide text-zinc-300">
                 <motion.div
-                  initial={{ 
-                    WebkitMaskPosition: "100% 100%", 
-                    maskPosition: "100% 100%" 
+                  initial={{
+                    WebkitMaskPosition: "100% 100%",
+                    maskPosition: "100% 100%"
                   } as any}
-                  animate={{ 
-                    WebkitMaskPosition: "0% 0%", 
-                    maskPosition: "0% 0%" 
+                  animate={{
+                    WebkitMaskPosition: "0% 0%",
+                    maskPosition: "0% 0%"
                   } as any}
-                  transition={{ 
-                    duration: 3, 
+                  transition={{
+                    duration: 3,
                     ease: "easeOut",
-                    delay: 0.2 
+                    delay: 0.2
                   }}
                   style={{
                     WebkitMaskImage: "linear-gradient(170deg, black 40%, transparent 60%)",
@@ -146,7 +142,7 @@ export default function BioStack() {
   const [isMounted, setIsMounted] = useState(false);
 
   const BIO_LINES = [
-    "I design the way some people pray",
+    "I design the way the Chinese make tea ;) ",
     "Slowly.",
     "Intentionally..",
     "With attention to what others overlook..."
@@ -196,7 +192,7 @@ export default function BioStack() {
             <h3 className="text-xs md:text-sm opacity-55 font-extralight text-zinc-50 tracking-wider">
               Bio
             </h3>
-            
+
             {/* 👇 BUTTON WITH COORDINATED FADE FOR ICON + TEXT */}
             <button
               onClick={toggleAll}
@@ -220,13 +216,13 @@ export default function BioStack() {
               </div>
             </button>
           </div>
-          
+
           <div className="text-sm sm:text-base md:text-base font-space font-extralight uppercase tracking-wide leading-tight min-h-[160px] sm:min-h-[140px]">
-            <Typewriter 
+            <Typewriter
               lines={BIO_LINES}
-              wait={3} 
+              wait={3}
               speed={40}
-              pause={1000} 
+              pause={1000}
               spacing="mb-1"
               withPrompt={true}
             />
