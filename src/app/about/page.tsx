@@ -22,7 +22,7 @@ export async function generateMetadata(
         siteName: 'everdann designs',
         images: [
           {
-            url: 'https://everdann.vercel.app/api/og/presentschool',
+            url: 'https://everdann.vercel.app/logos/presentschool-og.png',
             width: 1200,
             height: 630,
             alt: 'Daniel Kayode - Electrical & Electronics Engineering at FUTA',
@@ -35,7 +35,7 @@ export async function generateMetadata(
         card: 'summary_large_image',
         title: 'Daniel studying @ FUTA | Everdann Designs',
         description: 'Currently studying Electrical & Electronics Engineering at FUTA (94% complete).',
-        images: ['https://everdann.vercel.app/api/og/presentschool'],
+        images: ['https://everdann.vercel.app/logos/presentschool-og.png'],
       },
     };
   }
