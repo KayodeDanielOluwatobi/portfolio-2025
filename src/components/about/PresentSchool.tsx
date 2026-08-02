@@ -2,9 +2,10 @@
 
 import { Squircle } from '@squircle-js/react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import LinearWaveProgress from './LinearWaveProgress';
 import { useSquircleRadius } from '@/hooks/useSquircleRadius';
+import { Share2, Check } from 'lucide-react';
 
 // Helper Hook for smooth easing animation
 const useProgressAnimation = (targetValue: number, duration: number = 1500) => {
@@ -40,7 +41,7 @@ interface PresentSchoolProps {
 }
 
 export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSchoolProps) {
-    const progress = useProgressAnimation(80);
+    const progress = useProgressAnimation(94);
     
     // 👇 Dynamic Sizing Flags based on your Hook
     const squircleRadius = useSquircleRadius();
@@ -49,8 +50,57 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
 
     const CYAN_COLOR = '#3BA2DE';
 
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [shouldGlow, setShouldGlow] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const searchParams = new URLSearchParams(window.location.search);
+            if (searchParams.get('card') === 'presentschool') {
+                const timer = setTimeout(() => {
+                    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setShouldGlow(true);
+                    const glowTimer = setTimeout(() => {
+                        setShouldGlow(false);
+                    }, 3000);
+                    return () => clearTimeout(glowTimer);
+                }, 800);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, []);
+
+    const handleShare = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const shareUrl = `${window.location.origin}/about?card=presentschool`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Daniel studying @ FUTA | Everdann Designs',
+                    text: 'Currently studying Electrical & Electronics Engineering at FUTA (5th year).',
+                    url: shareUrl,
+                });
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (err) {
+                console.error('Failed to copy link:', err);
+            }
+        }
+    };
+
     return (
         <div 
+            ref={cardRef}
             className="w-full h-full"
             onMouseEnter={() => onHoverColor?.(CYAN_COLOR, '#ffffff')}
             onMouseLeave={() => onLeaveColor?.()}
@@ -58,7 +108,9 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
             <Squircle
                 cornerRadius={squircleRadius}
                 cornerSmoothing={0.7}
-                className="w-full bg-zinc-900/50 px-6 py-8 md:p-10 text-white/70 relative overflow-hidden"
+                className={`w-full bg-zinc-900/50 px-6 py-8 md:p-10 text-white/70 relative overflow-hidden transition-all duration-700 ${
+                    shouldGlow ? 'ring-2 ring-[#3BA2DE] shadow-[0_0_30px_rgba(59,162,222,0.4)] scale-[1.01]' : ''
+                }`}
             >
                 <Image
                     src="/logos/futapic.webp"
@@ -70,9 +122,18 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                 <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/90 via-[#000000]/70 to-[#000000]/90" />
 
                 <div className="relative z-10 space-y-12 md:space-y-12">
-                    <h3 className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
-                        Currently studying . . .
-                    </h3>
+                    <div className="flex justify-between items-center w-full">
+                        <h3 className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
+                            Currently studying . . .
+                        </h3>
+                        <button
+                            onClick={handleShare}
+                            className="flex items-center justify-center p-2 rounded-full bg-white/5 hover:bg-[#3BA2DE]/10 hover:text-[#3BA2DE] text-zinc-400 hover:border-[#3BA2DE]/20 border border-transparent transition-all duration-300 pointer-events-auto cursor-pointer z-20"
+                            title="Share this card"
+                        >
+                            {copied ? <Check size={14} className="text-[#3BA2DE]" /> : <Share2 size={14} />}
+                        </button>
+                    </div>
 
                     <div className="flex items-center gap-4">
                         <div className="flex-shrink-0">

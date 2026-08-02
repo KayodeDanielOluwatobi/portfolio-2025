@@ -1,0 +1,63 @@
+'use client';
+
+import { useState } from 'react';
+import Header from '@/components/layout/Header';
+import Bottom from '@/components/layout/Bottom';
+import AboutHero from '@/components/about/AboutHero';
+import AboutContent from '@/components/about/AboutContent';
+import Footer3 from '@/components/layout/Footer3';
+import { SmoothCursor } from '@/components/layout/SmoothCursor';
+import { darkenColor } from '@/utils/colorUtils';
+import FadeUp from '@/components/animations/FadeUp';
+
+export default function AboutClient() {
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Default: Black Fill / White Stroke
+    const [cursorColor, setCursorColor] = useState('var(--black-val)');
+    const [cursorStrokeColor, setCursorStrokeColor] = useState('var(--white-val)');
+
+    const handleColorChange = (fill: string, stroke?: string) => {
+        setCursorColor(fill);
+        // If 'stroke' is provided, use it. If NOT, darken the fill by 40%.
+        setCursorStrokeColor(stroke || darkenColor(fill, 40));
+    };
+
+    const handleResetColor = () => {
+        setCursorColor('var(--black-val)');
+        setCursorStrokeColor('var(--white-val)');
+    };
+
+    return (
+        <main className="bg-[var(--background)] min-h-screen transition-colors duration-400">
+            <Header
+                currentBrand="default"
+                onMobileMenuToggle={setIsMobileMenuOpen}
+            />
+
+            <SmoothCursor
+                cursorColor={cursorColor}
+                cursorStrokeColor={cursorStrokeColor}
+            />
+
+            <FadeUp delay={0.4}>
+                <AboutHero />
+            </FadeUp>
+
+            <FadeUp delay={0.4}>
+                <AboutContent
+                    onHoverColor={handleColorChange}
+                    onLeaveColor={handleResetColor}
+                />
+            </FadeUp>
+
+            <FadeUp delay={0.4}>
+                <Footer3 />
+            </FadeUp>
+
+            <FadeUp delay={0.4}>
+                <Bottom />
+            </FadeUp>
+        </main>
+    );
+}
