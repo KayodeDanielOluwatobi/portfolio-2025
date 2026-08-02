@@ -9,30 +9,30 @@ import { Share2, Check } from 'lucide-react';
 
 // Helper Hook for smooth easing animation
 const useProgressAnimation = (targetValue: number, duration: number = 1500) => {
-  const [value, setValue] = useState(0);
+    const [value, setValue] = useState(0);
 
-  useEffect(() => {
-    const startTime = Date.now();
-    const startValue = value;
-    
-    const animate = () => {
-      const now = Date.now();
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      
-      const ease = 1 - Math.pow(1 - progress, 4);
-      
-      setValue(startValue + (targetValue - startValue) * ease);
+    useEffect(() => {
+        const startTime = Date.now();
+        const startValue = value;
 
-      if (progress < 1) {
+        const animate = () => {
+            const now = Date.now();
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const ease = 1 - Math.pow(1 - progress, 4);
+
+            setValue(startValue + (targetValue - startValue) * ease);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+
         requestAnimationFrame(animate);
-      }
-    };
-    
-    requestAnimationFrame(animate);
-  }, [targetValue]); 
+    }, [targetValue]);
 
-  return value;
+    return value;
 };
 
 interface PresentSchoolProps {
@@ -42,7 +42,7 @@ interface PresentSchoolProps {
 
 export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSchoolProps) {
     const progress = useProgressAnimation(94);
-    
+
     // 👇 Dynamic Sizing Flags based on your Hook
     const squircleRadius = useSquircleRadius();
     const isTiny = squircleRadius <= 12;   // < 380px
@@ -99,7 +99,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
     };
 
     return (
-        <div 
+        <div
             ref={cardRef}
             className="w-full h-full"
             onMouseEnter={() => onHoverColor?.(CYAN_COLOR, '#ffffff')}
@@ -108,15 +108,14 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
             <Squircle
                 cornerRadius={squircleRadius}
                 cornerSmoothing={0.7}
-                className={`w-full bg-zinc-900/50 px-6 py-8 md:p-10 text-white/70 relative overflow-hidden transition-all duration-700 ${
-                    shouldGlow ? 'ring-2 ring-[#3BA2DE] shadow-[0_0_30px_rgba(59,162,222,0.4)] scale-[1.01]' : ''
-                }`}
+                className={`w-full bg-zinc-900/50 px-6 py-8 md:p-10 text-white/70 relative overflow-hidden transition-all duration-700 ${shouldGlow ? 'ring-2 ring-[#3BA2DE] shadow-[0_0_30px_rgba(59,162,222,0.4)] scale-[1.01]' : ''
+                    }`}
             >
                 <Image
                     src="/logos/futapic.webp"
                     alt=""
                     fill
-                    className="object-cover scale-103 " 
+                    className="object-cover scale-103 "
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-b from-[#000000]/90 via-[#000000]/70 to-[#000000]/90" />
@@ -139,7 +138,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                         <div className="flex-shrink-0">
                             <div className="w-12 h-12 md:w-12 md:h-12 rounded-full overflow-hidden bg-white/10 flex items-center justify-center">
                                 <Image
-                                    src="/logos/futa.jpg"
+                                    src="/logos/futa.png"
                                     alt="FUTA Logo"
                                     width={80}
                                     height={80}
@@ -164,7 +163,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
                     </div>
 
                     <div className="space-y-2">
-                        <LinearWaveProgress 
+                        <LinearWaveProgress
                             progress={progress}
                             // 👇 EXACT SETTINGS AS REQUESTED
                             height={isTiny ? 2.5 : 4}

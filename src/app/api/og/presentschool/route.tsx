@@ -10,9 +10,9 @@ export async function GET() {
     const fontPath = path.join(process.cwd(), 'src/app/fonts/SpaceMono-Regular.ttf');
     const fontData = fs.readFileSync(fontPath);
 
-    const futaLogoPath = path.join(process.cwd(), 'public/logos/futa.jpg');
+    const futaLogoPath = path.join(process.cwd(), 'public/logos/futa.png');
     const futaLogoBase64 = fs.readFileSync(futaLogoPath).toString('base64');
-    const futaLogoDataUrl = `data:image/jpeg;base64,${futaLogoBase64}`;
+    const futaLogoDataUrl = `data:image/png;base64,${futaLogoBase64}`;
 
     const futaPicPath = path.join(process.cwd(), 'public/logos/futapic.webp');
     const futaPicBase64 = fs.readFileSync(futaPicPath).toString('base64');
