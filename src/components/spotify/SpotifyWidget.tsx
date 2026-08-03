@@ -97,7 +97,7 @@ export default function SpotifyWidget({
 
       const data: SpotifyTrackData = await response.json();
       setTrack(data);
-      
+
       // Update progress
       setProgressMs(data.progressMs);
 
@@ -125,56 +125,56 @@ export default function SpotifyWidget({
   }, [pollInterval]);
 
   // 👇 Handle Hover Logic
- const handleMouseEnter = () => {
-  // If no track exists, default to Green
-  if (!track) {
-    onHoverColor?.('#1DB954');
-    return;
-  }
+  const handleMouseEnter = () => {
+    // If no track exists, default to Green
+    if (!track) {
+      onHoverColor?.('#1DB954');
+      return;
+    }
 
-  // If not playing (Paused OR Last Played), force Grey cursor
-  if (!track.isPlaying) {
-    onHoverColor?.('#71717a', '#ffffff'); // #71717a is Zinc-500 (Clean Grey)
-    return;
-  }
+    // If not playing (Paused OR Last Played), force Grey cursor
+    if (!track.isPlaying) {
+      onHoverColor?.('#71717a', '#ffffff'); // #71717a is Zinc-500 (Clean Grey)
+      return;
+    }
 
-  // If Playing, use the vibrant album color
-  if (track.colors?.barColor) {
-    onHoverColor?.(track.colors.barColor, '#ffffff');
-  } else {
-    onHoverColor?.('#1DB954', '#ffffff');
-  }
-};
+    // If Playing, use the vibrant album color
+    if (track.colors?.barColor) {
+      onHoverColor?.(track.colors.barColor, '#ffffff');
+    } else {
+      onHoverColor?.('#1DB954', '#ffffff');
+    }
+  };
 
 
   return (
     // Wrapper div to capture hover events cleanly outside the Squircle
-    <div 
-        className={`w-full h-full ${className}`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={() => onLeaveColor?.()}
-        style={width || height ? {
-            width: width ? `${width}px` : '100%',
-            height: height ? `${height}px` : undefined,
-        } : undefined}
+    <div
+      className={`w-full h-full ${className}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => onLeaveColor?.()}
+      style={width || height ? {
+        width: width ? `${width}px` : '100%',
+        height: height ? `${height}px` : undefined,
+      } : undefined}
     >
-        <Squircle
+      <Squircle
         cornerRadius={squircleRadius}
         cornerSmoothing={0.7}
         className="relative w-full h-full overflow-hidden shadow-xl shadow-black/50 border-white/0"
-        >
+      >
         {/* Background: Album Art */}
         {track && (
-            <div 
+          <div
             className="absolute inset-0 transition-all duration-700 ease-in-out"
             style={{
-                backgroundImage: `url(${track.track.albumArt})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                // GREYSCALE LOGIC: Only greyscale if it is Last Played history. If just paused, keep color.
-                filter: track.isLastPlayed ? 'grayscale(100%) brightness(0.8)' : 'none',
+              backgroundImage: `url(${track.track.albumArt})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              // GREYSCALE LOGIC: Only greyscale if it is Last Played history. If just paused, keep color.
+              filter: track.isLastPlayed ? 'grayscale(100%) brightness(0.8)' : 'none',
             }}
-            />
+          />
         )}
 
         {/* Gradient Overlay for text visibility */}
@@ -182,140 +182,143 @@ export default function SpotifyWidget({
 
         {/* Loader - Fades out when data arrives */}
         {isLoading && (
-            <div
-            className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${
-                fadeOut ? 'opacity-0' : 'opacity-100'
-            }`}
-            >
+          <div
+            className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'
+              }`}
+          >
             <CircularWaveProgress
-                progress={loaderProgress}
-                size={isMobile ? 50 : 70}
-                trackWidth={isMobile ? 5 : 6}
-                waveWidth={isMobile ? 5 : 6}
-                trackColor="#475569"
-                waveColor="#cbd5e1"
-                waveAmplitude={isMobile ? 2 : 3}
-                maxWaveFrequency={6}
-                undulationSpeed={2}
-                rotationSpeed={7}
-                edgeGap={20}
-                relaxationDuration={0}
-                className="opacity-30"
+              progress={loaderProgress}
+              size={isMobile ? 50 : 70}
+              trackWidth={isMobile ? 5 : 6}
+              waveWidth={isMobile ? 5 : 6}
+              trackColor="#475569"
+              waveColor="#cbd5e1"
+              waveAmplitude={isMobile ? 2 : 3}
+              maxWaveFrequency={6}
+              undulationSpeed={2}
+              rotationSpeed={7}
+              edgeGap={20}
+              relaxationDuration={0}
+              className="opacity-30"
             />
-            </div>
+          </div>
         )}
 
         {/* Widget Content - Fades in when data arrives */}
         <div
-            className={`relative z-5 transition-opacity duration-500 p-6 md:p-8 flex flex-col h-full ${
-            isLoading ? 'opacity-0' : 'opacity-100'
+          className={`relative z-5 transition-opacity duration-500 p-6 md:p-8 flex flex-col h-full ${isLoading ? 'opacity-0' : 'opacity-100'
             }`}
         >
-            
-            {/* Top: Status Text */}
-            <div className="mb-5 md:mb-auto -mt-1 md:-mt-1">
-            <span className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
-                {/* TEXT LABEL LOGIC */}
-                {track?.isPlaying 
-                ? "I'm Currently listening to . . ." 
-                : track?.isLastPlayed 
-                    ? "Last played . . ." 
-                    : "Paused . . ." 
-                }
-            </span>
-            </div>
 
-            {/* Middle: Title/Artist (Left) + Spotify Logo (Right) */}
-            <div className="opacity-90 flex items-center gap-7 mb-6">
+          {/* Top: Status Text */}
+          <div className="mb-5 md:mb-auto -mt-1 md:-mt-1">
+            <span className="text-xs md:text-sm opacity-55 font-extralight md:font-regular text-zinc-50 tracking-wider">
+              {/* TEXT LABEL LOGIC */}
+              {track?.isPlaying
+                ? "I'm Currently listening to . . ."
+                : track?.isLastPlayed
+                  ? "Last played . . ."
+                  : "Paused . . ."
+              }
+            </span>
+          </div>
+
+          {/* Middle: Title/Artist (Left) + Spotify Logo (Right) */}
+          <div className="opacity-90 flex items-center gap-7 mb-6">
             {/* Left: Title & Artist with Marquee */}
             <div className="flex-1 min-w-0">
-                <MarqueeText
+              <MarqueeText
                 text={track?.track.name || 'Loading...'}
                 className="text-base font-bold text-white mb-1 leading-tight"
                 speed={20}
                 gap={20}
                 // Optional: Pause marquee if song is not playing
-                play={true} 
-                />
-                <MarqueeText
+                play={true}
+              />
+              <MarqueeText
                 text={track?.track.artist || 'Loading...'}
                 className="text-sm text-zinc-50 leading-tight"
                 speed={20}
                 gap={20}
                 play={true}
-                />
+              />
             </div>
 
             {/* Right: Spotify Logo */}
             <div className="flex-shrink-0 -mt-1 relative scale-110 origin-top-right">
-                <Image
+              <Image
                 src="/logos/spotify.svg"
                 alt="Spotify"
                 width={32}
                 height={32}
                 className="text-green-500"
-                />
+              />
 
-                {/* Subtle playback indicator - Only show if playing */}
-                {track?.isPlaying && (
+              {/* Subtle playback indicator - Only show if playing */}
+              {track?.isPlaying && (
                 <motion.div
-                    className="absolute w-2 h-2 rounded-full z-20"
-                    style={{ 
+                  className="absolute w-2 h-2 rounded-full z-20"
+                  style={{
                     backgroundColor: track.colors.barColor,
                     top: '0.7px',
                     right: '0.7px',
-                    }}
-                    animate={{ opacity: [0.8, 1, 0.8] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
+                  }}
+                  animate={{ opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
                 />
-                )}
+              )}
             </div>
-            </div>
+          </div>
 
-            {/* Bottom: Audio Visualizers */}
+          {/* Bottom: Audio Visualizers & Premium Footnote */}
+          <div className="mt-auto space-y-3">
             {track && (
-            <div 
-                className={`mt-auto flex flex-row justify-start items-center gap-1 transition-all duration-500
-                ${track.isLastPlayed ? 'opacity-50 grayscale' : 'opacity-100'} 
-                `}
-            >
+              <div
+                className={`flex flex-row justify-start items-center gap-1 transition-all duration-500 ${track.isLastPlayed ? 'opacity-50 grayscale' : 'opacity-100'
+                  }`}
+              >
                 {/* Visualizer 1 */}
                 <AudioVisualizer
-                barCount={3}
-                pulsePattern="wave"
-                barColor={track.colors.barColor}
-                barWidth={6}
-                barSpacing={4}
-                maxHeight={100}
-                containerHeight={50}
-                staggerAmount={0.2} 
-                decayFactor={0.3} 
-                animationSpeed={1.2}
-                restHeight={2}
-                frequencyData={frequencyData || undefined}
-                currentProgressMs={progressMs}
-                />      
+                  barCount={3}
+                  pulsePattern="wave"
+                  barColor={track.colors.barColor}
+                  barWidth={6}
+                  barSpacing={4}
+                  maxHeight={100}
+                  containerHeight={50}
+                  staggerAmount={0.2}
+                  decayFactor={0.3}
+                  animationSpeed={1.2}
+                  restHeight={2}
+                  frequencyData={frequencyData || undefined}
+                  currentProgressMs={progressMs}
+                />
 
                 {/* Visualizer 2 (Atmosphere) */}
                 <AudioVisualizer
-                barCount={3}
-                pulsePattern="mirror"
-                barColor={track.colors.barColor}
-                barWidth={6}
-                barSpacing={4}
-                maxHeight={75}
-                containerHeight={50}
-                staggerAmount={0.6}
-                decayFactor={0.7} 
-                animationSpeed={0.3}
-                restHeight={2}
-                frequencyData={frequencyData || undefined}
-                currentProgressMs={progressMs}
+                  barCount={3}
+                  pulsePattern="mirror"
+                  barColor={track.colors.barColor}
+                  barWidth={6}
+                  barSpacing={4}
+                  maxHeight={75}
+                  containerHeight={50}
+                  staggerAmount={0.6}
+                  decayFactor={0.7}
+                  animationSpeed={0.3}
+                  restHeight={2}
+                  frequencyData={frequencyData || undefined}
+                  currentProgressMs={progressMs}
                 />
-            </div>
+              </div>
             )}
+
+            <div className="text-[9px] md:text-[10px] text-zinc-500/60 font-space tracking-wider uppercase leading-tight">
+              * Tested & fully functional; live tracking requires Spotify Premium.
+            </div>
+          </div>
         </div>
-        </Squircle>
+      </Squircle>
     </div>
   );
 }
