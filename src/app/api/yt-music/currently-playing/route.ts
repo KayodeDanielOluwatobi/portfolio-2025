@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Vibrant } from 'node-vibrant/node';
+import crypto from 'crypto';
 
 // Public InnerTube API Key for YouTube Music
 const API_KEY = 'AIzaSyAO_FJ2PI196E59xQla6Qzce37g6Gud1U0';
@@ -251,14 +252,31 @@ export async function GET(request: NextRequest) {
       browseId: 'FEmusic_history'
     };
 
+    const sapisidMatch = cookie.match(/SAPISID=([^;]+)/) || cookie.match(/__Secure-3PAPISID=([^;]+)/);
+    const sapisid = sapisidMatch ? sapisidMatch[1] : '';
+
+    let authHeader = '';
+    if (sapisid) {
+      const timestamp = Math.floor(Date.now() / 1000);
+      const origin = 'https://music.youtube.com';
+      const hashInput = `${timestamp} ${sapisid} ${origin}`;
+      const sha1 = crypto.createHash('sha1').update(hashInput).digest('hex');
+      authHeader = `SAPISIDHASH ${timestamp}_${sha1}`;
+    }
+
     const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Cookie': cookie,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36',
         'Origin': 'https://music.youtube.com',
-        'Referer': 'https://music.youtube.com/history'
+        'Referer': 'https://music.youtube.com/history',
+        ...(authHeader ? {
+          'Authorization': authHeader,
+          'X-Origin': 'https://music.youtube.com',
+          'X-Goog-AuthUser': '0'
+        } : {})
       },
       body: JSON.stringify(payload)
     });
