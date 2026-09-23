@@ -2,6 +2,7 @@
 
 'use client';
 
+import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -10,7 +11,9 @@ interface BentoAsset {
   src?: string;
   content?: string;
   title?: string;
-  titleColor?: string; 
+  titleColor?: string;
+  fontSize?: number;
+  height?: number;
 }
 
 interface BentoRowProps {
@@ -34,9 +37,19 @@ function BentoRow({ row }: { row: BentoRowProps }) {
   const { layout, assets } = row;
 
   if (layout === 'full') {
+    const isText = assets[0]?.type === 'text';
     return (
       <div className="w-full">
-        <MediaCard asset={assets[0]} className="aspect-video w-full" />
+        <MediaCard
+          asset={assets[0]}
+          className={
+            assets[0]?.height
+              ? 'w-full'
+              : isText
+              ? 'w-full py-1'
+              : 'aspect-video w-full'
+          }
+        />
       </div>
     );
   }
@@ -44,8 +57,14 @@ function BentoRow({ row }: { row: BentoRowProps }) {
   if (layout === 'twin') {
     return (
       <div className="grid grid-cols-2 gap-1 md:gap-2">
-        <MediaCard asset={assets[0]} className="aspect-[4/5] w-full" />
-        <MediaCard asset={assets[1]} className="aspect-[4/5] w-full" />
+        <MediaCard
+          asset={assets[0]}
+          className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
+        />
+        <MediaCard
+          asset={assets[1]}
+          className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
+        />
       </div>
     );
   }
@@ -81,16 +100,117 @@ function BentoRow({ row }: { row: BentoRowProps }) {
   return null;
 }
 
-function MediaCard({ asset, className }: { asset: BentoAsset; className?: string }) {
-  const isText = asset.type === 'text';
+function AutoFitText({
+  title,
+  content,
+  customFontSize,
+  customHeight,
+}: {
+  title?: string;
+  content?: string;
+  customFontSize?: number;
+  customHeight?: number;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [computedSize, setComputedSize] = useState<number>(customFontSize || 20);
+
+  useEffect(() => {
+    if (customFontSize) {
+      setComputedSize(customFontSize);
+      return;
+    }
+
+    const el = containerRef.current;
+    const textEl = textRef.current;
+    if (!el || !textEl || !content) return;
+
+    const calculateSize = () => {
+      const containerHeight = el.clientHeight;
+      const containerWidth = el.clientWidth;
+      if (containerHeight <= 0 || containerWidth <= 0) return;
+
+      let min = 11;
+      let max = 64;
+      let best = min;
+
+      for (let i = 0; i < 8; i++) {
+        const mid = (min + max) / 2;
+        textEl.style.fontSize = `${mid}px`;
+        textEl.style.lineHeight = `${mid * 1.3}px`;
+
+        const isOverflowing =
+          textEl.scrollHeight > el.clientHeight ||
+          textEl.scrollWidth > el.clientWidth;
+
+        if (isOverflowing) {
+          max = mid - 0.5;
+        } else {
+          best = mid;
+          min = mid + 0.5;
+        }
+      }
+
+      setComputedSize(Math.max(12, Math.floor(best)));
+    };
+
+    calculateSize();
+
+    const ro = new ResizeObserver(() => {
+      calculateSize();
+    });
+    ro.observe(el);
+
+    return () => ro.disconnect();
+  }, [content, title, customFontSize]);
 
   return (
-    <FadeUp className="h-full">
+    <div
+      ref={containerRef}
+      style={customHeight ? { minHeight: `${customHeight}px` } : undefined}
+      className="flex flex-col w-full px-2 sm:px-4 md:px-6 py-2 md:py-3 justify-start overflow-visible md:overflow-hidden"
+    >
+      {title && (
+        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/50 mb-2 md:mb-3 flex-shrink-0">
+          {title}
+        </h4>
+      )}
+      <div className="w-full overflow-visible md:overflow-hidden">
+        <p
+          ref={textRef}
+          className="font-light tracking-normal text-white w-full m-0 text-left sm:text-justify"
+          style={{
+            fontSize: customFontSize
+              ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
+              : `${computedSize}px`,
+            lineHeight: customFontSize ? '1.45' : `${computedSize * 1.3}px`,
+            textJustify: 'inter-word',
+            hyphens: 'none',
+            WebkitHyphens: 'none',
+            wordBreak: 'normal',
+          }}
+        >
+          {content}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MediaCard({ asset, className }: { asset: BentoAsset; className?: string }) {
+  const isText = asset.type === 'text';
+  const customHeightStyle = !isText && asset.height
+    ? { height: `${asset.height}px`, minHeight: `${asset.height}px` }
+    : undefined;
+
+  return (
+    <FadeUp className={isText ? 'w-full h-auto' : 'h-full'}>
       <div 
-        className={`group relative overflow-hidden h-full transition-all duration-500 ${className} ${
+        style={customHeightStyle}
+        className={`group relative overflow-hidden transition-all duration-500 ${className} ${
           isText 
-            ? 'bg-transparent border-none' 
-            : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl'
+            ? 'bg-transparent border-none w-full h-auto' 
+            : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl h-full'
         }`}
       >
         {asset.type === 'image' && (
@@ -110,16 +230,12 @@ function MediaCard({ asset, className }: { asset: BentoAsset; className?: string
         )}
 
         {asset.type === 'text' && (
-          <div className="flex flex-col justify-center items-start h-full py-4 md:py-8 px-2">
-            {asset.title && (
-              <h4 className="font-space text-[9px] md:text-sm uppercase tracking-[0.1em] md:tracking-[0.2em] text-white/50 mb-3 md:mb-8">
-                {asset.title}
-              </h4>
-            )}
-            <p className="text-sm md:text-4xl font-extralight md:font-thin tracking-wider md:tracking-wide text-white leading-snug md:leading-[1.1] max-w-[100%]">
-              {asset.content}
-            </p>
-          </div>
+          <AutoFitText
+            title={asset.title}
+            content={asset.content}
+            customFontSize={asset.fontSize}
+            customHeight={asset.height}
+          />
         )}
       </div>
     </FadeUp>

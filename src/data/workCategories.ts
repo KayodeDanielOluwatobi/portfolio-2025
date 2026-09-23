@@ -17,6 +17,12 @@ export const WORK_CATEGORIES = [
     subtitle: 'Worship visuals so fire, Moses would approve',
     color: '#FFFFFF',
   },
+  {
+    id: 'publishing',
+    label: 'Publishing',
+    subtitle: 'Print and editorial layouts crafted to make every page unforgettable',
+    color: '#FFFFFF',
+  },
 ];
 
 export const COLUMNS_CONFIG = {
@@ -31,6 +37,11 @@ export const COLUMNS_CONFIG = {
     desktop: 4,
   },
   church: {
+    mobile: 1,
+    tablet: 3,
+    desktop: 4,
+  },
+  publishing: {
     mobile: 1,
     tablet: 3,
     desktop: 4,

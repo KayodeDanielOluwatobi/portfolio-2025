@@ -2,7 +2,7 @@ import { supabase } from '@/utils/supabase/client';
 
 export async function getProjectBySlug(slug: string) {
   // We check all tables to find where the project lives
-  const tables = ['works_brands', 'works_socials', 'works_church'];
+  const tables = ['works_brands', 'works_socials', 'works_church', 'works_publishing'];
   
   for (const table of tables) {
     const { data, error } = await supabase

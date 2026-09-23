@@ -37,7 +37,7 @@ function WorksContent() {
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
-    if (categoryFromUrl && ['brands', 'socials', 'church'].includes(categoryFromUrl)) {
+    if (categoryFromUrl && ['brands', 'socials', 'church', 'publishing'].includes(categoryFromUrl)) {
       setActiveCategory(categoryFromUrl);
     }
   }, [searchParams]);
@@ -58,6 +58,7 @@ function WorksContent() {
           case 'brands': tableName = 'works_brands'; break;
           case 'socials': tableName = 'works_socials'; break;
           case 'church': tableName = 'works_church'; break;
+          case 'publishing': tableName = 'works_publishing'; break;
           default: tableName = 'works_brands';
         }
 

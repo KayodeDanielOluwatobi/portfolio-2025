@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Squircle } from '@squircle-js/react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 // 👇 Import the hook
 import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 
@@ -32,18 +33,19 @@ export default function ProjectCard({
   const dynamicRadius = useSquircleRadius(30, 22, 16, 12);
 
   return (
-    <Link href={`/works/${slug}`}>
-      <Squircle
-        cornerRadius={dynamicRadius} // 👈 Use the dynamic value here
-        cornerSmoothing={0.7}
-        className={`relative overflow-hidden cursor-pointer ${
-          aspectRatio === 'square' ? 'aspect-square' : ''
-        }`}
-        style={{ background: 'transparent' }}
-        aria-label={title}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+    <Link href={`/works/${slug}`} className="block">
+      <motion.div layoutId={`project-media-${slug}`}>
+        <Squircle
+          cornerRadius={dynamicRadius} // 👈 Use the dynamic value here
+          cornerSmoothing={0.7}
+          className={`relative overflow-hidden cursor-pointer ${
+            aspectRatio === 'square' ? 'aspect-square' : ''
+          }`}
+          style={{ background: 'transparent' }}
+          aria-label={title}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
         {/* Loading Placeholder */}
         {!isLoaded && (
           <div className="absolute inset-0 bg-white/5 animate-pulse" />
@@ -111,6 +113,7 @@ export default function ProjectCard({
           />
         )}
       </Squircle>
+      </motion.div>
     </Link>
   );
 }

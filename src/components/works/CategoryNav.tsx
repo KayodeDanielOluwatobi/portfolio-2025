@@ -30,7 +30,8 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
     all: 0,
     brands: 0,
     church: 0,
-    socials: 0
+    socials: 0,
+    publishing: 0
   });
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -41,22 +42,25 @@ export default function CategoryNav({ activeCategory, onCategoryChange }: Catego
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        // Run queries in parallel for 'works_brands', 'works_church', 'works_socials'
-        const [brands, church, socials] = await Promise.all([
+        // Run queries in parallel for 'works_brands', 'works_church', 'works_socials', 'works_publishing'
+        const [brands, church, socials, publishing] = await Promise.all([
           supabase.from('works_brands').select('*', { count: 'exact', head: true }),
           supabase.from('works_church').select('*', { count: 'exact', head: true }),
           supabase.from('works_socials').select('*', { count: 'exact', head: true }),
+          supabase.from('works_publishing').select('*', { count: 'exact', head: true }),
         ]);
 
         const brandCount = brands.count || 0;
         const churchCount = church.count || 0;
         const socialCount = socials.count || 0;
+        const publishingCount = publishing.count || 0;
 
         setCounts({
           brands: brandCount,
           church: churchCount,
           socials: socialCount,
-          all: brandCount + churchCount + socialCount // Sum all for the 'All' category
+          publishing: publishingCount,
+          all: brandCount + churchCount + socialCount + publishingCount // Sum all for the 'All' category
         });
       } catch (error) {
         console.error('Error fetching project counts:', error);

@@ -410,45 +410,102 @@ export default function Hero({
                   {currentBrand.tagline}
                 </p>
 
-                {/* Chips - Alternating filled and bordered */}
-                <div className="flex flex-wrap gap-3 pt-4">
-                  {currentBrand.chips.map((chip, index) => {
-                    const isFilled = index % 2 === 0;
-
-                    return (
-                      <span
-                        key={chip}
-                        className={`
-                            px-4 rounded-full text-xs font-space tracking-wider transition-all flex items-center justify-center py-[6px] md:py-1
-                            ${isFilled ? 'font-normal' : 'font-normal'} 
-                            leading-none pt-[9px] md:pt-[9.5px]
-                        `}
-                        style={{
-                          ...(isFilled
-                            ? {
-                                // NEW LOGIC APPLIED HERE
-                                color: getContrastingTextColor(currentBrand.textColor),
-                                backgroundColor: currentBrand.textColor,
-                                border: 'none',
-                              }
-                            : {
-                                color: currentBrand.textColor,
-                                backgroundColor: 'transparent',
-                                border: `2px solid ${currentBrand.textColor}`,
-                              }
-                          )
-                        }}
-                      >
-                        {chip}
-                      </span>
-                    );
-                  })}
-                </div>
+                {/* Chips - Alternating filled and bordered with bottom-up liquid curtain animation and synchronized hover */}
+                <HeroChipGroup
+                  chips={currentBrand.chips}
+                  textColor={currentBrand.textColor}
+                />
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
       </div>
     </motion.div>
+  );
+}
+
+function HeroChipGroup({
+  chips,
+  textColor,
+}: {
+  chips: string[];
+  textColor: string;
+}) {
+  const [isGroupHovered, setIsGroupHovered] = useState(false);
+
+  return (
+    <>
+      <style>{`
+        @keyframes liquid-hero-fast {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes liquid-hero-slow {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
+      <div
+        onMouseEnter={() => setIsGroupHovered(true)}
+        onMouseLeave={() => setIsGroupHovered(false)}
+        className="flex flex-wrap gap-3 pt-4"
+      >
+        {chips.map((chip, index) => {
+          const defaultFilled = index % 2 === 0;
+          const activeFilled = isGroupHovered ? !defaultFilled : defaultFilled;
+
+          return (
+            <span
+              key={chip}
+              className="relative overflow-hidden px-4 rounded-full text-xs font-space tracking-wider uppercase transition-colors duration-300 flex items-center justify-center font-normal leading-none pt-[8.5px] md:pt-[9px] pb-[6.5px] md:pb-[7px] cursor-pointer select-none"
+              style={{
+                border: `2px solid ${textColor}`,
+              }}
+            >
+              {/* ── Liquid Water Reservoir Tank (Smooth slow wave only on hover) ── */}
+              <div
+                className="absolute inset-x-0 bottom-0 pointer-events-none transition-all duration-700 ease-out overflow-hidden"
+                style={{
+                  height: activeFilled ? '100%' : '0%',
+                }}
+              >
+                {/* Solid Body of Water */}
+                <div
+                  className="absolute inset-0"
+                  style={{ backgroundColor: textColor }}
+                />
+
+                {/* Subsurface slow wave that only appears during hover transition */}
+                {isGroupHovered && (
+                  <div className="absolute top-0 inset-x-0 h-3 pointer-events-none opacity-40 overflow-visible -translate-y-1/2">
+                    <svg
+                      viewBox="0 0 900 60"
+                      preserveAspectRatio="none"
+                      className="w-[200%] h-full"
+                      style={{
+                        animation: 'liquid-hero-slow 3s ease-in-out infinite alternate',
+                        fill: textColor,
+                      }}
+                    >
+                      <path d="M 0 20 C 37.5 35, 75 5, 112.5 20 C 150 35, 187.5 5, 225 20 C 262.5 35, 300 5, 337.5 20 C 375 35, 412.5 5, 450 20 C 487.5 35, 525 5, 562.5 20 C 600 35, 637.5 5, 675 20 C 712.5 35, 750 5, 787.5 20 C 825 35, 862.5 5, 900 20 L 900 60 L 0 60 Z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              {/* Text Label */}
+              <span
+                className="relative z-10 transition-colors duration-300 font-normal"
+                style={{
+                  color: activeFilled ? getContrastingTextColor(textColor) : textColor,
+                }}
+              >
+                {chip}
+              </span>
+            </span>
+          );
+        })}
+      </div>
+    </>
   );
 }

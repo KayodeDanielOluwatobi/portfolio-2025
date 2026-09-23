@@ -44,7 +44,7 @@ export default function WorksGrid({ works, activeCategory, isLoading }: WorksGri
             <div key={i} className="flex flex-col gap-4">
               <div className={`w-full bg-white/5 animate-pulse rounded-lg ${
                 activeCategory === 'socials' ? 'aspect-square' : 
-                activeCategory === 'church' ? 'aspect-[3/4]' : 'aspect-video'
+                (activeCategory === 'church' || activeCategory === 'publishing') ? 'aspect-[3/4]' : 'aspect-video'
               }`} />
               <div className="h-6 w-3/4 bg-white/5 animate-pulse rounded" />
               <div className="h-4 w-1/2 bg-white/5 animate-pulse rounded" />

@@ -74,6 +74,7 @@ export default function WorkCard({
       case 'brands': return 'aspect-video';
       case 'socials': return 'aspect-square';
       case 'church': return 'aspect-[3/4]';
+      case 'publishing': return 'aspect-[3/4]';
       default: return 'aspect-video';
     }
   };
@@ -99,8 +100,8 @@ export default function WorkCard({
       onMouseLeave={handleMouseLeave}
     >
       {/* Link wraps only Image and Title */}
-      <Link href={`/works/${slug}`} className="cursor-pointer group">
-        
+      <Link href={`/works/${slug}`} className="cursor-pointer group block">
+        <motion.div layoutId={`project-media-${slug}`}>
         {/* Image Container with Dynamic Squircle */}
         <Squircle
           cornerRadius={dynamicRadius} // 👈 Uses the calculated radius
@@ -178,6 +179,7 @@ export default function WorkCard({
             </div>
           )}
         </Squircle>
+        </motion.div>
 
         {/* Title */}
         <div className="mt-4">

@@ -245,8 +245,41 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
     hidden: { opacity: 0, visibility: 'hidden' as const, transition: { duration: 0.5, ease: 'easeInOut' as const } },
   };
 
+  const swoopItemVariants = {
+    hidden: (order: number) => ({
+      opacity: 0,
+      x: 18 + (5 - order) * 6,
+      scale: 0.75,
+      filter: 'blur(6px)',
+    }),
+    visible: (order: number) => ({
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      filter: 'blur(0px)',
+      transition: {
+        duration: 0.38,
+        delay: order * 0.065,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    }),
+    exit: (order: number) => ({
+      opacity: 0,
+      x: 18 + (5 - order) * 6,
+      scale: 0.75,
+      filter: 'blur(6px)',
+      transition: {
+        duration: 0.22,
+        delay: order * 0.045,
+        ease: [0.4, 0, 0.2, 1] as const,
+      },
+    }),
+  };
+
   const shouldShowHeader = !isScrollingDown;
   const shouldShowLogo = isInHeroSection;
+  const [isCaseStudyNavHovered, setIsCaseStudyNavHovered] = useState(false);
+  const isCaseStudyPage = pathname?.startsWith('/works/') && pathname !== '/works';
 
   return (
     <motion.header 
@@ -255,70 +288,213 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
       initial="visible"
       animate={shouldShowHeader ? 'visible' : 'hidden'}
     >
-      <div className="container max-w-none mx-auto px-8 py-8 flex items-center justify-between">
-        {/* Logo with smooth fade */}
+      <div className="container max-w-none mx-auto px-8 py-8 h-20 flex items-center justify-between">
+        {/* Logo with smooth fade (reduced size on case study pages) */}
         <motion.div
           variants={logoFadeVariants}
           initial="visible"
           animate={shouldShowLogo && !isMenuOpen ? 'visible' : 'hidden'}
-          className="relative w-28 h-7 sm:w-28 sm:h-7 md:w-32 md:h-8 z-50"
+          className={`relative z-50 flex items-center transition-all duration-300 ${
+            isCaseStudyPage
+              ? 'w-20 h-6 sm:w-22 sm:h-6 md:w-24 md:h-6'
+              : 'w-28 h-7 sm:w-28 sm:h-7 md:w-32 md:h-8'
+          }`}
         >
-          <Link href="/">
+          <Link href="/" className="relative w-full h-full flex items-center">
             <Image
               src={currentTheme.logo}
               alt="everdann"
               fill
-              className={`object-contain ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'logo-invert' : ''}`}
+              className={`object-contain object-left ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'logo-invert' : ''}`}
               priority
             />
           </Link>
         </motion.div>
 
-        {/* Desktop Navigation */}
-        <motion.nav 
-          className="hidden md:flex items-center gap-12 pr-2"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="hover:opacity-85 transition-colors duration-300 font-space text-[0.8rem] tracking-wider"
-              style={{ color: headerTextColor }}
-            >
-              {item.name}
-            </Link>
-          ))}
-          {/* Desktop Github Link */}
-          <a
-            href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
-            aria-label="View Github Repository"
-            style={{ color: headerTextColor }}
+        {/* ── Case Study Expandable Desktop Nav Arena (Fluid right-to-left swoop) ── */}
+        {isCaseStudyPage ? (
+          <div
+            onMouseEnter={() => setIsCaseStudyNavHovered(true)}
+            onMouseLeave={() => setIsCaseStudyNavHovered(false)}
+            className="hidden md:flex items-center h-8 relative z-50 pl-6 pr-0 bg-transparent border-0 select-none"
           >
-            <Github className="w-5 h-5" />
-          </a>
+            <AnimatePresence mode="sync">
+              {isCaseStudyNavHovered && (
+                <div className="flex items-center h-8 gap-7 pr-6">
+                  {/* WORKS (order 5) */}
+                  <motion.div
+                    custom={5}
+                    variants={swoopItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex items-center h-8"
+                  >
+                    <Link
+                      href="/works"
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                    >
+                      WORKS
+                    </Link>
+                  </motion.div>
 
-          {/* Desktop Theme Switcher */}
-          {isMounted && (
+                  {/* LAB (order 4) */}
+                  <motion.div
+                    custom={4}
+                    variants={swoopItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex items-center h-8"
+                  >
+                    <Link
+                      href="/lab"
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                    >
+                      LAB
+                    </Link>
+                  </motion.div>
+
+                  {/* ABOUT (order 3) */}
+                  <motion.div
+                    custom={3}
+                    variants={swoopItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex items-center h-8"
+                  >
+                    <Link
+                      href="/about"
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                    >
+                      ABOUT
+                    </Link>
+                  </motion.div>
+
+                  {/* CONTACT (order 2) */}
+                  <motion.div
+                    custom={2}
+                    variants={swoopItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex items-center h-8"
+                  >
+                    <Link
+                      href="/contact"
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                    >
+                      CONTACT
+                    </Link>
+                  </motion.div>
+
+                  {/* Github (order 1) */}
+                  <motion.div
+                    custom={1}
+                    variants={swoopItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className="flex items-center h-8"
+                  >
+                    <a
+                      href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all text-white"
+                      aria-label="View Github Repository"
+                    >
+                      <Github className="w-4 h-4" />
+                    </a>
+                  </motion.div>
+
+                  {/* Theme Switcher (order 0 - emerges first on hover, exits first on leave) */}
+                  {isMounted && (
+                    <motion.div
+                      custom={0}
+                      variants={swoopItemVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="flex items-center h-8"
+                    >
+                      <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all text-white"
+                        aria-label="Toggle theme"
+                      >
+                        {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                      </button>
+                    </motion.div>
+                  )}
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Menu Icon Anchor Button (Borderless, fixed size, no background fill) */}
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="w-8 h-8 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform duration-200 bg-transparent border-0 p-0 shadow-none outline-none flex-shrink-0"
+              aria-label="Menu"
+            >
+              <div className="relative w-5 h-5">
+                <Image
+                  src={currentTheme.menuIcon}
+                  alt="Menu"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </button>
+          </div>
+        ) : (
+          /* Regular Desktop Navigation */
+          <motion.nav 
+            className="hidden md:flex items-center gap-12 pr-2"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="hover:opacity-85 transition-colors duration-300 font-space text-[0.8rem] tracking-wider"
+                style={{ color: headerTextColor }}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {/* Desktop Github Link */}
+            <a
+              href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
-              aria-label="Toggle theme"
+              aria-label="View Github Repository"
               style={{ color: headerTextColor }}
             >
-              {theme === 'dark' ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-          )}
-        </motion.nav>
+              <Github className="w-5 h-5" />
+            </a>
+
+            {/* Desktop Theme Switcher */}
+            {isMounted && (
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="flex items-center justify-center p-2 rounded-full border border-transparent hover:bg-white/10 active:scale-95 transition-all duration-200 cursor-pointer"
+                aria-label="Toggle theme"
+                style={{ color: headerTextColor }}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </button>
+            )}
+          </motion.nav>
+        )}
 
         {/* Mobile Right Cluster (Toggle + Menu Button) */}
         <div className="md:hidden flex items-center gap-5 z-50">
