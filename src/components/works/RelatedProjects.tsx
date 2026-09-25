@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import { useProjectTransition } from '@/context/TransitionContext';
 
 export default function RelatedProjects({ 
   currentSlug, 
@@ -13,6 +14,7 @@ export default function RelatedProjects({
   categoryTable: string; 
 }) {
   const [projects, setProjects] = useState<any[]>([]);
+  const { navigateWithTransition } = useProjectTransition();
 
   useEffect(() => {
     async function fetchRelated() {
@@ -57,7 +59,17 @@ export default function RelatedProjects({
             const thumbnail = project.media && project.media.length > 0 ? project.media[0] : null;
 
             return (
-              <Link key={project.slug} href={`/works/${project.slug}`} className="group block">
+              <Link 
+                key={project.slug} 
+                href={`/works/${project.slug}`} 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateWithTransition(`/works/${project.slug}`, {
+                    title: project.title,
+                  });
+                }}
+                className="group block"
+              >
                 <FadeUp>
                   <div className="relative aspect-video w-full overflow-hidden rounded-lg md:rounded-2xl border border-white/5 bg-zinc-900/40">
                     {thumbnail && (

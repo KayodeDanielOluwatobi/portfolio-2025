@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 // 👇 Import the hook
 import { useSquircleRadius } from '@/hooks/useSquircleRadius';
+import { useProjectTransition } from '@/context/TransitionContext';
 
 interface ProjectCardProps {
   title: string;
@@ -27,13 +28,21 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { navigateWithTransition } = useProjectTransition();
 
   // 👇 Initialize the responsive radius
   // It uses your prop for Desktop, but enforces 20px for Mobile and 12px for Tiny screens
   const dynamicRadius = useSquircleRadius(30, 22, 16, 12);
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigateWithTransition(`/works/${slug}`, {
+      title,
+    });
+  };
+
   return (
-    <Link href={`/works/${slug}`} className="block">
+    <Link href={`/works/${slug}`} onClick={handleClick} className="block">
       <motion.div layoutId={`project-media-${slug}`}>
         <Squircle
           cornerRadius={dynamicRadius} // 👈 Use the dynamic value here

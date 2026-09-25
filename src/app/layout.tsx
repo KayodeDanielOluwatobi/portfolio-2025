@@ -115,6 +115,9 @@ export const metadata: Metadata = {
   },
 }
 
+import { TransitionProvider } from '@/context/TransitionContext';
+import ProjectTransitionOverlay from '@/components/transitions/ProjectTransitionOverlay';
+
 export default function RootLayout({
   children,
 }: {
@@ -135,7 +138,10 @@ export default function RootLayout({
           {/* Global SmoothCursor - available on all pages */}
           {/* <SmoothCursor cursorColor="#000000" cursorStrokeColor="#ffffff" /> */}
           
-          {children}
+          <TransitionProvider>
+            <ProjectTransitionOverlay />
+            {children}
+          </TransitionProvider>
         </ThemeProvider>
       </body>
     </html>

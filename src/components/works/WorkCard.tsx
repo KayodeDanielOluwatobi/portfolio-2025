@@ -9,6 +9,7 @@ import { useTheme } from 'next-themes';
 import { MarqueeText } from '@/components/ui/MarqueeText';
 import { useCursor } from '@/context/CursorContext';
 import { useSquircleRadius } from '@/hooks/useSquircleRadius'; 
+import { useProjectTransition } from '@/context/TransitionContext';
 
 interface WorkCardProps {
   id: number;
@@ -41,7 +42,10 @@ export default function WorkCard({
   // 1. Hook into the Cursor Context
   const { setCursorTheme, resetCursorTheme } = useCursor();
 
-  // 2. Hook into the Responsive Squircle Radius
+  // 2. Hook into Project Transition Context
+  const { navigateWithTransition } = useProjectTransition();
+
+  // 3. Hook into the Responsive Squircle Radius
   // Desktop: 30px | Tablet/Mobile: 20px | Tiny Phones (320px): 12px
   const dynamicRadius = useSquircleRadius(30, 22, 16, 12);
 
@@ -93,6 +97,15 @@ export default function WorkCard({
     resetCursorTheme();
   };
 
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigateWithTransition(`/works/${slug}`, {
+      title,
+      tagline,
+      brandColor,
+    });
+  };
+
   return (
     <div 
       className="flex flex-col gap-4"
@@ -100,7 +113,7 @@ export default function WorkCard({
       onMouseLeave={handleMouseLeave}
     >
       {/* Link wraps only Image and Title */}
-      <Link href={`/works/${slug}`} className="cursor-pointer group block">
+      <Link href={`/works/${slug}`} onClick={handleLinkClick} className="cursor-pointer group block">
         <motion.div layoutId={`project-media-${slug}`}>
         {/* Image Container with Dynamic Squircle */}
         <Squircle
