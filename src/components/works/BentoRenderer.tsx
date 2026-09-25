@@ -25,7 +25,7 @@ export default function BentoRenderer({ rows }: { rows: BentoRowProps[] }) {
   if (!rows || rows.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-2.5 sm:gap-3.5 md:gap-5 w-full">
+    <div className="flex flex-col gap-5 sm:gap-7 md:gap-9 w-full">
       {rows.map((row, index) => (
         <BentoRow key={index} row={row} />
       ))}
@@ -46,7 +46,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
             assets[0]?.height
               ? 'w-full'
               : isText
-              ? 'w-full py-0'
+              ? 'w-full py-2 sm:py-4 md:py-6 my-1 sm:my-2'
               : 'aspect-video w-full'
           }
         />
@@ -56,7 +56,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'twin') {
     return (
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
         <MediaCard
           asset={assets[0]}
           className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
@@ -71,11 +71,11 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'big-left') {
     return (
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5 items-start">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
         <div className="w-full aspect-[4/5]">
           <MediaCard asset={assets[0]} className="w-full h-full" />
         </div>
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-5">
+        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
           <MediaCard asset={assets[1]} className="w-full h-full" />
           <MediaCard asset={assets[2]} className="w-full h-full" />
         </div>
@@ -85,8 +85,8 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'big-right') {
     return (
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5 items-start">
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
+        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
           <MediaCard asset={assets[0]} className="w-full h-full" />
           <MediaCard asset={assets[1]} className="w-full h-full" />
         </div>
@@ -99,7 +99,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'triple') {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 md:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
         <MediaCard
           asset={assets[0]}
           className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
