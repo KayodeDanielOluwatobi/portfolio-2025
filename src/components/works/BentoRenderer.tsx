@@ -40,7 +40,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
   if (layout === 'full') {
     const isText = assets[0]?.type === 'text';
     return (
-      <div className="w-full">
+      <div className={`w-full ${isText ? 'pt-4 sm:pt-6 md:pt-8' : ''}`}>
         <MediaCard
           asset={assets[0]}
           className={
@@ -195,16 +195,16 @@ function AutoFitText({
       className="flex flex-col w-full px-0 sm:px-2 md:px-4 py-0 justify-start overflow-visible"
     >
       {title && (
-        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.06em] text-white/40 mb-3 flex-shrink-0 flex items-center flex-wrap">
+        <h4 className="font-space text-sm sm:text-base md:text-lg uppercase tracking-[0.08em] font-medium text-white/50 mb-3.5 flex-shrink-0 flex items-center flex-wrap">
           {title.split(/([•·])/g).map((part, index) => {
             if (part === '•' || part === '·') {
               return (
                 <span
                   key={index}
-                  className="inline-flex items-center justify-center mx-1.5 select-none opacity-60 self-center -translate-y-[2px]"
+                  className="inline-flex items-center justify-center mx-2 sm:mx-2.5 select-none opacity-60 self-center -translate-y-[1px]"
                   aria-hidden="true"
                 >
-                  <span className="w-1 h-1 rounded-full bg-current" />
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current" />
                 </span>
               );
             }

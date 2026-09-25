@@ -582,7 +582,7 @@ function TextAssetEditor({
               placeholder="TITLE (OPTIONAL HEADER)"
               value={asset.title || ''}
               onChange={(e) => onChange({ ...asset, title: e.target.value })}
-              className="w-full bg-transparent border-none p-0 text-white/40 focus:text-white/80 font-space text-[10px] sm:text-xs uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+              className="w-full bg-transparent border-none p-0 text-white/50 focus:text-white/90 font-space text-sm sm:text-base font-medium uppercase tracking-[0.08em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
             />
           </div>
 
@@ -902,7 +902,7 @@ function TextAssetEditor({
                   placeholder="TITLE (OPTIONAL UPPERCASE HEADER - E.G. CHRISTIAN ORGANIZATION • 2025)"
                   value={asset.title || ''}
                   onChange={(e) => onChange({ ...asset, title: e.target.value })}
-                  className="w-full bg-transparent border-none p-0 text-white/40 focus:text-white/80 font-space text-xs md:text-sm uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+                  className="w-full bg-transparent border-none p-0 text-white/50 focus:text-white/90 font-space text-base md:text-lg font-medium uppercase tracking-[0.08em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
                 />
               </div>
 
