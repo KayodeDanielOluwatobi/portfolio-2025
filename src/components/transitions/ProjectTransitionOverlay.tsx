@@ -9,7 +9,7 @@ export default function ProjectTransitionOverlay() {
 
   if (!isTransitioning && phase === 'idle') return null;
 
-  // Custom Koto-style cubic bezier ease curve
+  // Ultra-creamy, cinematic cubic bezier ease curve
   const kotoEase = [0.76, 0, 0.24, 1] as const;
 
   const variants = {
@@ -19,20 +19,20 @@ export default function ProjectTransitionOverlay() {
     covering: {
       y: '0%',
       transition: {
-        duration: 0.35,
-        ease: [0.76, 0, 0.24, 1] as [number, number, number, number],
+        duration: 0.75,
+        ease: [0.77, 0, 0.175, 1] as [number, number, number, number],
       },
     },
     holding: {
       y: '0%',
       transition: {
-        duration: 0.1,
+        duration: 0.15,
       },
     },
     revealing: {
       y: '-100%',
       transition: {
-        duration: 0.45,
+        duration: 1.1,
         ease: [0.76, 0, 0.24, 1] as [number, number, number, number],
       },
     },
@@ -51,28 +51,31 @@ export default function ProjectTransitionOverlay() {
               onRevealComplete();
             }
           }}
-          className="fixed inset-0 z-[99999] pointer-events-auto bg-black text-white flex flex-col items-center justify-center p-6 select-none"
+          className="fixed inset-0 z-[99999] pointer-events-auto bg-[#070707] text-white flex flex-col items-center justify-center p-6 select-none"
           style={{ willChange: 'transform' }}
         >
-          {/* ── Centered Minimalist Typography ── */}
-          <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg px-4">
-            {/* Small Brand Name in Monospace */}
-            <h2 className="font-mono text-xs sm:text-sm uppercase tracking-[0.22em] text-white font-medium">
+          {/* ── Centered Minimalist Monospace Typography ── */}
+          <motion.div
+            animate={phase === 'revealing' ? { opacity: 0, y: -25, transition: { duration: 0.4, ease: 'easeOut' } } : { opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center text-center gap-2.5 max-w-lg px-4"
+          >
+            {/* Small Brand Name in Monospace (Subtle / Dimmed) */}
+            <h2 className="font-sohne-mono-1 font-mono text-xs sm:text-sm uppercase tracking-normal text-white/50 font-normal">
               {meta?.title || 'Case Study'}
             </h2>
 
             {/* Small Greyed-Out Tagline in Monospace */}
             {meta?.tagline && (
-              <p className="font-mono text-[11px] sm:text-xs text-white/40 tracking-wider font-light leading-relaxed max-w-sm sm:max-w-md">
+              <p className="font-sohne-mono-1 font-mono text-[11px] sm:text-xs text-white/30 tracking-normal font-light leading-relaxed max-w-sm sm:max-w-md">
                 {meta.tagline}
               </p>
             )}
 
-            {/* Small 100% Counter in Monospace */}
-            <div className="font-mono text-xs sm:text-sm tracking-widest text-white/90 tabular-nums mt-3">
+            {/* Small 100% Counter in Monospace (Bright White, Brighter than Brand Name) */}
+            <div className="font-sohne-mono-1 font-mono text-xs sm:text-sm tracking-normal text-white font-medium tabular-nums mt-2">
               {progress}%
             </div>
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

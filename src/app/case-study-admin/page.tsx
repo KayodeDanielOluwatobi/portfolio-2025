@@ -18,7 +18,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { renderFormattedText } from '@/utils/textFormatter';
+import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -276,8 +276,8 @@ function TextAssetEditor({
     window.addEventListener('mouseup', handleMouseUp);
   };
 
-  // ── Format Selection Handler (Bold: **, Italic: *, Title Mono: `) ─────────────
-  const applyFormat = (syntax: '**' | '*' | '`', isStudio: boolean = false) => {
+  // ── Format Selection Handler (Bold: **, Italic: *, Title Mono: `, Bullet: •) ──
+  const applyFormat = (syntax: '**' | '*' | '`' | '•', isStudio: boolean = false) => {
     const textarea = isStudio ? studioTextareaRef.current : textareaRef.current;
     if (!textarea) return;
 
@@ -292,35 +292,58 @@ function TextAssetEditor({
     let newStart = start;
     let newEnd = end;
 
-    const len = syntax.length;
-
-    if (selectedText.length === 0) {
-      const placeholder = syntax === '**' ? 'bold text' : syntax === '*' ? 'italic text' : 'MONOSPACE TAG';
-      newContent = raw.slice(0, start) + syntax + placeholder + syntax + raw.slice(end);
-      newStart = start + len;
-      newEnd = start + len + placeholder.length;
-    } else {
-      const isAlreadyWrapped =
-        selectedText.startsWith(syntax) && selectedText.endsWith(syntax) && selectedText.length >= len * 2;
-      const isOuterWrapped =
-        start >= len &&
-        end + len <= raw.length &&
-        raw.slice(start - len, start) === syntax &&
-        raw.slice(end, end + len) === syntax;
-
-      if (isAlreadyWrapped) {
-        const unwrapped = selectedText.slice(len, -len);
-        newContent = raw.slice(0, start) + unwrapped + raw.slice(end);
-        newStart = start;
-        newEnd = start + unwrapped.length;
-      } else if (isOuterWrapped) {
-        newContent = raw.slice(0, start - len) + selectedText + raw.slice(end + len);
-        newStart = start - len;
-        newEnd = end - len;
+    if (syntax === '•') {
+      if (selectedText.length === 0) {
+        const placeholder = '• List item';
+        newContent = raw.slice(0, start) + placeholder + raw.slice(end);
+        newStart = start + 2;
+        newEnd = start + placeholder.length;
       } else {
-        newContent = raw.slice(0, start) + syntax + selectedText + syntax + raw.slice(end);
+        const lines = selectedText.split('\n');
+        const allBullet = lines.every((l) => l.trim().startsWith('•'));
+        const newLines = lines.map((l) => {
+          if (allBullet) {
+            return l.replace(/^\s*•\s*/, '');
+          } else {
+            return l.trim().length > 0 ? (l.startsWith('• ') ? l : `• ${l}`) : l;
+          }
+        });
+        const replaced = newLines.join('\n');
+        newContent = raw.slice(0, start) + replaced + raw.slice(end);
         newStart = start;
-        newEnd = end + len * 2;
+        newEnd = start + replaced.length;
+      }
+    } else {
+      const len = syntax.length;
+
+      if (selectedText.length === 0) {
+        const placeholder = syntax === '**' ? 'bold text' : syntax === '*' ? 'italic text' : 'MONOSPACE TAG';
+        newContent = raw.slice(0, start) + syntax + placeholder + syntax + raw.slice(end);
+        newStart = start + len;
+        newEnd = start + len + placeholder.length;
+      } else {
+        const isAlreadyWrapped =
+          selectedText.startsWith(syntax) && selectedText.endsWith(syntax) && selectedText.length >= len * 2;
+        const isOuterWrapped =
+          start >= len &&
+          end + len <= raw.length &&
+          raw.slice(start - len, start) === syntax &&
+          raw.slice(end, end + len) === syntax;
+
+        if (isAlreadyWrapped) {
+          const unwrapped = selectedText.slice(len, -len);
+          newContent = raw.slice(0, start) + unwrapped + raw.slice(end);
+          newStart = start;
+          newEnd = start + unwrapped.length;
+        } else if (isOuterWrapped) {
+          newContent = raw.slice(0, start - len) + selectedText + raw.slice(end + len);
+          newStart = start - len;
+          newEnd = end - len;
+        } else {
+          newContent = raw.slice(0, start) + syntax + selectedText + syntax + raw.slice(end);
+          newStart = start;
+          newEnd = end + len * 2;
+        }
       }
     }
 
@@ -554,6 +577,16 @@ function TextAssetEditor({
               >
                 `TAG`
               </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyFormat('•', false)}
+                title="Bullet List Item (• text)"
+                className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/10 text-white text-[11px] flex items-center gap-1 transition-colors"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />
+                <span className="font-mono text-[10px]">List</span>
+              </button>
             </div>
 
             {/* Live Preview Toggle & Badges */}
@@ -601,15 +634,35 @@ function TextAssetEditor({
                 }}
               >
                 {asset.content ? (
-                  asset.content
-                    .split(/\r?\n+/)
-                    .map((p) => p.trim())
-                    .filter(Boolean)
-                    .map((p, i) => (
-                      <p key={i} className="font-light tracking-normal text-zinc-200 leading-relaxed">
-                        {renderFormattedText(p)}
+                  (asset.content || '').split(/\r?\n/).map((line, i) => {
+                    if (line.trim() === '') {
+                      return <div key={i} className="h-2.5 w-full" aria-hidden="true" />;
+                    }
+
+                    const isBullet = isBulletLine(line);
+                    const txt = isBullet ? cleanBulletLine(line) : line;
+
+                    if (isBullet) {
+                      return (
+                        <div key={i} className="flex items-start gap-2 pl-1 w-full text-left font-light text-zinc-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white/70 mt-1.5 flex-shrink-0" />
+                          <div className="flex-1 text-left sm:text-justify" style={{ textJustify: 'inter-word' }}>
+                            {renderFormattedText(txt)}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <p
+                        key={i}
+                        className="font-light tracking-normal text-zinc-200 leading-relaxed text-left sm:text-justify"
+                        style={{ textJustify: 'inter-word' }}
+                      >
+                        {renderFormattedText(txt)}
                       </p>
-                    ))
+                    );
+                  })
                 ) : (
                   <span className="text-white/20 italic text-xs">No text written yet…</span>
                 )}
@@ -617,7 +670,7 @@ function TextAssetEditor({
             ) : (
               <textarea
                 ref={textareaRef}
-                placeholder="Click here to type… Highlight text and click B, I, or `TAG` (or Ctrl+B, Ctrl+I, Ctrl+M) to format."
+                placeholder="Click here to type… Highlight text and click B, I, `TAG`, or • List to format."
                 value={asset.content || ''}
                 onChange={(e) => onChange({ ...asset, content: e.target.value })}
                 onKeyDown={(e) => handleTextareaKeyDown(e, false)}
@@ -874,6 +927,16 @@ function TextAssetEditor({
                     <span>`TAG`</span>
                     <span className="text-[9px] text-cyan-400/60 font-normal">Title Style</span>
                   </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyFormat('•', true)}
+                    title="Bullet List Item (• text)"
+                    className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs flex items-center gap-1.5 transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" />
+                    <span className="font-mono text-[10px]">List</span>
+                  </button>
                 </div>
 
                 {/* Studio Live Preview Toggle */}
@@ -921,15 +984,35 @@ function TextAssetEditor({
                     }}
                   >
                     {asset.content ? (
-                      asset.content
-                        .split(/\r?\n+/)
-                        .map((p) => p.trim())
-                        .filter(Boolean)
-                        .map((p, i) => (
-                          <p key={i} className="font-light tracking-normal text-zinc-200 leading-relaxed">
-                            {renderFormattedText(p)}
+                      (asset.content || '').split(/\r?\n/).map((line, i) => {
+                        if (line.trim() === '') {
+                          return <div key={i} className="h-3.5 sm:h-4.5 w-full" aria-hidden="true" />;
+                        }
+
+                        const isBullet = isBulletLine(line);
+                        const txt = isBullet ? cleanBulletLine(line) : line;
+
+                        if (isBullet) {
+                          return (
+                            <div key={i} className="flex items-start gap-3 pl-2 w-full text-left font-light text-zinc-200">
+                              <span className="w-2 h-2 rounded-full bg-white/70 mt-2.5 flex-shrink-0" />
+                              <div className="flex-1 text-left sm:text-justify" style={{ textJustify: 'inter-word' }}>
+                                {renderFormattedText(txt)}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <p
+                            key={i}
+                            className="font-light tracking-normal text-zinc-200 leading-relaxed text-left sm:text-justify"
+                            style={{ textJustify: 'inter-word' }}
+                          >
+                            {renderFormattedText(txt)}
                           </p>
-                        ))
+                        );
+                      })
                     ) : (
                       <span className="text-white/20 italic text-sm">No text written yet…</span>
                     )}

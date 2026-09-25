@@ -5,7 +5,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import FadeUp from '@/components/animations/FadeUp';
-import { renderFormattedText } from '@/utils/textFormatter';
+import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
 
 interface BentoAsset {
   type: 'image' | 'video' | 'text';
@@ -134,13 +134,8 @@ function AutoFitText({
   const containerRef = useRef<HTMLDivElement>(null);
   const [computedSize, setComputedSize] = useState<number>(customFontSize || 20);
 
-  // Split into distinct paragraphs on any newline sequence (single or multiple newlines/CRLF)
-  const paragraphs = content
-    ? content
-        .split(/\r?\n+/)
-        .map((p) => p.trim())
-        .filter((p) => p.length > 0)
-    : [];
+  // Split on single newlines to preserve the exact number of times Enter is pressed
+  const rawLines = content ? content.split(/\r?\n/) : [];
 
   useEffect(() => {
     if (customFontSize) {
@@ -149,7 +144,7 @@ function AutoFitText({
     }
 
     const el = containerRef.current;
-    if (!el || paragraphs.length === 0) return;
+    if (!el || rawLines.length === 0) return;
 
     const calculateSize = () => {
       const containerHeight = el.clientHeight;
@@ -187,7 +182,7 @@ function AutoFitText({
     ro.observe(el);
 
     return () => ro.disconnect();
-  }, [content, title, customFontSize, paragraphs.length]);
+  }, [content, title, customFontSize, rawLines.length]);
 
   return (
     <div
@@ -212,27 +207,70 @@ function AutoFitText({
           })}
         </h4>
       )}
-      <div className="w-full overflow-visible flex flex-col gap-4 sm:gap-5 md:gap-6">
-        {paragraphs.length > 0 ? (
-          paragraphs.map((paragraph, pIdx) => (
-            <p
-              key={pIdx}
-              className="font-light tracking-normal text-zinc-200 w-full m-0 text-left sm:text-justify leading-relaxed sm:leading-[1.7]"
-              style={{
-                fontSize: customFontSize
-                  ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
-                  : `${computedSize}px`,
-                lineHeight: customFontSize ? '1.65' : `${computedSize * 1.5}px`,
-                textJustify: 'inter-word',
-                hyphens: 'none',
-                WebkitHyphens: 'none',
-                wordBreak: 'normal',
-                whiteSpace: 'pre-wrap',
-              }}
-            >
-              {renderFormattedText(paragraph)}
-            </p>
-          ))
+      <div className="w-full overflow-visible flex flex-col gap-1.5 sm:gap-2">
+        {rawLines.length > 0 ? (
+          rawLines.map((line, pIdx) => {
+            // Empty line from Enter keypress -> preserve exact vertical spacing
+            if (line.trim() === '') {
+              return <div key={pIdx} className="h-3.5 sm:h-4.5 w-full" aria-hidden="true" />;
+            }
+
+            const isBullet = isBulletLine(line);
+            const contentText = isBullet ? cleanBulletLine(line) : line;
+
+            if (isBullet) {
+              return (
+                <div
+                  key={pIdx}
+                  className="flex items-start gap-2.5 sm:gap-3.5 pl-1 sm:pl-2 w-full font-light tracking-normal text-zinc-200 m-0 leading-relaxed sm:leading-[1.7]"
+                  style={{
+                    fontSize: customFontSize
+                      ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
+                      : `${computedSize}px`,
+                    lineHeight: customFontSize ? '1.65' : `${computedSize * 1.5}px`,
+                    wordBreak: 'normal',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  <span
+                    className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white/70 flex-shrink-0 self-start mt-[0.55em] sm:mt-[0.6em] transition-all"
+                    aria-hidden="true"
+                  />
+                  <div
+                    className="flex-1 text-left sm:text-justify"
+                    style={{
+                      textJustify: 'inter-word',
+                      hyphens: 'none',
+                      WebkitHyphens: 'none',
+                      wordBreak: 'normal',
+                    }}
+                  >
+                    {renderFormattedText(contentText)}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <p
+                key={pIdx}
+                className="font-light tracking-normal text-zinc-200 w-full m-0 text-left sm:text-justify leading-relaxed sm:leading-[1.7]"
+                style={{
+                  fontSize: customFontSize
+                    ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
+                    : `${computedSize}px`,
+                  lineHeight: customFontSize ? '1.65' : `${computedSize * 1.5}px`,
+                  textJustify: 'inter-word',
+                  hyphens: 'none',
+                  WebkitHyphens: 'none',
+                  wordBreak: 'normal',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {renderFormattedText(contentText)}
+              </p>
+            );
+          })
         ) : null}
       </div>
     </div>

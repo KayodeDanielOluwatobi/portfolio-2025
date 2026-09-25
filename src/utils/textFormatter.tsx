@@ -63,3 +63,34 @@ export function renderFormattedText(text: string): React.ReactNode {
     return part;
   });
 }
+
+/**
+ * Checks if a line or paragraph starts with a bullet marker:
+ * - `• ` (bullet point)
+ * - `- ` (dash)
+ * - `* ` (asterisk)
+ */
+export function isBulletLine(text: string): boolean {
+  if (!text) return false;
+  const trimmed = text.trim();
+  return (
+    trimmed.startsWith('•') ||
+    trimmed.startsWith('- ') ||
+    trimmed.startsWith('* ')
+  );
+}
+
+/**
+ * Removes the bullet prefix from a line
+ */
+export function cleanBulletLine(text: string): string {
+  if (!text) return '';
+  const trimmed = text.trim();
+  if (trimmed.startsWith('•')) {
+    return trimmed.slice(1).trim();
+  }
+  if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+    return trimmed.slice(2).trim();
+  }
+  return trimmed;
+}

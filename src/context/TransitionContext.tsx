@@ -31,10 +31,12 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
   const [targetUrl, setTargetUrl] = useState<string | null>(null);
 
   const animFrameRef = useRef<number | null>(null);
+  const routerPrefetched = useRef(false);
 
   const navigateWithTransition = useCallback((url: string, projectMeta?: TransitionMeta) => {
     if (isTransitioning) return;
 
+    routerPrefetched.current = false;
     try {
       router.prefetch(url);
     } catch {
@@ -47,8 +49,8 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
     setPhase('covering');
     setProgress(0);
 
-    // Exact 2.5 seconds (2500ms) timeframe
-    const duration = 2500;
+    // Smooth continuous countup progression (easeInOut curve for liquid-smooth ticking)
+    const duration = 2100;
     const startTime = performance.now();
 
     // Smooth countup animation using requestAnimationFrame
@@ -56,9 +58,18 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
       const elapsed = currentTime - startTime;
       const t = Math.min(1, elapsed / duration);
 
-      // Smooth cubic-bezier countup progression: slow start, quick glide, precise finish
-      // EaseOutCubic: 1 - Math.pow(1 - t, 3)
-      const easedT = 1 - Math.pow(1 - t, 3);
+      // Pre-warm router navigation early during the countup
+      if (t > 0.4 && !routerPrefetched.current) {
+        routerPrefetched.current = true;
+        try {
+          router.prefetch(url);
+        } catch {}
+      }
+
+      // Creamy easeInOutCubic: gentle start, silky acceleration, elegant landing at 100%
+      const easedT = t < 0.5 
+        ? 4 * t * t * t 
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
       const currentPct = Math.min(100, Math.floor(easedT * 100));
 
       setProgress(currentPct);
@@ -70,10 +81,10 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
         setPhase('holding');
         router.push(url);
 
-        // Allow a brief moment at 100% then trigger upward reveal
+        // Allow a smooth 320ms hold for Next.js to mount the page before sweeping reveal upwards
         setTimeout(() => {
           setPhase('revealing');
-        }, 150);
+        }, 320);
       }
     };
 

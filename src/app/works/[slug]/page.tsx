@@ -14,6 +14,7 @@ import BentoRenderer from '@/components/works/BentoRenderer';
 import RelatedProjects from '@/components/works/RelatedProjects';
 import ViewCounter from '@/components/works/ViewCounter';
 import { darkenColor } from '@/utils/colorUtils';
+import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
 
 export default function CaseStudyPage() {
   const params = useParams();
@@ -68,6 +69,7 @@ export default function CaseStudyPage() {
 
       {/* ── 1. IMMERSIVE HERO SECTION (65% Desktop Viewport Height) ── */}
       <section
+        data-case-study-hero="true"
         className="group relative w-full overflow-hidden h-[55vh] md:h-[65vh] min-h-[380px] max-h-[720px] flex flex-col justify-end"
         style={{ backgroundColor }}
       >
@@ -199,19 +201,41 @@ export default function CaseStudyPage() {
       {/* ── 2. EDITORIAL DESCRIPTION SECTION (Fallback only when no Bento rows exist) ── */}
       {description && bentoRows.length === 0 && (
         <section className="pt-8 pb-4 px-4 sm:px-6">
-          <div className="container mx-auto max-w-6xl flex flex-col gap-4">
+          <div className="container mx-auto max-w-6xl flex flex-col gap-2">
             {description
-              .split(/\r?\n+/)
-              .map((p: string) => p.trim())
-              .filter(Boolean)
-              .map((p: string, i: number) => (
-                <p
-                  key={i}
-                  className="text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed max-w-3xl"
-                >
-                  {p}
-                </p>
-              ))}
+              .split(/\r?\n/)
+              .map((line: string, i: number) => {
+                if (line.trim() === '') {
+                  return <div key={i} className="h-3 sm:h-4 w-full" aria-hidden="true" />;
+                }
+
+                const isBullet = isBulletLine(line);
+                const txt = isBullet ? cleanBulletLine(line) : line;
+
+                if (isBullet) {
+                  return (
+                    <div key={i} className="flex items-start gap-3 pl-2 w-full text-left font-light text-zinc-200">
+                      <span className="w-2 h-2 rounded-full bg-white/70 mt-2 flex-shrink-0" />
+                      <div
+                        className="flex-1 text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed text-left sm:text-justify"
+                        style={{ textJustify: 'inter-word' }}
+                      >
+                        {renderFormattedText(txt)}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <p
+                    key={i}
+                    className="text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed max-w-3xl text-left sm:text-justify"
+                    style={{ textJustify: 'inter-word' }}
+                  >
+                    {renderFormattedText(txt)}
+                  </p>
+                );
+              })}
           </div>
         </section>
       )}

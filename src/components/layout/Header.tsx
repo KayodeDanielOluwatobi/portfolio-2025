@@ -50,6 +50,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const isCaseStudyPage = pathname?.startsWith('/works/') && pathname !== '/works';
   const isHeroPresent = pathname === '/';
 
   // 2. Dynamic State for Themes
@@ -128,8 +129,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
     ? (brandThemes[currentBrand] || brandThemes.default || DEFAULT_THEME)
     : (brandThemes.default || DEFAULT_THEME);
 
-  // Dynamic text/icon color: force white inside keycaps, brand color inside hero, theme foreground past hero
-  const headerTextColor = isInKeycapsSection
+  // Dynamic text/icon color: force white inside keycaps or case study hero, brand color inside home hero, theme foreground past hero
+  const headerTextColor = (isInKeycapsSection || (isInHeroSection && isCaseStudyPage))
     ? '#ffffff'
     : (isInHeroSection && isHeroPresent)
       ? currentTheme.textColor 
@@ -149,10 +150,10 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
       const velocity = scrollDelta / (timeDelta || 1);
       setScrollVelocity(velocity);
 
-      const heroSection = document.querySelector('[data-cursor-brand]');
+      const heroSection = document.querySelector('[data-cursor-brand], [data-case-study-hero]');
       if (heroSection) {
         const heroRect = heroSection.getBoundingClientRect();
-        const isHeaderInHero = heroRect.bottom > 0;
+        const isHeaderInHero = heroRect.bottom > 40;
         
         if (isHeaderInHero !== isInHeroSection) {
           setIsInHeroSection(isHeaderInHero);
@@ -279,7 +280,6 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   const shouldShowHeader = !isScrollingDown;
   const shouldShowLogo = isInHeroSection;
   const [isCaseStudyNavHovered, setIsCaseStudyNavHovered] = useState(false);
-  const isCaseStudyPage = pathname?.startsWith('/works/') && pathname !== '/works';
 
   return (
     <motion.header 
@@ -305,7 +305,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
               src={currentTheme.logo}
               alt="everdann"
               fill
-              className={`object-contain object-left ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'logo-invert' : ''}`}
+              className={`object-contain object-left ${((!isInHeroSection || (!isHeroPresent && !isCaseStudyPage)) && !isInKeycapsSection) ? 'logo-invert' : ''}`}
               priority
             />
           </Link>
@@ -443,7 +443,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   src={currentTheme.menuIcon}
                   alt="Menu"
                   fill
-                  className="object-contain"
+                  className={`object-contain ${((!isInHeroSection || (!isHeroPresent && !isCaseStudyPage)) && !isInKeycapsSection) ? 'menu-icon-invert' : ''}`}
                 />
               </div>
             </button>
@@ -543,7 +543,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     src={currentTheme.menuIcon}
                     alt="Menu"
                     fill
-                    className={`object-contain ${((!isInHeroSection || !isHeroPresent) && !isInKeycapsSection) ? 'menu-icon-invert' : ''}`}
+                    className={`object-contain ${((!isInHeroSection || (!isHeroPresent && !isCaseStudyPage)) && !isInKeycapsSection) ? 'menu-icon-invert' : ''}`}
                   />
                 </motion.div>
                 <motion.div 
