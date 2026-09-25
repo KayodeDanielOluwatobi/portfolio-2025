@@ -97,6 +97,25 @@ function BentoRow({ row }: { row: BentoRowProps }) {
     );
   }
 
+  if (layout === 'triple') {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 md:gap-5">
+        <MediaCard
+          asset={assets[0]}
+          className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+        />
+        <MediaCard
+          asset={assets[1]}
+          className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+        />
+        <MediaCard
+          asset={assets[2]}
+          className={assets[2]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+        />
+      </div>
+    );
+  }
+
   return null;
 }
 

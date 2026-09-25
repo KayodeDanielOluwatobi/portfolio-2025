@@ -23,7 +23,7 @@ import { CSS } from '@dnd-kit/utilities';
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-type LayoutType = 'full' | 'twin' | 'big-left' | 'big-right';
+type LayoutType = 'full' | 'twin' | 'triple' | 'big-left' | 'big-right';
 type AssetType = 'image' | 'video' | 'text';
 type TableName = 'works_brands' | 'works_socials' | 'works_church' | 'works_publishing';
 type CategoryFilter = 'all' | TableName;
@@ -61,6 +61,7 @@ interface ProjectEntry {
 const SLOT_COUNTS: Record<LayoutType, number> = {
   full: 1,
   twin: 2,
+  triple: 3,
   'big-left': 3,
   'big-right': 3,
 };
@@ -68,6 +69,7 @@ const SLOT_COUNTS: Record<LayoutType, number> = {
 const SLOT_LABELS: Record<LayoutType, string[]> = {
   full: ['Main'],
   twin: ['Left', 'Right'],
+  triple: ['Left (1/3)', 'Middle (1/3)', 'Right (1/3)'],
   'big-left': ['Big (Left)', 'Top Right', 'Bottom Right'],
   'big-right': ['Top Left', 'Bottom Left', 'Big (Right)'],
 };
@@ -119,6 +121,15 @@ function LayoutPreviewBox({ layout }: { layout: LayoutType }) {
       </div>
     );
   }
+  if (layout === 'triple') {
+    return (
+      <div className="w-full h-full grid grid-cols-3 gap-1">
+        <div className={base} />
+        <div className={base} />
+        <div className={base} />
+      </div>
+    );
+  }
   if (layout === 'big-left') {
     return (
       <div className="w-full h-full grid grid-cols-2 gap-1">
@@ -151,7 +162,8 @@ function LayoutPickerModal({
 }) {
   const layouts: { type: LayoutType; label: string }[] = [
     { type: 'full', label: 'Full Width' },
-    { type: 'twin', label: 'Twin' },
+    { type: 'twin', label: 'Twin (2 Columns)' },
+    { type: 'triple', label: 'Triple (3 Columns)' },
     { type: 'big-left', label: 'Big Left' },
     { type: 'big-right', label: 'Big Right' },
   ];
