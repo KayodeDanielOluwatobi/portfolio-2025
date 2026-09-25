@@ -25,7 +25,7 @@ export default function BentoRenderer({ rows }: { rows: BentoRowProps[] }) {
   if (!rows || rows.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-1 md:gap-2 w-full">
+    <div className="flex flex-col gap-2.5 sm:gap-3.5 md:gap-5 w-full">
       {rows.map((row, index) => (
         <BentoRow key={index} row={row} />
       ))}
@@ -46,7 +46,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
             assets[0]?.height
               ? 'w-full'
               : isText
-              ? 'w-full py-1'
+              ? 'w-full py-0'
               : 'aspect-video w-full'
           }
         />
@@ -56,7 +56,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'twin') {
     return (
-      <div className="grid grid-cols-2 gap-1 md:gap-2">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5">
         <MediaCard
           asset={assets[0]}
           className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
@@ -71,11 +71,11 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'big-left') {
     return (
-      <div className="grid grid-cols-2 gap-1 md:gap-2 items-start">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5 items-start">
         <div className="w-full aspect-[4/5]">
           <MediaCard asset={assets[0]} className="w-full h-full" />
         </div>
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-1 md:gap-2">
+        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-5">
           <MediaCard asset={assets[1]} className="w-full h-full" />
           <MediaCard asset={assets[2]} className="w-full h-full" />
         </div>
@@ -85,8 +85,8 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'big-right') {
     return (
-      <div className="grid grid-cols-2 gap-1 md:gap-2 items-start">
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-1 md:gap-2">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-5 items-start">
+        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-5">
           <MediaCard asset={assets[0]} className="w-full h-full" />
           <MediaCard asset={assets[1]} className="w-full h-full" />
         </div>
@@ -167,8 +167,8 @@ function AutoFitText({
   return (
     <div
       ref={containerRef}
-      style={customHeight ? { minHeight: `${customHeight}px` } : undefined}
-      className="flex flex-col w-full px-2 sm:px-4 md:px-6 py-2 md:py-3 justify-start overflow-visible md:overflow-hidden"
+      style={customHeight ? ({ '--desktop-h': `${customHeight}px` } as React.CSSProperties) : undefined}
+      className="flex flex-col w-full px-1 sm:px-3 md:px-6 py-1 md:py-3 justify-start overflow-visible md:overflow-hidden md:[min-height:var(--desktop-h)]"
     >
       {title && (
         <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.06em] text-white/50 mb-2 md:mb-3 flex-shrink-0 flex items-center flex-wrap">
@@ -213,7 +213,7 @@ function AutoFitText({
 function MediaCard({ asset, className }: { asset: BentoAsset; className?: string }) {
   const isText = asset.type === 'text';
   const customHeightStyle = !isText && asset.height
-    ? { height: `${asset.height}px`, minHeight: `${asset.height}px` }
+    ? ({ '--card-h': `${asset.height}px` } as React.CSSProperties)
     : undefined;
 
   return (
@@ -221,6 +221,8 @@ function MediaCard({ asset, className }: { asset: BentoAsset; className?: string
       <div 
         style={customHeightStyle}
         className={`group relative overflow-hidden transition-all duration-500 ${className} ${
+          !isText && asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''
+        } ${
           isText 
             ? 'bg-transparent border-none w-full h-auto' 
             : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl h-full'
