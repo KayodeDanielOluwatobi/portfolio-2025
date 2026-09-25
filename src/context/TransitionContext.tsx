@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
 export interface TransitionMeta {
@@ -30,6 +30,8 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
   const [progress, setProgress] = useState(0);
   const [targetUrl, setTargetUrl] = useState<string | null>(null);
 
+  const animFrameRef = useRef<number | null>(null);
+
   const navigateWithTransition = useCallback((url: string, projectMeta?: TransitionMeta) => {
     if (isTransitioning) return;
 
@@ -45,46 +47,47 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
     setPhase('covering');
     setProgress(0);
 
-    // Fast high-tech counter animation: 0% to 100% over 480ms
+    // Exact 2.5 seconds (2500ms) timeframe
+    const duration = 2500;
     const startTime = performance.now();
-    const duration = 480;
 
-    const timer = setInterval(() => {
-      const now = performance.now();
-      const elapsed = now - startTime;
-      const rawPct = (elapsed / duration) * 100;
-      const nextProgress = Math.min(100, Math.floor(rawPct));
-      setProgress(nextProgress);
+    // Smooth countup animation using requestAnimationFrame
+    const updateProgress = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const t = Math.min(1, elapsed / duration);
 
-      if (nextProgress >= 100) {
-        clearInterval(timer);
+      // Smooth cubic-bezier countup progression: slow start, quick glide, precise finish
+      // EaseOutCubic: 1 - Math.pow(1 - t, 3)
+      const easedT = 1 - Math.pow(1 - t, 3);
+      const currentPct = Math.min(100, Math.floor(easedT * 100));
+
+      setProgress(currentPct);
+
+      if (t < 1) {
+        animFrameRef.current = requestAnimationFrame(updateProgress);
+      } else {
+        setProgress(100);
         setPhase('holding');
         router.push(url);
+
+        // Allow a brief moment at 100% then trigger upward reveal
+        setTimeout(() => {
+          setPhase('revealing');
+        }, 150);
       }
-    }, 16);
+    };
+
+    animFrameRef.current = requestAnimationFrame(updateProgress);
   }, [isTransitioning, router]);
 
-  // When pathname changes to the new page while transitioning, trigger the exit sweep reveal
+  // Clean up animation on unmount
   useEffect(() => {
-    if (isTransitioning && targetUrl) {
-      if (pathname === targetUrl || (targetUrl.startsWith('/works/') && pathname.startsWith('/works/'))) {
-        const revealTimer = setTimeout(() => {
-          setPhase('revealing');
-        }, 120);
-        return () => clearTimeout(revealTimer);
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
       }
-    }
-  }, [pathname, targetUrl, isTransitioning]);
-
-  // Safety fallback if page change takes longer or fails
-  useEffect(() => {
-    if (isTransitioning && phase === 'holding') {
-      const fallbackTimer = setTimeout(() => {
-        setPhase('revealing');
-      }, 1500);
-      return () => clearTimeout(fallbackTimer);
-    }
-  }, [isTransitioning, phase]);
+    };
+  }, []);
 
   const onRevealComplete = useCallback(() => {
     setIsTransitioning(false);

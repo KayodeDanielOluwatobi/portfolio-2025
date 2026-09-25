@@ -14,6 +14,7 @@ interface ProjectCardProps {
   slug: string;
   media: string;
   type: 'image' | 'gif' | 'video';
+  tagline?: string;
   aspectRatio?: 'square' | 'auto';
   cornerRadius?: number;
 }
@@ -23,6 +24,7 @@ export default function ProjectCard({
   slug, 
   media, 
   type, 
+  tagline,
   cornerRadius = 30, // This is now your "Desktop Max"
   aspectRatio = 'square' 
 }: ProjectCardProps) {
@@ -38,6 +40,7 @@ export default function ProjectCard({
     e.preventDefault();
     navigateWithTransition(`/works/${slug}`, {
       title,
+      tagline,
     });
   };
 
