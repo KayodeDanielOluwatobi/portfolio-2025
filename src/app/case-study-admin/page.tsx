@@ -260,233 +260,211 @@ function TextAssetEditor({
 
   return (
     <>
-      {/* ── Inline Slot Card ── */}
-      <div className="flex flex-col gap-3">
-        {/* Title Input */}
-        <input
-          type="text"
-          placeholder="Title (optional header)"
-          value={asset.title || ''}
-          onChange={(e) => onChange({ ...asset, title: e.target.value })}
-          className="w-full bg-white/5 border border-white/8 rounded-lg px-3 py-2 text-white text-xs placeholder:text-white/20 focus:outline-none focus:border-white/25 uppercase font-space tracking-wider"
-        />
-
-        {/* Content Textarea */}
-        <textarea
-          placeholder="Type content text…"
-          value={asset.content || ''}
-          onChange={(e) => onChange({ ...asset, content: e.target.value })}
-          rows={3}
-          className="w-full bg-white/5 border border-white/8 rounded-lg px-3 py-2 text-white text-xs placeholder:text-white/20 focus:outline-none focus:border-white/25 resize-none leading-relaxed"
-        />
-
-        {/* Focus Mode Trigger Banner */}
-        <button
-          type="button"
-          onClick={() => setIsStudioOpen(true)}
-          className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-cyan-950/60 via-zinc-900 to-cyan-950/60 hover:from-cyan-900/60 hover:to-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-300 hover:text-cyan-200 text-xs font-space tracking-wider uppercase transition-all flex items-center justify-between shadow-lg group"
-        >
-          <div className="flex items-center gap-2">
+      {/* ── Inline Slot Card (Unified 2-in-1 WYSIWYG Canvas) ── */}
+      <div className="flex flex-col gap-2.5">
+        {/* Top Action & Focus Mode Bar */}
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setIsStudioOpen(true)}
+            className="py-1.5 px-3 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-300 hover:text-cyan-200 text-xs font-space tracking-wider uppercase transition-all flex items-center gap-2 group shadow-sm"
+          >
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Open Desktop Studio & Crosshairs</span>
-          </div>
-          <span className="text-[11px] opacity-70 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
-            Focus Mode ↗
-          </span>
-        </button>
+            <span>Open Desktop Studio</span>
+            <span className="text-[10px] opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">↗</span>
+          </button>
 
-        {/* Collapsible Inspector Drawer */}
-        <div className="bg-black/60 border border-white/10 rounded-xl overflow-hidden transition-all">
-          {/* Collapsible Header with Chevron */}
+          {/* Quick Sliders Toggle */}
           <button
             type="button"
             onClick={() => setIsControlsCollapsed(!isControlsCollapsed)}
-            className="w-full px-3 py-2.5 flex items-center justify-between text-[11px] font-space text-white/50 hover:text-white/80 bg-white/[0.02] hover:bg-white/[0.05] transition-colors select-none"
+            className="py-1 px-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-space flex items-center gap-1.5 transition-all"
           >
-            <div className="flex items-center gap-2">
-              <span className="text-cyan-400 font-mono text-xs">◈</span>
-              <span className="uppercase tracking-widest text-[10px]">Text Controls & Sliders</span>
-              <span className="text-[10px] text-white/30 font-mono">
-                ({asset.fontSize ? `${asset.fontSize}px` : 'Auto'} · {asset.height ? `${asset.height}px` : 'Fluid'})
-              </span>
-            </div>
+            <span className="text-[10px] font-mono text-cyan-400">◈</span>
+            <span className="text-[11px]">{isControlsCollapsed ? 'Show Controls' : 'Hide Controls'}</span>
             <svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+              className={`w-3 h-3 transition-transform duration-200 ${
                 isControlsCollapsed ? 'rotate-180 text-white/40' : 'text-cyan-400'
               }`}
             >
               <path d="m18 15-6-6-6 6" />
             </svg>
           </button>
-
-          {/* Drawer Body */}
-          {!isControlsCollapsed && (
-            <div className="p-3 pt-1 flex flex-col gap-3 border-t border-white/5 animate-in fade-in duration-150">
-              {/* Font Size Slider */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/60 text-[11px]">Font Size</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-cyan-300 text-xs font-semibold">
-                      {asset.fontSize ? `${asset.fontSize}px` : 'Auto-Fit'}
-                    </span>
-                    {asset.fontSize && (
-                      <button
-                        type="button"
-                        onClick={() => onChange({ ...asset, fontSize: undefined })}
-                        className="text-[10px] text-white/30 hover:text-white/70 underline"
-                      >
-                        Reset Auto
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <input
-                  type="range"
-                  min="12"
-                  max="64"
-                  step="1"
-                  value={asset.fontSize || 24}
-                  onChange={(e) =>
-                    onChange({ ...asset, fontSize: parseInt(e.target.value, 10) })
-                  }
-                  className="w-full accent-cyan-400 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
-                />
-              </div>
-
-              {/* Height Slider */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/60 text-[11px]">Box Height (Desktop)</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-cyan-300 text-xs font-semibold">
-                      {asset.height ? `${asset.height}px` : 'Auto (Fluid)'}
-                    </span>
-                    {asset.height && (
-                      <button
-                        type="button"
-                        onClick={() => onChange({ ...asset, height: undefined })}
-                        className="text-[10px] text-white/30 hover:text-white/70 underline"
-                      >
-                        Reset Fluid
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <input
-                  type="range"
-                  min="140"
-                  max="700"
-                  step="10"
-                  value={asset.height || 300}
-                  onChange={(e) =>
-                    onChange({ ...asset, height: parseInt(e.target.value, 10) })
-                  }
-                  className="w-full accent-cyan-400 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
-                />
-
-                {/* Quick Height Presets */}
-                <div className="flex gap-1.5 pt-1 flex-wrap">
-                  {[
-                    { label: 'Auto', val: undefined },
-                    { label: '220px', val: 220 },
-                    { label: '340px', val: 340 },
-                    { label: '480px', val: 480 },
-                  ].map((preset) => (
-                    <button
-                      key={preset.label}
-                      type="button"
-                      onClick={() => onChange({ ...asset, height: preset.val })}
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
-                        asset.height === preset.val || (!asset.height && preset.val === undefined)
-                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                          : 'bg-white/5 text-white/30 hover:text-white/60 border border-transparent'
-                      }`}
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Compact Live Canvas with Working Drag Border & Crosshairs */}
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between text-[10px] text-white/30 uppercase tracking-wider font-space">
-            <span>Inline Preview</span>
-            <span className="text-cyan-400/60 font-mono">↕ Drag bottom bar or crosshair</span>
+        {/* Collapsible Inspector Drawer */}
+        {!isControlsCollapsed && (
+          <div className="bg-black/60 border border-white/10 rounded-xl p-3 flex flex-col gap-3 animate-in fade-in duration-150">
+            {/* Font Size Slider */}
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-white/60 text-[11px]">Font Size</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-cyan-300 text-xs font-semibold">
+                    {asset.fontSize ? `${asset.fontSize}px` : 'Auto-Fit'}
+                  </span>
+                  {asset.fontSize && (
+                    <button
+                      type="button"
+                      onClick={() => onChange({ ...asset, fontSize: undefined })}
+                      className="text-[10px] text-white/30 hover:text-white/70 underline"
+                    >
+                      Reset Auto
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input
+                type="range"
+                min="12"
+                max="64"
+                step="1"
+                value={asset.fontSize || 24}
+                onChange={(e) =>
+                  onChange({ ...asset, fontSize: parseInt(e.target.value, 10) })
+                }
+                className="w-full accent-cyan-400 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+
+            {/* Height Slider */}
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-white/60 text-[11px]">Box Height</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-cyan-300 text-xs font-semibold">
+                    {asset.height ? `${asset.height}px` : 'Auto (Fluid)'}
+                  </span>
+                  {asset.height && (
+                    <button
+                      type="button"
+                      onClick={() => onChange({ ...asset, height: undefined })}
+                      className="text-[10px] text-white/30 hover:text-white/70 underline"
+                    >
+                      Reset Fluid
+                    </button>
+                  )}
+                </div>
+              </div>
+              <input
+                type="range"
+                min="140"
+                max="700"
+                step="10"
+                value={asset.height || 300}
+                onChange={(e) =>
+                  onChange({ ...asset, height: parseInt(e.target.value, 10) })
+                }
+                className="w-full accent-cyan-400 bg-white/10 h-1.5 rounded-lg appearance-none cursor-pointer"
+              />
+
+              {/* Quick Height Presets */}
+              <div className="flex gap-1.5 pt-0.5 flex-wrap">
+                {[
+                  { label: 'Auto', val: undefined },
+                  { label: '220px', val: 220 },
+                  { label: '340px', val: 340 },
+                  { label: '480px', val: 480 },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => onChange({ ...asset, height: preset.val })}
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+                      asset.height === preset.val || (!asset.height && preset.val === undefined)
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                        : 'bg-white/5 text-white/30 hover:text-white/60 border border-transparent'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── 2-in-1 WYSIWYG Editable Text Box with Crosshairs & Drag Controls ── */}
+        <div
+          ref={canvasRef}
+          className={`relative rounded-xl border bg-zinc-950 p-4 sm:p-5 flex flex-col justify-start overflow-hidden transition-all shadow-lg ${
+            isDraggingHeight
+              ? 'border-cyan-400 ring-1 ring-cyan-400/40 shadow-[0_0_20px_rgba(34,211,238,0.25)]'
+              : 'border-cyan-500/30 hover:border-cyan-400/60'
+          }`}
+          style={{
+            height: asset.height ? `${Math.min(320, asset.height * 0.7)}px` : 'auto',
+            minHeight: '150px',
+          }}
+        >
+          {/* 4 Corner Crosshairs */}
+          <span className="absolute top-1.5 left-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none select-none">
+            +
+          </span>
+          <span className="absolute top-1.5 right-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none select-none">
+            +
+          </span>
+          <span className="absolute bottom-2 left-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none select-none">
+            +
+          </span>
+
+          {/* Bottom-Right Interactive Crosshair Drag Handle */}
+          <div
+            onMouseDown={handleStartResize}
+            title="Drag corner crosshair to resize box height"
+            className="absolute bottom-1 right-1 px-1.5 py-1 cursor-ns-resize z-20 group flex items-center gap-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 rounded transition-all select-none"
+          >
+            <span className="font-mono text-xs font-bold text-cyan-300 group-hover:scale-125 transition-transform inline-block">
+              +
+            </span>
+            <span className="text-[9px] font-mono text-cyan-300 font-semibold">
+              {asset.height ? `${asset.height}px` : 'Auto'}
+            </span>
           </div>
 
-          <div
-            ref={canvasRef}
-            className={`relative rounded-xl border bg-zinc-950 p-4 select-none overflow-hidden transition-colors ${
-              isDraggingHeight
-                ? 'border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.2)]'
-                : 'border-cyan-500/30 hover:border-cyan-500/50'
-            }`}
-            style={{
-              height: asset.height ? `${Math.min(260, asset.height * 0.65)}px` : 'auto',
-              minHeight: '130px',
-            }}
-          >
-            {/* 4 Corner Crosshairs */}
-            <span className="absolute top-1.5 left-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none">
-              +
-            </span>
-            <span className="absolute top-1.5 right-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none">
-              +
-            </span>
-            <span className="absolute bottom-1.5 left-1.5 font-mono text-[11px] text-cyan-400/60 leading-none pointer-events-none">
-              +
-            </span>
+          {/* Top-Right Dimension Badge */}
+          <div className="absolute top-2 right-4 font-mono text-[9px] bg-cyan-950/80 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30 pointer-events-none select-none">
+            {asset.height ? `${asset.height}px H` : 'Auto H'} · {asset.fontSize ? `${asset.fontSize}px` : 'Auto FONT'}
+          </div>
 
-            {/* Bottom-Right Interactive Crosshair Drag Handle */}
-            <div
-              onMouseDown={handleStartResize}
-              title="Drag corner to resize height"
-              className="absolute bottom-0.5 right-0.5 p-1.5 cursor-ns-resize z-20 group"
-            >
-              <span className="font-mono text-xs font-bold text-cyan-400 group-hover:scale-125 group-hover:text-cyan-300 transition-transform inline-block">
-                +
-              </span>
-            </div>
+          {/* ── Direct In-Box Editable Title ── */}
+          <div className="w-full flex-shrink-0 mb-2 relative z-10 pr-24">
+            <input
+              type="text"
+              placeholder="TITLE (OPTIONAL HEADER)"
+              value={asset.title || ''}
+              onChange={(e) => onChange({ ...asset, title: e.target.value })}
+              className="w-full bg-transparent border-none p-0 text-white/60 focus:text-white font-space text-[10px] sm:text-xs uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+            />
+          </div>
 
-            {/* Dimension Badge */}
-            <div className="absolute top-2 right-4 font-mono text-[9px] bg-cyan-950/80 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-500/30">
-              {asset.height ? `${asset.height}px H` : 'Auto H'} · {asset.fontSize ? `${asset.fontSize}px` : 'Auto'}
-            </div>
-
-            {asset.title && (
-              <h5 className="font-space text-[9px] uppercase tracking-widest text-white/50 mb-1.5">
-                {asset.title}
-              </h5>
-            )}
-            <p
-              className="font-light text-white text-justify leading-snug"
+          {/* ── Direct In-Box Editable Justified Body Text ── */}
+          <div className="w-full flex-1 flex items-stretch relative z-10 overflow-hidden pb-3">
+            <textarea
+              placeholder="Click here to type or paste content text directly… Live justified text renders right inside this box."
+              value={asset.content || ''}
+              onChange={(e) => onChange({ ...asset, content: e.target.value })}
+              className="w-full h-full bg-transparent border-none p-0 text-white font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-snug"
               style={{
                 fontSize: asset.fontSize ? `${Math.max(12, asset.fontSize * 0.75)}px` : '13px',
+                lineHeight: asset.fontSize ? `${Math.max(16, asset.fontSize * 1.05)}px` : '18px',
                 textAlign: 'justify',
                 textJustify: 'inter-word',
-                hyphens: 'none',
               }}
-            >
-              {asset.content || 'Text preview with justified alignment…'}
-            </p>
+            />
+          </div>
 
-            {/* Interactive Bottom Drag Bar */}
-            <div
-              onMouseDown={handleStartResize}
-              className="absolute bottom-0 inset-x-0 h-3 bg-cyan-500/10 hover:bg-cyan-500/30 cursor-ns-resize flex items-center justify-center transition-colors group"
-              title="Drag up or down to adjust box height"
-            >
-              <div className="w-8 h-1 bg-cyan-400/50 group-hover:bg-cyan-300 rounded-full" />
-            </div>
+          {/* Interactive Bottom Drag Bar */}
+          <div
+            onMouseDown={handleStartResize}
+            className="absolute bottom-0 inset-x-0 h-3 bg-cyan-500/10 hover:bg-cyan-500/30 cursor-ns-resize flex items-center justify-center transition-colors group z-20"
+            title="Drag up or down to adjust box height"
+          >
+            <div className="w-12 h-1 bg-cyan-400/50 group-hover:bg-cyan-300 group-hover:w-20 transition-all rounded-full" />
           </div>
         </div>
       </div>
@@ -505,7 +483,7 @@ function TextAssetEditor({
                   <span className="text-cyan-300 text-xs">{slotLabel}</span>
                 </h3>
                 <p className="text-[11px] text-white/40">
-                  Full Desktop Viewport Simulation · Drag crosshairs or bottom handle to resize
+                  WYSIWYG 2-in-1 Canvas · Edit text directly inside the box or drag crosshairs to resize height
                 </p>
               </div>
             </div>
@@ -645,47 +623,29 @@ function TextAssetEditor({
           )}
 
           {/* Desktop Canvas Container (Exact Case Study Proportion) */}
-          <div className="max-w-6xl w-full mx-auto my-auto py-8 flex flex-col gap-4">
-            {/* Live Editable Title & Content Toolbar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <input
-                type="text"
-                placeholder="Title (optional uppercase header)"
-                value={asset.title || ''}
-                onChange={(e) => onChange({ ...asset, title: e.target.value })}
-                className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 uppercase font-space tracking-wider"
-              />
-              <textarea
-                placeholder="Live edit your content text right here…"
-                value={asset.content || ''}
-                onChange={(e) => onChange({ ...asset, content: e.target.value })}
-                rows={1}
-                className="w-full md:col-span-2 bg-zinc-900 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 resize-none leading-relaxed"
-              />
-            </div>
-
-            {/* The True Desktop Text Box with Interactive Crosshairs & Drag Controls */}
+          <div className="max-w-6xl w-full mx-auto my-auto py-8 flex flex-col items-center justify-center">
+            {/* The True Desktop 2-in-1 WYSIWYG Text Box */}
             <div
-              className={`relative w-full rounded-2xl border bg-black/90 p-8 sm:p-12 overflow-hidden transition-all select-none shadow-2xl flex flex-col justify-center ${
+              className={`relative w-full rounded-2xl border bg-black/90 p-8 sm:p-12 overflow-hidden transition-all shadow-2xl flex flex-col justify-start ${
                 isDraggingHeight
                   ? 'border-cyan-400 ring-2 ring-cyan-400/30 shadow-[0_0_50px_rgba(34,211,238,0.25)]'
                   : 'border-cyan-500/40 hover:border-cyan-400/70'
               }`}
               style={{
                 height: asset.height ? `${asset.height}px` : 'auto',
-                minHeight: '180px',
+                minHeight: '220px',
               }}
             >
-              {/* ── Design Software Corner Crosshairs ── */}
-              <div className="absolute top-3 left-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none">
+              {/* ── Corner Crosshairs ── */}
+              <div className="absolute top-3 left-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none pointer-events-none">
                 <span className="text-base font-bold leading-none">+</span>
                 <span className="text-[9px] text-cyan-400/40 uppercase font-space">TL</span>
               </div>
-              <div className="absolute top-3 right-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none">
+              <div className="absolute top-3 right-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none pointer-events-none">
                 <span className="text-[9px] text-cyan-400/40 uppercase font-space">TR</span>
                 <span className="text-base font-bold leading-none">+</span>
               </div>
-              <div className="absolute bottom-4 left-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none">
+              <div className="absolute bottom-4 left-3 flex items-center gap-1 font-mono text-xs text-cyan-400/70 select-none pointer-events-none">
                 <span className="text-base font-bold leading-none">+</span>
                 <span className="text-[9px] text-cyan-400/40 uppercase font-space">BL</span>
               </div>
@@ -694,7 +654,7 @@ function TextAssetEditor({
               <div
                 onMouseDown={handleStartResize}
                 title="Drag corner crosshair to resize box height"
-                className="absolute bottom-2 right-2 p-2 cursor-ns-resize z-30 group flex items-center gap-1 bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 rounded-lg transition-all"
+                className="absolute bottom-2 right-2 p-2 cursor-ns-resize z-30 group flex items-center gap-1 bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-500/50 rounded-lg transition-all select-none"
               >
                 <span className="font-mono text-sm font-bold text-cyan-300 group-hover:scale-125 transition-transform inline-block">
                   +
@@ -705,43 +665,45 @@ function TextAssetEditor({
               </div>
 
               {/* Status Indicator & Live Dimension Pill */}
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 font-mono text-[10px] bg-cyan-950/90 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 shadow-md flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 font-mono text-[10px] bg-cyan-950/90 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 shadow-md flex items-center gap-2 pointer-events-none z-20 select-none">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 <span>
                   DESKTOP CANVAS: {asset.height ? `${asset.height}px HEIGHT` : 'FLUID HEIGHT'} ·{' '}
                   {asset.fontSize ? `${asset.fontSize}px FONT` : 'AUTO FONT'}
                 </span>
               </div>
 
-              {/* Rendered Content */}
-              {asset.title && (
-                <h4 className="font-space text-xs md:text-sm uppercase tracking-[0.2em] text-white/50 mb-4 flex-shrink-0">
-                  {asset.title}
-                </h4>
-              )}
+              {/* Direct In-Canvas Title Editor */}
+              <div className="w-full flex-shrink-0 mb-3 pt-2 relative z-10">
+                <input
+                  type="text"
+                  placeholder="TITLE (OPTIONAL UPPERCASE HEADER - E.G. CHRISTIAN ORGANIZATION • 2025)"
+                  value={asset.title || ''}
+                  onChange={(e) => onChange({ ...asset, title: e.target.value })}
+                  className="w-full bg-transparent border-none p-0 text-white/70 focus:text-white font-space text-xs md:text-sm uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+                />
+              </div>
 
-              <div className="w-full flex-1 flex items-center overflow-hidden">
-                <p
-                  className="font-light tracking-normal text-white w-full m-0 text-justify"
+              {/* Direct In-Canvas Body Content Editor (Full Real-time Justified Rendering) */}
+              <div className="w-full flex-1 flex items-stretch relative z-10 overflow-hidden pb-4">
+                <textarea
+                  placeholder="Click here to type your story… Live justified text renders directly at exact desktop proportions"
+                  value={asset.content || ''}
+                  onChange={(e) => onChange({ ...asset, content: e.target.value })}
+                  className="w-full h-full bg-transparent border-none p-0 text-white font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-relaxed"
                   style={{
                     fontSize: asset.fontSize ? `${asset.fontSize}px` : '24px',
                     lineHeight: asset.fontSize ? `${asset.fontSize * 1.35}px` : '32px',
                     textAlign: 'justify',
                     textJustify: 'inter-word',
-                    hyphens: 'none',
-                    WebkitHyphens: 'none',
-                    wordBreak: 'normal',
                   }}
-                >
-                  {asset.content ||
-                    'Type your text in the content box above to see real-time justified rendering at exact desktop proportions…'}
-                </p>
+                />
               </div>
 
               {/* Interactive Bottom Edge Drag Handle Bar */}
               <div
                 onMouseDown={handleStartResize}
-                className="absolute bottom-0 inset-x-0 h-4 bg-cyan-500/10 hover:bg-cyan-500/30 cursor-ns-resize flex items-center justify-center transition-all group border-t border-cyan-500/20"
+                className="absolute bottom-0 inset-x-0 h-4 bg-cyan-500/10 hover:bg-cyan-500/30 cursor-ns-resize flex items-center justify-center transition-all group border-t border-cyan-500/20 z-20"
                 title="Click and drag up or down to adjust desktop box height"
               >
                 <div className="w-20 h-1 bg-cyan-400/50 group-hover:bg-cyan-300 group-hover:w-28 transition-all rounded-full" />

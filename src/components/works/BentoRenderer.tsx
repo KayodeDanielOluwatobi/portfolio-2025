@@ -171,8 +171,21 @@ function AutoFitText({
       className="flex flex-col w-full px-2 sm:px-4 md:px-6 py-2 md:py-3 justify-start overflow-visible md:overflow-hidden"
     >
       {title && (
-        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/50 mb-2 md:mb-3 flex-shrink-0">
-          {title}
+        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.06em] text-white/50 mb-2 md:mb-3 flex-shrink-0 flex items-center flex-wrap">
+          {title.split(/([•·])/g).map((part, index) => {
+            if (part === '•' || part === '·') {
+              return (
+                <span
+                  key={index}
+                  className="inline-flex items-center justify-center mx-1.5 select-none opacity-60 self-center -translate-y-[2px]"
+                  aria-hidden="true"
+                >
+                  <span className="w-1 h-1 rounded-full bg-current" />
+                </span>
+              );
+            }
+            return <span key={index}>{part}</span>;
+          })}
         </h4>
       )}
       <div className="w-full overflow-visible md:overflow-hidden">
