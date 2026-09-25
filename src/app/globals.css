@@ -436,7 +436,7 @@ html.light .logo-invert,
 
 
 
-/* Image Protection Styles */
+/* ── Global Image & Media Protection ────────────────────────── */
 .image-protected::after {
   content: '';
   position: absolute;
@@ -445,11 +445,15 @@ html.light .logo-invert,
   width: 100%;
   height: 100%;
   z-index: 5;
-  cursor: pointer;
+  cursor: default;
 }
 
-/* Prevent image selection and dragging */
-img {
+/* Prevent image & video selection, dragging, and mobile long-press menus */
+img,
+video,
+picture,
+canvas,
+[data-protected-media] {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -458,14 +462,11 @@ img {
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-video {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
 
 
 

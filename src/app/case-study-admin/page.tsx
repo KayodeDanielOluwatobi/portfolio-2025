@@ -644,9 +644,9 @@ function TextAssetEditor({
 
                     if (isBullet) {
                       return (
-                        <div key={i} className="flex items-start gap-2 pl-1 w-full text-left font-light text-zinc-200">
+                        <div key={i} className="flex items-start gap-2 pl-1 w-full text-justify font-light text-zinc-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-white/70 mt-1.5 flex-shrink-0" />
-                          <div className="flex-1 text-left sm:text-justify" style={{ textJustify: 'inter-word' }}>
+                          <div className="flex-1 text-justify" style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
                             {renderFormattedText(txt)}
                           </div>
                         </div>
@@ -656,8 +656,8 @@ function TextAssetEditor({
                     return (
                       <p
                         key={i}
-                        className="font-light tracking-normal text-zinc-200 leading-relaxed text-left sm:text-justify"
-                        style={{ textJustify: 'inter-word' }}
+                        className="font-light tracking-normal text-zinc-200 leading-relaxed text-justify"
+                        style={{ textAlign: 'justify', textJustify: 'inter-word' }}
                       >
                         {renderFormattedText(txt)}
                       </p>
@@ -994,9 +994,9 @@ function TextAssetEditor({
 
                         if (isBullet) {
                           return (
-                            <div key={i} className="flex items-start gap-3 pl-2 w-full text-left font-light text-zinc-200">
+                            <div key={i} className="flex items-start gap-3 pl-2 w-full text-justify font-light text-zinc-200">
                               <span className="w-2 h-2 rounded-full bg-white/70 mt-2.5 flex-shrink-0" />
-                              <div className="flex-1 text-left sm:text-justify" style={{ textJustify: 'inter-word' }}>
+                              <div className="flex-1 text-justify" style={{ textAlign: 'justify', textJustify: 'inter-word' }}>
                                 {renderFormattedText(txt)}
                               </div>
                             </div>
@@ -1006,8 +1006,8 @@ function TextAssetEditor({
                         return (
                           <p
                             key={i}
-                            className="font-light tracking-normal text-zinc-200 leading-relaxed text-left sm:text-justify"
-                            style={{ textJustify: 'inter-word' }}
+                            className="font-light tracking-normal text-zinc-200 leading-relaxed text-justify"
+                            style={{ textAlign: 'justify', textJustify: 'inter-word' }}
                           >
                             {renderFormattedText(txt)}
                           </p>
@@ -1633,6 +1633,9 @@ function AdminDashboard() {
   const [brandLogo, setBrandLogo] = useState<string>('');
   const [rows, setRows] = useState<BentoRow[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(288);
+  const [isResizingSidebar, setIsResizingSidebar] = useState(false);
+  const sidebarWidthRef = useRef(288);
 
   const listScrollRef = useRef<HTMLDivElement>(null);
 
@@ -1645,6 +1648,47 @@ function AdminDashboard() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
+
+  // ── Load sidebar width from localStorage ──────────────────────────────────
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('admin_sidebar_width');
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 180 && parsed <= 600) {
+          setSidebarWidth(parsed);
+          sidebarWidthRef.current = parsed;
+        }
+      }
+    } catch {}
+  }, []);
+
+  // ── Drag handler to resize sidebar width ──────────────────────────────────
+  const handleStartResizeSidebar = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingSidebar(true);
+    const startX = e.clientX;
+    const startW = sidebarWidthRef.current;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const delta = moveEvent.clientX - startX;
+      const nextWidth = Math.max(180, Math.min(600, Math.round(startW + delta)));
+      setSidebarWidth(nextWidth);
+      sidebarWidthRef.current = nextWidth;
+    };
+
+    const onMouseUp = () => {
+      setIsResizingSidebar(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      try {
+        localStorage.setItem('admin_sidebar_width', String(sidebarWidthRef.current));
+      } catch {}
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, []);
 
   // ── Load all projects on mount ─────────────────────────────────────────────
   useEffect(() => {
@@ -1851,9 +1895,9 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
+    <div className="h-screen w-screen overflow-hidden bg-black text-white flex flex-col" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <header className="flex-shrink-0 border-b border-white/10 px-6 h-12 flex items-center gap-4">
+      <header className="flex-shrink-0 border-b border-white/10 px-6 h-12 flex items-center gap-4 bg-zinc-950 z-20 select-none">
         <span
           className="text-xs uppercase tracking-[0.2em] text-white/35"
           style={{ fontFamily: 'var(--font-space-mono, monospace)' }}
@@ -1885,9 +1929,22 @@ function AdminDashboard() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden relative">
         {/* ── Sidebar ───────────────────────────────────────────────────────── */}
-        <aside className="w-72 flex-shrink-0 border-r border-white/10 flex flex-col bg-zinc-950 overflow-hidden">
+        <aside
+          style={{ width: `${sidebarWidth}px` }}
+          className="flex-shrink-0 h-full border-r border-white/10 flex flex-col bg-zinc-950 overflow-hidden relative select-none"
+        >
+          {/* Draggable Vertical Resize Bar on Right Edge */}
+          <div
+            onMouseDown={handleStartResizeSidebar}
+            className={`absolute top-0 right-0 bottom-0 w-2 cursor-col-resize z-30 transition-colors ${
+              isResizingSidebar
+                ? 'bg-cyan-400'
+                : 'hover:bg-cyan-500/40 active:bg-cyan-400 bg-transparent'
+            }`}
+            title="Drag left or right to adjust sidebar width"
+          />
           {/* Search */}
           <div className="p-3 border-b border-white/10 flex-shrink-0">
             <input
@@ -1977,7 +2034,7 @@ function AdminDashboard() {
         </aside>
 
         {/* ── Main panel ────────────────────────────────────────────────────── */}
-        <main className="flex-1 overflow-y-auto bg-black">
+        <main className="flex-1 h-full min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-black">
           {!selectedProject ? (
             /* Empty state */
             <div className="flex items-center justify-center h-full">

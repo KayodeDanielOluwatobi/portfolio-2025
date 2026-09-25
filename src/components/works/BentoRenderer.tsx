@@ -57,7 +57,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'twin') {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4 md:gap-5">
         <MediaCard
           asset={assets[0]}
           className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
@@ -237,8 +237,9 @@ function AutoFitText({
                     aria-hidden="true"
                   />
                   <div
-                    className="flex-1 text-left sm:text-justify"
+                    className="flex-1 text-justify"
                     style={{
+                      textAlign: 'justify',
                       textJustify: 'inter-word',
                       hyphens: 'none',
                       WebkitHyphens: 'none',
@@ -254,12 +255,13 @@ function AutoFitText({
             return (
               <p
                 key={pIdx}
-                className="font-light tracking-normal text-zinc-200 w-full m-0 text-left sm:text-justify leading-relaxed sm:leading-[1.7]"
+                className="font-light tracking-normal text-zinc-200 w-full m-0 text-justify leading-relaxed sm:leading-[1.7]"
                 style={{
                   fontSize: customFontSize
                     ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
                     : `${computedSize}px`,
                   lineHeight: customFontSize ? '1.65' : `${computedSize * 1.5}px`,
+                  textAlign: 'justify',
                   textJustify: 'inter-word',
                   hyphens: 'none',
                   WebkitHyphens: 'none',
@@ -299,7 +301,9 @@ function MediaCard({ asset, className }: { asset: BentoAsset; className?: string
           <img 
             src={asset.src} 
             alt="" 
-            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" 
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
           />
         )}
         
@@ -307,7 +311,18 @@ function MediaCard({ asset, className }: { asset: BentoAsset; className?: string
           <video 
             src={asset.src} 
             autoPlay muted loop playsInline 
-            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105" 
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
+          />
+        )}
+
+        {/* Transparent Protective Shield over media */}
+        {!isText && (
+          <div 
+            className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
+            onContextMenu={(e) => e.preventDefault()}
+            draggable="false"
           />
         )}
 

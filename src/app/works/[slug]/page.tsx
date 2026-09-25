@@ -96,7 +96,9 @@ export default function CaseStudyPage() {
               <img
                 src={brandLogo}
                 alt={`${brandName} Logo`}
-                className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_32px_rgba(0,0,0,0.85)]"
+                draggable="false"
+                onContextMenu={(e) => e.preventDefault()}
+                className="max-w-full max-h-full object-contain filter drop-shadow-[0_12px_32px_rgba(0,0,0,0.85)] pointer-events-none select-none"
               />
             </div>
           </motion.div>
@@ -214,11 +216,11 @@ export default function CaseStudyPage() {
 
                 if (isBullet) {
                   return (
-                    <div key={i} className="flex items-start gap-3 pl-2 w-full text-left font-light text-zinc-200">
+                    <div key={i} className="flex items-start gap-3 pl-2 w-full text-justify font-light text-zinc-200">
                       <span className="w-2 h-2 rounded-full bg-white/70 mt-2 flex-shrink-0" />
                       <div
-                        className="flex-1 text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed text-left sm:text-justify"
-                        style={{ textJustify: 'inter-word' }}
+                        className="flex-1 text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed text-justify"
+                        style={{ textAlign: 'justify', textJustify: 'inter-word' }}
                       >
                         {renderFormattedText(txt)}
                       </div>
@@ -229,8 +231,8 @@ export default function CaseStudyPage() {
                 return (
                   <p
                     key={i}
-                    className="text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed max-w-3xl text-left sm:text-justify"
-                    style={{ textJustify: 'inter-word' }}
+                    className="text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed max-w-3xl text-justify"
+                    style={{ textAlign: 'justify', textJustify: 'inter-word' }}
                   >
                     {renderFormattedText(txt)}
                   </p>
