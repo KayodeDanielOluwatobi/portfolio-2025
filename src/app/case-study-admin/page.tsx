@@ -18,6 +18,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { renderFormattedText } from '@/utils/textFormatter';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -232,7 +233,12 @@ function TextAssetEditor({
   const [isStudioOpen, setIsStudioOpen] = useState(false);
   const [isControlsCollapsed, setIsControlsCollapsed] = useState(false);
   const [isDraggingHeight, setIsDraggingHeight] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [studioPreviewMode, setStudioPreviewMode] = useState(false);
+
   const canvasRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const studioTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Close Studio on Escape key
   useEffect(() => {
@@ -268,6 +274,85 @@ function TextAssetEditor({
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  // ── Format Selection Handler (Bold: **, Italic: *, Title Mono: `) ─────────────
+  const applyFormat = (syntax: '**' | '*' | '`', isStudio: boolean = false) => {
+    const textarea = isStudio ? studioTextareaRef.current : textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const scrollTop = textarea.scrollTop;
+    const scrollLeft = textarea.scrollLeft;
+    const raw = asset.content || '';
+    const selectedText = raw.substring(start, end);
+
+    let newContent = '';
+    let newStart = start;
+    let newEnd = end;
+
+    const len = syntax.length;
+
+    if (selectedText.length === 0) {
+      const placeholder = syntax === '**' ? 'bold text' : syntax === '*' ? 'italic text' : 'MONOSPACE TAG';
+      newContent = raw.slice(0, start) + syntax + placeholder + syntax + raw.slice(end);
+      newStart = start + len;
+      newEnd = start + len + placeholder.length;
+    } else {
+      const isAlreadyWrapped =
+        selectedText.startsWith(syntax) && selectedText.endsWith(syntax) && selectedText.length >= len * 2;
+      const isOuterWrapped =
+        start >= len &&
+        end + len <= raw.length &&
+        raw.slice(start - len, start) === syntax &&
+        raw.slice(end, end + len) === syntax;
+
+      if (isAlreadyWrapped) {
+        const unwrapped = selectedText.slice(len, -len);
+        newContent = raw.slice(0, start) + unwrapped + raw.slice(end);
+        newStart = start;
+        newEnd = start + unwrapped.length;
+      } else if (isOuterWrapped) {
+        newContent = raw.slice(0, start - len) + selectedText + raw.slice(end + len);
+        newStart = start - len;
+        newEnd = end - len;
+      } else {
+        newContent = raw.slice(0, start) + syntax + selectedText + syntax + raw.slice(end);
+        newStart = start;
+        newEnd = end + len * 2;
+      }
+    }
+
+    onChange({ ...asset, content: newContent });
+
+    // Lock scroll position and restore exact selection without snapping to bottom
+    requestAnimationFrame(() => {
+      if (textarea) {
+        textarea.focus({ preventScroll: true });
+        textarea.setSelectionRange(newStart, newEnd);
+        textarea.scrollTop = scrollTop;
+        textarea.scrollLeft = scrollLeft;
+      }
+    });
+  };
+
+  const handleTextareaKeyDown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement>,
+    isStudio: boolean = false
+  ) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        applyFormat('**', isStudio);
+      } else if (e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        applyFormat('*', isStudio);
+      } else if (e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        applyFormat('`', isStudio);
+      }
+    }
   };
 
   return (
@@ -410,7 +495,7 @@ function TextAssetEditor({
           }`}
           style={{
             height: asset.height ? `${Math.min(320, asset.height * 0.7)}px` : 'auto',
-            minHeight: '150px',
+            minHeight: '160px',
           }}
         >
           {/* 4 Corner Crosshairs */}
@@ -438,36 +523,113 @@ function TextAssetEditor({
             </span>
           </div>
 
-          {/* Top-Right Dimension Badge */}
-          <div className="absolute top-2 right-4 font-mono text-[9px] bg-cyan-950/80 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30 pointer-events-none select-none">
-            {asset.height ? `${asset.height}px H` : 'Auto H'} · {asset.fontSize ? `${asset.fontSize}px` : 'Auto FONT'}
+          {/* Formatting Quick-Toolbar & Dimension Badge */}
+          <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-white/5 relative z-10">
+            {/* Inline Formatting Actions */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyFormat('**', false)}
+                title="Bold (Ctrl+B) - Wraps selected text in **bold**"
+                className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold text-[11px] transition-colors"
+              >
+                B
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyFormat('*', false)}
+                title="Italic (Ctrl+I) - Wraps selected text in *italic*"
+                className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 border border-white/10 text-zinc-300 italic font-serif text-[11px] transition-colors"
+              >
+                I
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyFormat('`', false)}
+                title="Title Monospace Style (Ctrl+M) - Wraps selected text in `TITLE MONO` format"
+                className="px-2 py-0.5 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-space text-[9px] uppercase tracking-wider font-semibold transition-colors"
+              >
+                `TAG`
+              </button>
+            </div>
+
+            {/* Live Preview Toggle & Badges */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPreviewMode(!previewMode)}
+                className={`px-2 py-0.5 rounded text-[10px] font-space tracking-wider uppercase transition-colors ${
+                  previewMode
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
+                    : 'bg-white/5 text-white/40 hover:text-white/70 border border-white/5'
+                }`}
+              >
+                {previewMode ? '👁️ Previewing' : '✏️ Edit'}
+              </button>
+              <span className="font-mono text-[9px] text-cyan-400/80 select-none">
+                {asset.height ? `${asset.height}px` : 'Auto H'}
+              </span>
+            </div>
           </div>
 
           {/* ── Direct In-Box Editable Title ── */}
-          <div className="w-full flex-shrink-0 mb-2 relative z-10 pr-24">
+          <div className="w-full flex-shrink-0 mb-2 relative z-10">
             <input
               type="text"
               placeholder="TITLE (OPTIONAL HEADER)"
               value={asset.title || ''}
               onChange={(e) => onChange({ ...asset, title: e.target.value })}
-              className="w-full bg-transparent border-none p-0 text-white/60 focus:text-white font-space text-[10px] sm:text-xs uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+              className="w-full bg-transparent border-none p-0 text-white/40 focus:text-white/80 font-space text-[10px] sm:text-xs uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
             />
           </div>
 
-          {/* ── Direct In-Box Editable Justified Body Text ── */}
+          {/* ── Direct In-Box Editable or Live Preview Justified Body Text ── */}
           <div className="w-full flex-1 flex items-stretch relative z-10 overflow-hidden pb-3">
-            <textarea
-              placeholder="Click here to type or paste content text directly… Live justified text renders right inside this box."
-              value={asset.content || ''}
-              onChange={(e) => onChange({ ...asset, content: e.target.value })}
-              className="w-full h-full bg-transparent border-none p-0 text-white font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-snug"
-              style={{
-                fontSize: asset.fontSize ? `${Math.max(12, asset.fontSize * 0.75)}px` : '13px',
-                lineHeight: asset.fontSize ? `${Math.max(16, asset.fontSize * 1.05)}px` : '18px',
-                textAlign: 'justify',
-                textJustify: 'inter-word',
-              }}
-            />
+            {previewMode ? (
+              <div
+                onClick={() => setPreviewMode(false)}
+                title="Click anywhere to return to editor"
+                className="w-full h-full overflow-y-auto flex flex-col gap-2.5 cursor-text text-zinc-200"
+                style={{
+                  fontSize: asset.fontSize ? `${Math.max(12, asset.fontSize * 0.75)}px` : '13px',
+                  lineHeight: asset.fontSize ? `${Math.max(16, asset.fontSize * 1.05)}px` : '18px',
+                  textAlign: 'justify',
+                  textJustify: 'inter-word',
+                }}
+              >
+                {asset.content ? (
+                  asset.content
+                    .split(/\r?\n+/)
+                    .map((p) => p.trim())
+                    .filter(Boolean)
+                    .map((p, i) => (
+                      <p key={i} className="font-light tracking-normal text-zinc-200 leading-relaxed">
+                        {renderFormattedText(p)}
+                      </p>
+                    ))
+                ) : (
+                  <span className="text-white/20 italic text-xs">No text written yet…</span>
+                )}
+              </div>
+            ) : (
+              <textarea
+                ref={textareaRef}
+                placeholder="Click here to type… Highlight text and click B, I, or `TAG` (or Ctrl+B, Ctrl+I, Ctrl+M) to format."
+                value={asset.content || ''}
+                onChange={(e) => onChange({ ...asset, content: e.target.value })}
+                onKeyDown={(e) => handleTextareaKeyDown(e, false)}
+                className="w-full h-full bg-transparent border-none p-0 text-zinc-200 font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-snug"
+                style={{
+                  fontSize: asset.fontSize ? `${Math.max(12, asset.fontSize * 0.75)}px` : '13px',
+                  lineHeight: asset.fontSize ? `${Math.max(16, asset.fontSize * 1.05)}px` : '18px',
+                  textAlign: 'justify',
+                  textJustify: 'inter-word',
+                }}
+              />
+            )}
           </div>
 
           {/* Interactive Bottom Drag Bar */}
@@ -495,7 +657,9 @@ function TextAssetEditor({
                   <span className="text-cyan-300 text-xs">{slotLabel}</span>
                 </h3>
                 <p className="text-[11px] text-white/40">
-                  WYSIWYG 2-in-1 Canvas · Edit text directly inside the box or drag crosshairs to resize height
+                  Select text & use <span className="text-white font-semibold">Ctrl+B</span> (Bold),{' '}
+                  <span className="text-white font-semibold">Ctrl+I</span> (Italic),{' '}
+                  <span className="text-cyan-300 font-semibold">Ctrl+M</span> (Title Tag)
                 </p>
               </div>
             </div>
@@ -645,7 +809,7 @@ function TextAssetEditor({
               }`}
               style={{
                 height: asset.height ? `${asset.height}px` : 'auto',
-                minHeight: '220px',
+                minHeight: '240px',
               }}
             >
               {/* ── Corner Crosshairs ── */}
@@ -676,40 +840,116 @@ function TextAssetEditor({
                 </span>
               </div>
 
-              {/* Status Indicator & Live Dimension Pill */}
-              <div className="absolute top-3 left-1/2 -translate-x-1/2 font-mono text-[10px] bg-cyan-950/90 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 shadow-md flex items-center gap-2 pointer-events-none z-20 select-none">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                <span>
-                  DESKTOP CANVAS: {asset.height ? `${asset.height}px HEIGHT` : 'FLUID HEIGHT'} ·{' '}
-                  {asset.fontSize ? `${asset.fontSize}px FONT` : 'AUTO FONT'}
-                </span>
+              {/* Top Studio Formatting Toolbar */}
+              <div className="w-full flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/10 relative z-20">
+                {/* Selection Formatting Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyFormat('**', true)}
+                    title="Bold Selection (Ctrl+B)"
+                    className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>B</span>
+                    <span className="text-[10px] text-white/50 font-normal">Bold</span>
+                  </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyFormat('*', true)}
+                    title="Italic Selection (Ctrl+I)"
+                    className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 border border-white/20 text-zinc-200 italic font-serif text-xs flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>I</span>
+                    <span className="text-[10px] text-white/50 font-sans not-italic font-normal">Italic</span>
+                  </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyFormat('`', true)}
+                    title="Monospace Title Format Selection (Ctrl+M)"
+                    className="px-3 py-1 rounded bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-500/50 text-cyan-300 font-space text-[10px] tracking-wider uppercase font-semibold flex items-center gap-1.5 transition-colors"
+                  >
+                    <span>`TAG`</span>
+                    <span className="text-[9px] text-cyan-400/60 font-normal">Title Style</span>
+                  </button>
+                </div>
+
+                {/* Studio Live Preview Toggle */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStudioPreviewMode(!studioPreviewMode)}
+                    className={`px-3 py-1 rounded-full text-xs font-space uppercase tracking-wider transition-colors flex items-center gap-1.5 ${
+                      studioPreviewMode
+                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                        : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    <span>{studioPreviewMode ? '👁️ Live Render' : '✏️ Raw Markdown'}</span>
+                  </button>
+                  <div className="font-mono text-[10px] bg-cyan-950/90 text-cyan-300 px-3 py-1 rounded-full border border-cyan-500/40 select-none">
+                    {asset.height ? `${asset.height}px H` : 'AUTO H'} · {asset.fontSize ? `${asset.fontSize}px FONT` : 'AUTO FONT'}
+                  </div>
+                </div>
               </div>
 
               {/* Direct In-Canvas Title Editor */}
-              <div className="w-full flex-shrink-0 mb-3 pt-2 relative z-10">
+              <div className="w-full flex-shrink-0 mb-3 relative z-10">
                 <input
                   type="text"
                   placeholder="TITLE (OPTIONAL UPPERCASE HEADER - E.G. CHRISTIAN ORGANIZATION • 2025)"
                   value={asset.title || ''}
                   onChange={(e) => onChange({ ...asset, title: e.target.value })}
-                  className="w-full bg-transparent border-none p-0 text-white/70 focus:text-white font-space text-xs md:text-sm uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
+                  className="w-full bg-transparent border-none p-0 text-white/40 focus:text-white/80 font-space text-xs md:text-sm uppercase tracking-[0.06em] placeholder:text-white/20 focus:outline-none transition-colors select-text"
                 />
               </div>
 
-              {/* Direct In-Canvas Body Content Editor (Full Real-time Justified Rendering) */}
+              {/* Direct In-Canvas Body Content Editor (Full Real-time Justified Rendering or Live Preview) */}
               <div className="w-full flex-1 flex items-stretch relative z-10 overflow-hidden pb-4">
-                <textarea
-                  placeholder="Click here to type your story… Live justified text renders directly at exact desktop proportions"
-                  value={asset.content || ''}
-                  onChange={(e) => onChange({ ...asset, content: e.target.value })}
-                  className="w-full h-full bg-transparent border-none p-0 text-white font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-relaxed"
-                  style={{
-                    fontSize: asset.fontSize ? `${asset.fontSize}px` : '24px',
-                    lineHeight: asset.fontSize ? `${asset.fontSize * 1.35}px` : '32px',
-                    textAlign: 'justify',
-                    textJustify: 'inter-word',
-                  }}
-                />
+                {studioPreviewMode ? (
+                  <div
+                    onClick={() => setStudioPreviewMode(false)}
+                    title="Click anywhere to return to editor"
+                    className="w-full h-full overflow-y-auto flex flex-col gap-4 cursor-text text-zinc-200"
+                    style={{
+                      fontSize: asset.fontSize ? `${asset.fontSize}px` : '24px',
+                      lineHeight: asset.fontSize ? `${asset.fontSize * 1.35}px` : '32px',
+                      textAlign: 'justify',
+                      textJustify: 'inter-word',
+                    }}
+                  >
+                    {asset.content ? (
+                      asset.content
+                        .split(/\r?\n+/)
+                        .map((p) => p.trim())
+                        .filter(Boolean)
+                        .map((p, i) => (
+                          <p key={i} className="font-light tracking-normal text-zinc-200 leading-relaxed">
+                            {renderFormattedText(p)}
+                          </p>
+                        ))
+                    ) : (
+                      <span className="text-white/20 italic text-sm">No text written yet…</span>
+                    )}
+                  </div>
+                ) : (
+                  <textarea
+                    ref={studioTextareaRef}
+                    placeholder="Click here to type your story… Select text & press Ctrl+B (Bold), Ctrl+I (Italic), or Ctrl+M (Title Monospace Tag)."
+                    value={asset.content || ''}
+                    onChange={(e) => onChange({ ...asset, content: e.target.value })}
+                    onKeyDown={(e) => handleTextareaKeyDown(e, true)}
+                    className="w-full h-full bg-transparent border-none p-0 text-zinc-200 font-light tracking-normal placeholder:text-white/20 focus:outline-none resize-none select-text leading-relaxed"
+                    style={{
+                      fontSize: asset.fontSize ? `${asset.fontSize}px` : '24px',
+                      lineHeight: asset.fontSize ? `${asset.fontSize * 1.35}px` : '32px',
+                      textAlign: 'justify',
+                      textJustify: 'inter-word',
+                    }}
+                  />
+                )}
               </div>
 
               {/* Interactive Bottom Edge Drag Handle Bar */}

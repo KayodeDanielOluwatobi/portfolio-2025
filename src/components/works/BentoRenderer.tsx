@@ -5,6 +5,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import FadeUp from '@/components/animations/FadeUp';
+import { renderFormattedText } from '@/utils/textFormatter';
 
 interface BentoAsset {
   type: 'image' | 'video' | 'text';
@@ -46,7 +47,7 @@ function BentoRow({ row }: { row: BentoRowProps }) {
             assets[0]?.height
               ? 'w-full'
               : isText
-              ? 'w-full py-2 sm:py-4 md:py-6 my-1 sm:my-2'
+              ? 'w-full'
               : 'aspect-video w-full'
           }
         />
@@ -123,7 +124,7 @@ function AutoFitText({
   title,
   content,
   customFontSize,
-  customHeight,
+  customHeight: _customHeight,
 }: {
   title?: string;
   content?: string;
@@ -131,8 +132,15 @@ function AutoFitText({
   customHeight?: number;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
   const [computedSize, setComputedSize] = useState<number>(customFontSize || 20);
+
+  // Split into distinct paragraphs on any newline sequence (single or multiple newlines/CRLF)
+  const paragraphs = content
+    ? content
+        .split(/\r?\n+/)
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0)
+    : [];
 
   useEffect(() => {
     if (customFontSize) {
@@ -141,26 +149,24 @@ function AutoFitText({
     }
 
     const el = containerRef.current;
-    const textEl = textRef.current;
-    if (!el || !textEl || !content) return;
+    if (!el || paragraphs.length === 0) return;
 
     const calculateSize = () => {
       const containerHeight = el.clientHeight;
       const containerWidth = el.clientWidth;
       if (containerHeight <= 0 || containerWidth <= 0) return;
 
-      let min = 11;
-      let max = 64;
+      let min = 12;
+      let max = 48;
       let best = min;
 
       for (let i = 0; i < 8; i++) {
         const mid = (min + max) / 2;
-        textEl.style.fontSize = `${mid}px`;
-        textEl.style.lineHeight = `${mid * 1.3}px`;
+        el.style.fontSize = `${mid}px`;
 
         const isOverflowing =
-          textEl.scrollHeight > el.clientHeight ||
-          textEl.scrollWidth > el.clientWidth;
+          el.scrollHeight > el.clientHeight ||
+          el.scrollWidth > el.clientWidth;
 
         if (isOverflowing) {
           max = mid - 0.5;
@@ -170,7 +176,7 @@ function AutoFitText({
         }
       }
 
-      setComputedSize(Math.max(12, Math.floor(best)));
+      setComputedSize(Math.max(13, Math.floor(best)));
     };
 
     calculateSize();
@@ -181,16 +187,15 @@ function AutoFitText({
     ro.observe(el);
 
     return () => ro.disconnect();
-  }, [content, title, customFontSize]);
+  }, [content, title, customFontSize, paragraphs.length]);
 
   return (
     <div
       ref={containerRef}
-      style={customHeight ? ({ '--desktop-h': `${customHeight}px` } as React.CSSProperties) : undefined}
-      className="flex flex-col w-full px-1 sm:px-3 md:px-6 py-1 md:py-3 justify-start overflow-visible md:overflow-hidden md:[min-height:var(--desktop-h)]"
+      className="flex flex-col w-full px-0 sm:px-2 md:px-4 py-0 justify-start overflow-visible"
     >
       {title && (
-        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.06em] text-white/50 mb-2 md:mb-3 flex-shrink-0 flex items-center flex-wrap">
+        <h4 className="font-space text-[10px] md:text-xs uppercase tracking-[0.06em] text-white/40 mb-3 flex-shrink-0 flex items-center flex-wrap">
           {title.split(/([•·])/g).map((part, index) => {
             if (part === '•' || part === '·') {
               return (
@@ -207,23 +212,28 @@ function AutoFitText({
           })}
         </h4>
       )}
-      <div className="w-full overflow-visible md:overflow-hidden">
-        <p
-          ref={textRef}
-          className="font-light tracking-normal text-white w-full m-0 text-left sm:text-justify"
-          style={{
-            fontSize: customFontSize
-              ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
-              : `${computedSize}px`,
-            lineHeight: customFontSize ? '1.45' : `${computedSize * 1.3}px`,
-            textJustify: 'inter-word',
-            hyphens: 'none',
-            WebkitHyphens: 'none',
-            wordBreak: 'normal',
-          }}
-        >
-          {content}
-        </p>
+      <div className="w-full overflow-visible flex flex-col gap-4 sm:gap-5 md:gap-6">
+        {paragraphs.length > 0 ? (
+          paragraphs.map((paragraph, pIdx) => (
+            <p
+              key={pIdx}
+              className="font-light tracking-normal text-zinc-200 w-full m-0 text-left sm:text-justify leading-relaxed sm:leading-[1.7]"
+              style={{
+                fontSize: customFontSize
+                  ? `clamp(13px, calc(${Math.max(11, Math.round(customFontSize * 0.4))}px + 1.1vw), ${customFontSize}px)`
+                  : `${computedSize}px`,
+                lineHeight: customFontSize ? '1.65' : `${computedSize * 1.5}px`,
+                textJustify: 'inter-word',
+                hyphens: 'none',
+                WebkitHyphens: 'none',
+                wordBreak: 'normal',
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {renderFormattedText(paragraph)}
+            </p>
+          ))
+        ) : null}
       </div>
     </div>
   );

@@ -199,10 +199,19 @@ export default function CaseStudyPage() {
       {/* ── 2. EDITORIAL DESCRIPTION SECTION (Fallback only when no Bento rows exist) ── */}
       {description && bentoRows.length === 0 && (
         <section className="pt-8 pb-4 px-4 sm:px-6">
-          <div className="container mx-auto max-w-6xl">
-            <p className="text-base sm:text-lg md:text-xl font-light text-white/75 leading-relaxed max-w-3xl">
-              {description}
-            </p>
+          <div className="container mx-auto max-w-6xl flex flex-col gap-4">
+            {description
+              .split(/\r?\n+/)
+              .map((p: string) => p.trim())
+              .filter(Boolean)
+              .map((p: string, i: number) => (
+                <p
+                  key={i}
+                  className="text-base sm:text-lg md:text-xl font-light text-zinc-200 leading-relaxed max-w-3xl"
+                >
+                  {p}
+                </p>
+              ))}
           </div>
         </section>
       )}
