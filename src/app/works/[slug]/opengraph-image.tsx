@@ -198,20 +198,7 @@ export default async function OpengraphImage({
               width: '100%',
               height: '100%',
               background:
-                'linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.50) 50%, rgba(0, 0, 0, 0.28) 100%)',
-            }}
-          />
-
-          {/* Radial vignette behind center */}
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background:
-                'radial-gradient(circle at center, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 70%)',
+                'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.25) 100%)',
             }}
           />
 
