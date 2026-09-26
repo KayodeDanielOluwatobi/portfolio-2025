@@ -20,13 +20,14 @@ export async function generateMetadata({
     };
   }
 
-  // 2. Await the headers to get the current host (everdann.vercel.app or preview URL)
-  const headerList = await headers();
-  const host = headerList.get('host');
-  const protocol = host?.includes('localhost') ? 'http' : 'https';
-  const currentUrl = `${protocol}://${host}/works/${slug}`;
-
-  const ogImageUrl = `${currentUrl}/opengraph-image`;
+  try {
+    // 2. Await the headers to get the current host (everdann.vercel.app or preview URL)
+    const headerList = await headers();
+    const rawHost = headerList.get('host') || headerList.get('x-forwarded-host');
+    const host = rawHost || process.env.VERCEL_PROJECT_PRODUCTION_URL || 'everdann.vercel.app';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    const currentUrl = `${protocol}://${host}/works/${slug}`;
+    const ogImageUrl = `${currentUrl}/opengraph-image`;
 
   return {
     title: `${project.title} — Case Study`,
@@ -55,6 +56,13 @@ export async function generateMetadata({
       images: [ogImageUrl],
     },
   };
+  } catch (err) {
+    console.error(`[Metadata Error for slug ${slug}]:`, err);
+    return {
+      title: `${project.title} — Case Study`,
+      description: project.tagline,
+    };
+  }
 }
 
 export default function CaseStudyLayout({
