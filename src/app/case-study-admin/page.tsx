@@ -1335,17 +1335,21 @@ function SortableRowCard({
 function HeroImageEditor({
   heroImage,
   brandLogo,
+  brandLogoSize = 100,
   table,
   slug,
   onHeroChange,
   onLogoChange,
+  onLogoSizeChange,
 }: {
   heroImage: string;
   brandLogo: string;
+  brandLogoSize: number;
   table: TableName;
   slug: string;
   onHeroChange: (url: string) => void;
   onLogoChange: (url: string) => void;
+  onLogoSizeChange: (size: number) => void;
 }) {
   const [uploadingHero, setUploadingHero] = useState(false);
   const [heroMsg, setHeroMsg] = useState('');
@@ -1356,6 +1360,42 @@ function HeroImageEditor({
   const [logoMsg, setLogoMsg] = useState('');
   const [logoDragOver, setLogoDragOver] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const logoBoxRef = useRef<HTMLDivElement>(null);
+  const [isResizingLogo, setIsResizingLogo] = useState(false);
+
+  // Proportionate corner drag resize around center
+  const handleStartResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const rect = logoBoxRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Exact center point of the centered logo on screen
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const startDist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+    const initialSize = brandLogoSize || 100;
+    if (startDist <= 0) return;
+
+    setIsResizingLogo(true);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const currentDist = Math.hypot(moveEvent.clientX - centerX, moveEvent.clientY - centerY);
+      const ratio = currentDist / startDist;
+      const nextSize = Math.max(25, Math.min(260, Math.round(initialSize * ratio)));
+      onLogoSizeChange(nextSize);
+    };
+
+    const onMouseUp = () => {
+      setIsResizingLogo(false);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   // Upload Hero Banner
   const handleHeroUpload = async (file: File) => {
@@ -1411,7 +1451,7 @@ function HeroImageEditor({
       <div className="flex items-center justify-between px-4 py-3 bg-white/[0.04] border-b border-white/8">
         <div className="flex items-center gap-2">
           <span className="text-white text-xs font-medium tracking-wide">Hero Showcase & Centered Brand Logo</span>
-          <span className="text-white/30 text-[11px]">(65% viewport hero on case study)</span>
+          <span className="text-white/30 text-[11px]">(Live proportionate center crosshair)</span>
         </div>
         <div className="flex items-center gap-2">
           {brandLogo && (
@@ -1445,7 +1485,7 @@ function HeroImageEditor({
           onDragOver={(e) => { e.preventDefault(); setHeroDragOver(true); }}
           onDragLeave={() => setHeroDragOver(false)}
           onClick={() => !heroImage && heroInputRef.current?.click()}
-          className={`relative rounded-xl overflow-hidden border-2 transition-all ${
+          className={`relative rounded-xl overflow-hidden border-2 transition-all select-none ${
             heroDragOver
               ? 'border-cyan-400 bg-white/5'
               : heroImage
@@ -1454,70 +1494,122 @@ function HeroImageEditor({
           }`}
         >
           {heroImage ? (
-            <div className="group relative aspect-[21/9] md:aspect-[24/9] w-full max-h-[300px] bg-black/60 overflow-hidden flex items-center justify-center">
+            <div className="group relative aspect-[21/9] md:aspect-[24/9] w-full max-h-[380px] min-h-[220px] bg-black/60 overflow-hidden flex items-center justify-center">
               {/* Hero Banner Background Image */}
               <img
                 src={heroImage}
                 alt="Case Study Hero"
-                className="w-full h-full object-cover"
+                draggable="false"
+                className="w-full h-full object-cover pointer-events-none select-none"
               />
 
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/30 pointer-events-none" />
 
-              {/* ── Centered Brand Logo Slot on Top of Hero ── */}
-              <div
-                onDrop={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setLogoDragOver(false);
-                  const file = e.dataTransfer.files[0];
-                  if (file) handleLogoUpload(file);
-                }}
-                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setLogoDragOver(true); }}
-                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setLogoDragOver(false); }}
-                onClick={(e) => { e.stopPropagation(); logoInputRef.current?.click(); }}
-                className={`relative z-20 max-w-[280px] w-full p-4 rounded-2xl transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
-                  brandLogo
-                    ? 'hover:bg-black/60 group/logo border border-white/20 hover:border-cyan-400/60 backdrop-blur-md'
-                    : logoDragOver
-                    ? 'border-2 border-cyan-400 bg-cyan-950/80'
-                    : 'border-2 border-dashed border-cyan-400/50 hover:border-cyan-300 bg-black/60 hover:bg-black/80 backdrop-blur-md'
-                }`}
-              >
+              {/* ── Center Alignment Crosshair Guide Lines ── */}
+              <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] border-t border-dashed border-cyan-400/25 pointer-events-none z-10" />
+              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[1px] border-l border-dashed border-cyan-400/25 pointer-events-none z-10" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-cyan-400/40 pointer-events-none z-10 flex items-center justify-center">
+                <div className="w-1 h-1 rounded-full bg-cyan-400" />
+              </div>
+
+              {/* ── Exact Center Container ── */}
+              <div className="absolute inset-0 z-20 flex items-center justify-center p-6 pointer-events-none">
                 {brandLogo ? (
-                  <div className="relative flex flex-col items-center">
+                  /* Logo with Interactive Proportionate Crosshair Bounding Box */
+                  <div
+                    ref={logoBoxRef}
+                    style={{
+                      transform: `scale(${brandLogoSize / 100})`,
+                      transformOrigin: 'center center',
+                    }}
+                    className={`relative pointer-events-auto flex items-center justify-center select-none transition-transform duration-75 ${
+                      isResizingLogo ? 'cursor-nwse-resize' : ''
+                    }`}
+                  >
+                    {/* Centered Logo Graphic */}
                     <img
                       src={brandLogo}
                       alt="Brand Logo"
-                      className="max-h-20 max-w-[200px] object-contain filter drop-shadow-2xl mb-1"
+                      draggable="false"
+                      className="max-h-24 sm:max-h-32 md:max-h-40 max-w-[240px] sm:max-w-[340px] md:max-w-[440px] object-contain filter drop-shadow-[0_12px_32px_rgba(0,0,0,0.85)] pointer-events-none select-none"
                     />
-                    <span className="text-[10px] text-cyan-300 font-space uppercase tracking-wider bg-black/70 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                      Brand Logo (Centered)
-                    </span>
-                    <div className="opacity-0 group-hover/logo:opacity-100 transition-opacity absolute inset-0 bg-black/80 rounded-xl flex items-center justify-center gap-2">
-                      <span className="text-[11px] text-white px-2 py-1 bg-white/20 rounded-full">
-                        Change Logo
-                      </span>
+
+                    {/* Proportionate Crosshair Bounding Outline */}
+                    <div className="absolute -inset-3 border border-dashed border-cyan-400/70 rounded-lg pointer-events-none z-20">
+                      {/* Center crosshair symbol */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center opacity-60">
+                        <span className="text-cyan-300 font-mono text-xs font-bold">+</span>
+                      </div>
+                    </div>
+
+                    {/* 4 Corner Crosshair Handles (Drag each to scale proportionally around center) */}
+                    <div
+                      onMouseDown={handleStartResize}
+                      title="Drag to resize proportionally around center"
+                      className="absolute -top-4 -left-4 w-4 h-4 bg-cyan-400 hover:bg-cyan-300 border-2 border-zinc-950 rounded-sm shadow-xl cursor-nwse-resize z-30 pointer-events-auto flex items-center justify-center transition-transform hover:scale-125"
+                    >
+                      <div className="w-1 h-1 bg-black rounded-full" />
+                    </div>
+
+                    <div
+                      onMouseDown={handleStartResize}
+                      title="Drag to resize proportionally around center"
+                      className="absolute -top-4 -right-4 w-4 h-4 bg-cyan-400 hover:bg-cyan-300 border-2 border-zinc-950 rounded-sm shadow-xl cursor-nesw-resize z-30 pointer-events-auto flex items-center justify-center transition-transform hover:scale-125"
+                    >
+                      <div className="w-1 h-1 bg-black rounded-full" />
+                    </div>
+
+                    <div
+                      onMouseDown={handleStartResize}
+                      title="Drag to resize proportionally around center"
+                      className="absolute -bottom-4 -left-4 w-4 h-4 bg-cyan-400 hover:bg-cyan-300 border-2 border-zinc-950 rounded-sm shadow-xl cursor-nesw-resize z-30 pointer-events-auto flex items-center justify-center transition-transform hover:scale-125"
+                    >
+                      <div className="w-1 h-1 bg-black rounded-full" />
+                    </div>
+
+                    <div
+                      onMouseDown={handleStartResize}
+                      title="Drag to resize proportionally around center"
+                      className="absolute -bottom-4 -right-4 w-4 h-4 bg-cyan-400 hover:bg-cyan-300 border-2 border-zinc-950 rounded-sm shadow-xl cursor-nwse-resize z-30 pointer-events-auto flex items-center justify-center transition-transform hover:scale-125"
+                    >
+                      <div className="w-1 h-1 bg-black rounded-full" />
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-1.5 py-2">
+                  /* Upload Logo Dropzone */
+                  <div
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLogoDragOver(false);
+                      const file = e.dataTransfer.files[0];
+                      if (file) handleLogoUpload(file);
+                    }}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setLogoDragOver(true); }}
+                    onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setLogoDragOver(false); }}
+                    onClick={(e) => { e.stopPropagation(); logoInputRef.current?.click(); }}
+                    className={`pointer-events-auto relative z-20 max-w-[280px] w-full p-5 rounded-2xl transition-all cursor-pointer flex flex-col items-center justify-center text-center backdrop-blur-md ${
+                      logoDragOver
+                        ? 'border-2 border-cyan-400 bg-cyan-950/80 shadow-2xl'
+                        : 'border-2 border-dashed border-cyan-400/50 hover:border-cyan-300 bg-black/60 hover:bg-black/80'
+                    }`}
+                  >
                     {uploadingLogo ? (
-                      <>
-                        <div className="w-5 h-5 border border-cyan-400/40 border-t-cyan-400 rounded-full animate-spin" />
+                      <div className="flex flex-col items-center gap-2 py-2">
+                        <div className="w-5 h-5 border-2 border-cyan-400/40 border-t-cyan-400 rounded-full animate-spin" />
                         <span className="text-cyan-300 text-xs font-space">{logoMsg}</span>
-                      </>
+                      </div>
                     ) : (
-                      <>
-                        <span className="text-cyan-400 text-xl font-bold">✦</span>
+                      <div className="flex flex-col items-center gap-1.5 py-1">
+                        <span className="text-cyan-400 text-2xl font-bold">✦</span>
                         <span className="text-white text-xs font-medium font-space">
                           Drop or Click to Upload Brand Logo
                         </span>
                         <span className="text-white/40 text-[10px]">
-                          (Will sit centered over the hero banner)
+                          (Centered in hero with live crosshair scaling)
                         </span>
-                      </>
+                      </div>
                     )}
                   </div>
                 )}
@@ -1550,6 +1642,63 @@ function HeroImageEditor({
             </div>
           )}
         </div>
+
+        {/* ── Proportionate Crosshair & Size Toolbar (Visible when Logo is Present) ── */}
+        {brandLogo && (
+          <div className="flex items-center justify-between gap-4 px-4 py-2.5 bg-cyan-950/20 border border-cyan-500/20 rounded-xl flex-wrap">
+            <div className="flex items-center gap-2">
+              <span className="text-cyan-400 text-xs font-mono font-medium">✛ Centered Logo Scale:</span>
+              <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-xs font-mono font-bold min-w-[52px] text-center">
+                {brandLogoSize}%
+              </span>
+            </div>
+            <div className="flex items-center gap-3 flex-1 max-w-xs min-w-[200px]">
+              <button
+                type="button"
+                onClick={() => onLogoSizeChange(Math.max(30, brandLogoSize - 5))}
+                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs flex items-center justify-center transition-colors select-none"
+                title="Decrease 5%"
+              >
+                -
+              </button>
+              <input
+                type="range"
+                min="30"
+                max="250"
+                step="1"
+                value={brandLogoSize}
+                onChange={(e) => onLogoSizeChange(Number(e.target.value))}
+                className="flex-1 accent-cyan-400 h-1.5 bg-white/10 rounded-lg cursor-pointer"
+              />
+              <button
+                type="button"
+                onClick={() => onLogoSizeChange(Math.min(250, brandLogoSize + 5))}
+                className="w-6 h-6 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs flex items-center justify-center transition-colors select-none"
+                title="Increase 5%"
+              >
+                +
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              {brandLogoSize !== 100 && (
+                <button
+                  type="button"
+                  onClick={() => onLogoSizeChange(100)}
+                  className="text-[11px] text-white/50 hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors"
+                >
+                  Reset (100%)
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="text-[11px] text-cyan-300 hover:text-cyan-200 px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 transition-all"
+              >
+                Change Logo
+              </button>
+            </div>
+          </div>
+        )}
 
         {heroMsg && heroMsg.startsWith('Error') && (
           <p className="text-red-400 text-xs">{heroMsg}</p>
@@ -1632,9 +1781,11 @@ function AdminDashboard() {
   const [loadingRows, setLoadingRows] = useState(false);
   const [heroImage, setHeroImage] = useState<string>('');
   const [brandLogo, setBrandLogo] = useState<string>('');
+  const [brandLogoSize, setBrandLogoSize] = useState<number>(100);
   const [rows, setRows] = useState<BentoRow[]>([]);
   const [isDirty, setIsDirty] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(288);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isResizingSidebar, setIsResizingSidebar] = useState(false);
   const sidebarWidthRef = useRef(288);
 
@@ -1650,9 +1801,13 @@ function AdminDashboard() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // ── Load sidebar width from localStorage ──────────────────────────────────
+  // ── Load sidebar width & collapsed preference from localStorage ───────────
   useEffect(() => {
     try {
+      const savedCollapsed = localStorage.getItem('admin_sidebar_collapsed');
+      if (savedCollapsed === 'true') {
+        setIsSidebarCollapsed(true);
+      }
       const saved = localStorage.getItem('admin_sidebar_width');
       if (saved) {
         const parsed = parseInt(saved, 10);
@@ -1662,6 +1817,16 @@ function AdminDashboard() {
         }
       }
     } catch {}
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('admin_sidebar_collapsed', String(next));
+      } catch {}
+      return next;
+    });
   }, []);
 
   // ── Drag handler to resize sidebar width ──────────────────────────────────
@@ -1740,6 +1905,7 @@ function AdminDashboard() {
             rows: cleanRows,
             hero_image: heroImage,
             brand_logo: brandLogo,
+            brand_logo_size: brandLogoSize,
           }),
         });
       } catch (err) {
@@ -1751,6 +1917,7 @@ function AdminDashboard() {
     setLoadingRows(true);
     setHeroImage('');
     setBrandLogo('');
+    setBrandLogoSize(100);
     setRows([]);
     setIsDirty(false);
     setSaveStatus('idle');
@@ -1764,6 +1931,7 @@ function AdminDashboard() {
       const json = await res.json();
       setHeroImage(json.heroImage || '');
       setBrandLogo(json.brandLogo || '');
+      setBrandLogoSize(Number(json.brandLogoSize) || 100);
       const existingRows: BentoRow[] = (json.caseStudyData?.rows ?? []).map(
         (row: Omit<BentoRow, 'id'>) => ({ ...row, id: crypto.randomUUID() })
       );
@@ -1773,7 +1941,7 @@ function AdminDashboard() {
     } finally {
       setLoadingRows(false);
     }
-  }, [selectedProject, isDirty, rows, heroImage, brandLogo]);
+  }, [selectedProject, isDirty, rows, heroImage, brandLogo, brandLogoSize]);
 
   // ── DnD reorder ───────────────────────────────────────────────────────────
   const handleDragEnd = (event: DragEndEvent) => {
@@ -1833,6 +2001,7 @@ function AdminDashboard() {
           rows: cleanRows,
           hero_image: heroImage,
           brand_logo: brandLogo,
+          brand_logo_size: brandLogoSize,
         }),
       });
       const json = await res.json();
@@ -1854,7 +2023,7 @@ function AdminDashboard() {
       setSaveStatus('error');
       setSaveError(err.message);
     }
-  }, [selectedProject, rows, heroImage, brandLogo]);
+  }, [selectedProject, rows, heroImage, brandLogo, brandLogoSize]);
 
   // ── Auto-save (debounced 2s after changes) ──────────────────────────────────
   useEffect(() => {
@@ -1865,7 +2034,7 @@ function AdminDashboard() {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [rows, heroImage, brandLogo, isDirty, selectedProject, loadingRows, handleSave]);
+  }, [rows, heroImage, brandLogo, brandLogoSize, isDirty, selectedProject, loadingRows, handleSave]);
 
   // ── Warn before accidental tab close with unsaved changes ─────────────────
   useEffect(() => {
@@ -1914,7 +2083,25 @@ function AdminDashboard() {
   return (
     <div className="h-screen w-screen overflow-hidden bg-black text-white flex flex-col" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <header className="flex-shrink-0 border-b border-white/10 px-6 h-12 flex items-center gap-4 bg-zinc-950 z-20 select-none">
+      <header className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 h-12 flex items-center gap-3 bg-zinc-950 z-20 select-none">
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          title={isSidebarCollapsed ? 'Expand sidebar (show projects)' : 'Collapse sidebar'}
+          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/70 hover:text-white transition-all flex items-center justify-center group"
+          aria-label={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg className="w-4 h-4 text-cyan-400 group-hover:scale-105 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M9 3v18" />
+            {isSidebarCollapsed ? (
+              <path d="m14 9 3 3-3 3" />
+            ) : (
+              <path d="m16 15-3-3 3-3" />
+            )}
+          </svg>
+        </button>
+
         <span
           className="text-xs uppercase tracking-[0.2em] text-white/35"
           style={{ fontFamily: 'var(--font-space-mono, monospace)' }}
@@ -1949,28 +2136,48 @@ function AdminDashboard() {
       <div className="flex flex-1 min-h-0 overflow-hidden relative">
         {/* ── Sidebar ───────────────────────────────────────────────────────── */}
         <aside
-          style={{ width: `${sidebarWidth}px` }}
-          className="flex-shrink-0 h-full border-r border-white/10 flex flex-col bg-zinc-950 overflow-hidden relative select-none"
+          style={{ width: isSidebarCollapsed ? 0 : `${sidebarWidth}px` }}
+          className={`flex-shrink-0 h-full border-r border-white/10 flex flex-col bg-zinc-950 overflow-hidden relative select-none transition-[width] duration-300 ease-in-out ${
+            isSidebarCollapsed ? 'border-r-0 pointer-events-none' : ''
+          }`}
         >
           {/* Draggable Vertical Resize Bar on Right Edge */}
-          <div
-            onMouseDown={handleStartResizeSidebar}
-            className={`absolute top-0 right-0 bottom-0 w-2 cursor-col-resize z-30 transition-colors ${
-              isResizingSidebar
-                ? 'bg-cyan-400'
-                : 'hover:bg-cyan-500/40 active:bg-cyan-400 bg-transparent'
-            }`}
-            title="Drag left or right to adjust sidebar width"
-          />
-          {/* Search */}
-          <div className="p-3 border-b border-white/10 flex-shrink-0">
-            <input
-              type="text"
-              placeholder="Search projects…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/8 rounded-lg px-3 py-2 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20"
+          {!isSidebarCollapsed && (
+            <div
+              onMouseDown={handleStartResizeSidebar}
+              className={`absolute top-0 right-0 bottom-0 w-2 cursor-col-resize z-30 transition-colors ${
+                isResizingSidebar
+                  ? 'bg-cyan-400'
+                  : 'hover:bg-cyan-500/40 active:bg-cyan-400 bg-transparent'
+              }`}
+              title="Drag left or right to adjust sidebar width"
             />
+          )}
+
+          {/* Search + Collapse Button */}
+          <div className="p-3 border-b border-white/10 flex-shrink-0 flex items-center gap-2">
+            <div className="relative flex-1 min-w-0">
+              <input
+                type="text"
+                placeholder="Search projects…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white/5 border border-white/8 rounded-lg px-3 py-2 text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              title="Collapse sidebar"
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/50 hover:text-white transition-all flex-shrink-0"
+              aria-label="Collapse sidebar"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M9 3v18" />
+                <path d="m16 15-3-3 3-3" />
+              </svg>
+            </button>
           </div>
 
           {/* Category filter */}
@@ -2064,7 +2271,23 @@ function AdminDashboard() {
         </aside>
 
         {/* ── Main panel ────────────────────────────────────────────────────── */}
-        <main className="flex-1 h-full min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-black">
+        <main className="flex-1 h-full min-h-0 min-w-0 overflow-y-auto overscroll-contain bg-black relative">
+          {/* Floating Expand Sidebar Button when collapsed */}
+          {isSidebarCollapsed && (
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              title="Show projects sidebar"
+              className="absolute top-4 left-4 z-40 px-3 py-2 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 text-white/80 hover:text-white shadow-2xl backdrop-blur-md flex items-center gap-2 text-xs font-medium transition-all group animate-in fade-in"
+            >
+              <svg className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M9 3v18" />
+                <path d="m14 9 3 3-3 3" />
+              </svg>
+              <span>Projects</span>
+            </button>
+          )}
           {!selectedProject ? (
             /* Empty state */
             <div className="flex items-center justify-center h-full">
@@ -2152,6 +2375,7 @@ function AdminDashboard() {
                   <HeroImageEditor
                     heroImage={heroImage}
                     brandLogo={brandLogo}
+                    brandLogoSize={brandLogoSize}
                     table={selectedProject.table}
                     slug={selectedProject.slug}
                     onHeroChange={(url) => {
@@ -2161,6 +2385,11 @@ function AdminDashboard() {
                     }}
                     onLogoChange={(url) => {
                       setBrandLogo(url);
+                      setIsDirty(true);
+                      setSaveStatus('idle');
+                    }}
+                    onLogoSizeChange={(size) => {
+                      setBrandLogoSize(size);
                       setIsDirty(true);
                       setSaveStatus('idle');
                     }}

@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       caseStudyData: data.case_study_data || null,
       heroImage: data.case_study_data?.hero_image || defaultMedia || '',
       brandLogo: data.case_study_data?.brand_logo || data.case_study_data?.logo || '',
+      brandLogoSize: Number(data.case_study_data?.brand_logo_size) || 100,
     });
   }
 

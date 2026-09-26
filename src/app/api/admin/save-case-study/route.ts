@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const supabase = getSupabaseAdmin();
     const body = await request.json();
-    const { slug, table, rows, hero_image, brand_logo } = body;
+    const { slug, table, rows, hero_image, brand_logo, brand_logo_size } = body;
 
     if (!slug || !table || !Array.isArray(rows)) {
       return NextResponse.json({ error: 'Missing required fields: slug, table, rows' }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
         rows: cleanRows,
         ...(hero_image !== undefined ? { hero_image } : {}),
         ...(brand_logo !== undefined ? { brand_logo } : {}),
+        ...(brand_logo_size !== undefined ? { brand_logo_size: Number(brand_logo_size) } : {}),
       },
     };
 

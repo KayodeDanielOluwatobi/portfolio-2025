@@ -55,6 +55,7 @@ export default function CaseStudyPage() {
     project.logo_variant ||
     project.logo ||
     '';
+  const brandLogoSize = Number(project.case_study_data?.brand_logo_size) || 100;
   const tagline = project.tagline || '';
   const description = project.description || project.about_brand;
   const bentoRows = project.case_study_data?.rows || [];
@@ -92,7 +93,13 @@ export default function CaseStudyPage() {
             transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none p-6"
           >
-            <div className="relative w-full max-w-[240px] sm:max-w-[360px] md:max-w-[480px] lg:max-w-[560px] h-28 sm:h-40 md:h-52 lg:h-60 flex items-center justify-center">
+            <div 
+              style={{
+                transform: `scale(${brandLogoSize / 100})`,
+                transformOrigin: 'center center',
+              }}
+              className="relative w-full max-w-[240px] sm:max-w-[360px] md:max-w-[480px] lg:max-w-[560px] h-28 sm:h-40 md:h-52 lg:h-60 flex items-center justify-center transition-transform duration-300"
+            >
               <img
                 src={brandLogo}
                 alt={`${brandName} Logo`}
