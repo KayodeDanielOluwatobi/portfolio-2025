@@ -111,8 +111,13 @@ export default function CaseStudyPage() {
           </motion.div>
         )}
 
-        {/* Gradient Overlay for Cinematic Depth and Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/45 to-black/25 pointer-events-none" />
+        {/* Gradient Overlay for Cinematic Depth and Readability — Locked to dark theme */}
+        <div 
+          style={{
+            background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.25) 100%)',
+          }}
+          className="absolute inset-0 pointer-events-none" 
+        />
 
         {/* Hero Content Container */}
         <div className="relative z-10 w-full px-8 pb-8 pt-28 flex items-end justify-between">

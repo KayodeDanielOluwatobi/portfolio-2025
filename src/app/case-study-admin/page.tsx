@@ -1503,8 +1503,13 @@ function HeroImageEditor({
                 className="w-full h-full object-cover pointer-events-none select-none"
               />
 
-              {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/30 pointer-events-none" />
+              {/* Dark Gradient Overlay — Locked to dark irrespective of any theme */}
+              <div 
+                style={{
+                  background: 'linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.45) 50%, rgba(0, 0, 0, 0.25) 100%)',
+                }}
+                className="absolute inset-0 pointer-events-none z-[1]" 
+              />
 
               {/* ── Center Alignment Crosshair Guide Lines ── */}
               <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] border-t border-dashed border-cyan-400/25 pointer-events-none z-10" />
@@ -2081,7 +2086,11 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-black text-white flex flex-col" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
+    <div
+      data-theme="dark"
+      className="dark h-screen w-screen overflow-hidden bg-black text-white flex flex-col"
+      style={{ fontFamily: 'var(--font-inter, sans-serif)', colorScheme: 'dark' }}
+    >
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <header className="flex-shrink-0 border-b border-white/10 px-4 sm:px-6 h-12 flex items-center gap-3 bg-zinc-950 z-20 select-none">
         <button
