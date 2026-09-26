@@ -91,7 +91,7 @@ export default function DuolingoWidget({ onHoverColor, onLeaveColor }: DuolingoW
     return (
       <Squircle
         cornerRadius={squircleRadius}
-        cornerSmoothing={0.7}
+        cornerSmoothing={1}
         className="w-full min-h-[320px] bg-zinc-900/50 relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#000000]/90 via-[#000000]/85 to-[#000000]/90" />
@@ -129,7 +129,7 @@ export default function DuolingoWidget({ onHoverColor, onLeaveColor }: DuolingoW
     >
       <Squircle
         cornerRadius={squircleRadius}
-        cornerSmoothing={0.7}
+        cornerSmoothing={1}
         className="w-full min-h-[320px] md:h-full relative overflow-hidden group font-din bg-zinc-900"
       >
         <div

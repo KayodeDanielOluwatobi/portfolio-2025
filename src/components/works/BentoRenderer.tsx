@@ -325,7 +325,7 @@ function MediaCard({
   ) : (
     <Squircle
       cornerRadius={squircleRadius}
-      cornerSmoothing={0.7}
+      cornerSmoothing={1}
       style={customHeightStyle}
       className={`group relative overflow-hidden transition-all duration-500 ${className} ${
         asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''

@@ -118,7 +118,7 @@ export default function WorkCard({
         {/* Image Container with Dynamic Squircle */}
         <Squircle
           cornerRadius={dynamicRadius} // 👈 Uses the calculated radius
-          cornerSmoothing={0.7}
+          cornerSmoothing={1}
           className={`relative overflow-hidden ${getAspectRatio()} bg-white/5 image-protected`}
         >
           {!isLoaded && <div className="absolute inset-0 bg-white/5 animate-pulse" />}

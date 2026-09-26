@@ -49,7 +49,7 @@ export default function ProjectCard({
       <motion.div layoutId={`project-media-${slug}`}>
         <Squircle
           cornerRadius={dynamicRadius} // 👈 Use the dynamic value here
-          cornerSmoothing={0.7}
+          cornerSmoothing={1}
           className={`relative overflow-hidden cursor-pointer ${
             aspectRatio === 'square' ? 'aspect-square' : ''
           }`}

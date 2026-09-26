@@ -73,7 +73,7 @@ export default function WeatherWidget({
   width,
   height,
   cornerRadius = 30,
-  cornerSmoothing = 0.7,
+  cornerSmoothing = 1,
   className = ''
 }: WeatherWidgetProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);

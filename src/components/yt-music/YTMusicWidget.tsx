@@ -170,7 +170,7 @@ export default function YTMusicWidget({
     >
       <Squircle
         cornerRadius={squircleRadius}
-        cornerSmoothing={0.7}
+        cornerSmoothing={1}
         className="relative w-full h-full overflow-hidden shadow-xl shadow-black/50 border-white/0"
       >
         {/* Background: Album Art */}

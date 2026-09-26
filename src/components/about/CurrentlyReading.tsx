@@ -181,7 +181,7 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
   const LoadingState = () => (
     <Squircle
       cornerRadius={squircleRadius}
-      cornerSmoothing={0.7}
+      cornerSmoothing={1}
       className="w-full min-h-[350px] bg-zinc-900/50 p-6 md:p-8 text-white relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#000000]/90 via-[#000000]/85 to-[#000000]/90" />
@@ -221,7 +221,7 @@ export default function CurrentlyReading({ onHoverColor, onLeaveColor }: Current
     >
       <Squircle
         cornerRadius={squircleRadius}
-        cornerSmoothing={0.7}
+        cornerSmoothing={1}
         className="w-full bg-zinc-900/50 p-6 md:p-8 text-white relative overflow-hidden group"
       >
         <AnimatePresence mode="wait">

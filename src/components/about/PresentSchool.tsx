@@ -107,7 +107,7 @@ export default function PresentSchool({ onHoverColor, onLeaveColor }: PresentSch
         >
             <Squircle
                 cornerRadius={squircleRadius}
-                cornerSmoothing={0.7}
+                cornerSmoothing={1}
                 className={`w-full bg-zinc-900/50 px-6 py-8 md:p-10 text-white/70 relative overflow-hidden transition-all duration-700 ${shouldGlow ? 'ring-2 ring-[#3BA2DE] shadow-[0_0_30px_rgba(59,162,222,0.4)] scale-[1.01]' : ''
                     }`}
             >

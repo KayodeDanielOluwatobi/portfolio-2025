@@ -144,11 +144,11 @@ export default function KeycapInteractive({ onHoverColor, onLeaveColor }: Keycap
   const tooltipSize = imageScale < 0.6 ? {
     progressSize: 30, padding: '8px', gap: '6px', minWidth: '120px',
     toolNameSize: '10px', proficiencyLabelSize: '9px', proficiencyTextSize: '11px',
-    cornerRadius: 24, cornerSmoothing: 0.8, trackWidth: 3, waveWidth: 4
+    cornerRadius: 24, cornerSmoothing: 1, trackWidth: 3, waveWidth: 4
   } : imageScale < 1 ? {
     progressSize: 45, padding: '12px', gap: '8px', minWidth: '150px',
     toolNameSize: '11px', proficiencyLabelSize: '9px', proficiencyTextSize: '12px',
-    cornerRadius: 32, cornerSmoothing: 0.9, trackWidth: 5, waveWidth: 6
+    cornerRadius: 32, cornerSmoothing: 1, trackWidth: 5, waveWidth: 6
   } : {
     progressSize: 60, padding: '20px', gap: '12px', minWidth: '180px',
     toolNameSize: '14px', proficiencyLabelSize: '11px', proficiencyTextSize: '14px',
