@@ -40,6 +40,7 @@ const keycapProficiencies: Record<string, 'Expert' | 'Advanced' | 'Intermediate'
   'ChatGPT': 'Expert',
   'Gemini': 'Advanced',
   'Be': 'Advanced',
+  'Affinity': 'Expert',
 };
 
 const toolDisplayNames: Record<string, { main: string; sub?: string }> = {
@@ -63,6 +64,7 @@ const toolProgressOverrides: Record<string, number> = {
   'Illustrator': 85,
   'InDesign': 85,
   'Photoshop': 85,
+  'Affinity': 85,
   'Premiere Pro': 70,
   'After Effects': 70,
 };
