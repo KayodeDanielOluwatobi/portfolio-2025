@@ -123,7 +123,7 @@ export default function CaseStudyPage() {
         />
 
         {/* Hero Content Container */}
-        <div className="relative z-10 w-full px-8 pb-8 pt-28 flex items-end justify-between">
+        <div className="relative z-10 w-full px-6 sm:px-8 pb-6 sm:pb-8 pt-28 flex items-end justify-between">
           <div className="flex flex-col gap-4 w-full">
             {/* Top row: Brand Title & Actions Cluster */}
             <div className="flex items-end justify-between gap-6 flex-wrap">
@@ -218,8 +218,8 @@ export default function CaseStudyPage() {
 
       {/* ── 2. EDITORIAL DESCRIPTION SECTION (Fallback only when no Bento rows exist) ── */}
       {description && bentoRows.length === 0 && (
-        <section className="pt-8 pb-4 px-4 sm:px-6">
-          <div className="container mx-auto max-w-6xl flex flex-col gap-2">
+        <section className="pt-8 pb-4 px-6 sm:px-6 md:px-8 max-w-6xl mx-auto w-full">
+          <div className="flex flex-col gap-2">
             {description
               .split(/\r?\n/)
               .map((line: string, i: number) => {
@@ -260,10 +260,8 @@ export default function CaseStudyPage() {
 
       {/* ── 3. BENTO RENDERER GRID (Follows hero section with comfortable top spacing) ── */}
       {bentoRows.length > 0 && (
-        <section className="pt-8 sm:pt-10 md:pt-12 pb-32 px-3 sm:px-4 md:px-6 lg:px-8">
-          <div className="container mx-auto max-w-6xl">
-            <BentoRenderer rows={bentoRows} />
-          </div>
+        <section className="pt-6 sm:pt-10 md:pt-12 pb-32 px-6 sm:px-6 md:px-8 max-w-6xl mx-auto w-full">
+          <BentoRenderer rows={bentoRows} />
         </section>
       )}
 

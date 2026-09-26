@@ -296,17 +296,13 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
           : undefined
       }
     >
-      <div className="container max-w-none mx-auto px-8 py-8 h-20 flex items-center justify-between">
-        {/* Logo with smooth fade (reduced size on case study pages) */}
+      <div className="container max-w-none mx-auto px-6 sm:px-8 py-6 sm:py-8 h-20 flex items-center justify-between">
+        {/* Logo with smooth fade */}
         <motion.div
           variants={logoFadeVariants}
           initial="visible"
           animate={shouldShowLogo && !isMenuOpen ? 'visible' : 'hidden'}
-          className={`relative z-50 flex items-center transition-all duration-300 ${
-            isCaseStudyPage
-              ? 'w-20 h-6 sm:w-22 sm:h-6 md:w-24 md:h-6'
-              : 'w-28 h-7 sm:w-28 sm:h-7 md:w-32 md:h-8'
-          }`}
+          className="relative z-50 flex items-center transition-all duration-300 w-28 h-7 sm:w-28 sm:h-7 md:w-32 md:h-8"
         >
           <Link href="/" className="relative w-full h-full flex items-center">
             <Image

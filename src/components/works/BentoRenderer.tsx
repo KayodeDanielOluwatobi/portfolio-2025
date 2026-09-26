@@ -4,6 +4,8 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Squircle } from '@squircle-js/react';
+import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 import FadeUp from '@/components/animations/FadeUp';
 import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
 
@@ -26,7 +28,7 @@ export default function BentoRenderer({ rows }: { rows: BentoRowProps[] }) {
   if (!rows || rows.length === 0) return null;
 
   return (
-    <div className="flex flex-col gap-5 sm:gap-7 md:gap-9 w-full">
+    <div className="flex flex-col gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 w-full">
       {rows.map((row, index) => (
         <BentoRow key={index} row={row} />
       ))}
@@ -57,27 +59,31 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'twin') {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4 md:gap-5">
-        <MediaCard
-          asset={assets[0]}
-          className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
-        />
-        <MediaCard
-          asset={assets[1]}
-          className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
-        />
-      </div>
+      <FadeUp className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5">
+          <MediaCard
+            asset={assets[0]}
+            className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
+            skipFadeUp
+          />
+          <MediaCard
+            asset={assets[1]}
+            className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] w-full'}
+            skipFadeUp
+          />
+        </div>
+      </FadeUp>
     );
   }
 
   if (layout === 'big-left') {
     return (
       <FadeUp className="w-full">
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 items-start">
           <div className="w-full aspect-[4/5]">
             <MediaCard asset={assets[0]} className="w-full h-full" skipFadeUp />
           </div>
-          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
+          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5">
             <MediaCard asset={assets[1]} className="w-full h-full" skipFadeUp />
             <MediaCard asset={assets[2]} className="w-full h-full" skipFadeUp />
           </div>
@@ -89,8 +95,8 @@ function BentoRow({ row }: { row: BentoRowProps }) {
   if (layout === 'big-right') {
     return (
       <FadeUp className="w-full">
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
-          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5 items-start">
+          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5">
             <MediaCard asset={assets[0]} className="w-full h-full" skipFadeUp />
             <MediaCard asset={assets[1]} className="w-full h-full" skipFadeUp />
           </div>
@@ -104,20 +110,25 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'triple') {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
-        <MediaCard
-          asset={assets[0]}
-          className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
-        />
-        <MediaCard
-          asset={assets[1]}
-          className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
-        />
-        <MediaCard
-          asset={assets[2]}
-          className={assets[2]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
-        />
-      </div>
+      <FadeUp className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5 md:gap-4 lg:gap-5">
+          <MediaCard
+            asset={assets[0]}
+            className={assets[0]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+            skipFadeUp
+          />
+          <MediaCard
+            asset={assets[1]}
+            className={assets[1]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+            skipFadeUp
+          />
+          <MediaCard
+            asset={assets[2]}
+            className={assets[2]?.height ? 'w-full' : 'aspect-[4/5] sm:aspect-[3/4] w-full'}
+            skipFadeUp
+          />
+        </div>
+      </FadeUp>
     );
   }
 
@@ -294,21 +305,31 @@ function MediaCard({
 }) {
   if (!asset) return null;
 
+  const squircleRadius = useSquircleRadius(24, 20, 16, 12);
   const isText = asset.type === 'text';
   const customHeightStyle = !isText && asset.height
     ? ({ '--card-h': `${asset.height}px` } as React.CSSProperties)
     : undefined;
 
-  const cardNode = (
+  const cardNode = isText ? (
     <div 
+      className={`group relative overflow-hidden transition-all duration-500 ${className} bg-transparent border-none w-full h-auto`}
+    >
+      <AutoFitText
+        title={asset.title}
+        content={asset.content}
+        customFontSize={asset.fontSize}
+        customHeight={asset.height}
+      />
+    </div>
+  ) : (
+    <Squircle
+      cornerRadius={squircleRadius}
+      cornerSmoothing={0.7}
       style={customHeightStyle}
       className={`group relative overflow-hidden transition-all duration-500 ${className} ${
-        !isText && asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''
-      } ${
-        isText 
-          ? 'bg-transparent border-none w-full h-auto' 
-          : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl h-full'
-      }`}
+        asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''
+      } bg-zinc-900/40 border border-white/5 h-full`}
     >
       {asset.type === 'image' && (
         <img 
@@ -331,23 +352,12 @@ function MediaCard({
       )}
 
       {/* Transparent Protective Shield over media */}
-      {!isText && (
-        <div 
-          className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
-          onContextMenu={(e) => e.preventDefault()}
-          draggable="false"
-        />
-      )}
-
-      {asset.type === 'text' && (
-        <AutoFitText
-          title={asset.title}
-          content={asset.content}
-          customFontSize={asset.fontSize}
-          customHeight={asset.height}
-        />
-      )}
-    </div>
+      <div 
+        className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
+        onContextMenu={(e) => e.preventDefault()}
+        draggable="false"
+      />
+    </Squircle>
   );
 
   if (skipFadeUp) {
