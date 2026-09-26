@@ -72,29 +72,33 @@ function BentoRow({ row }: { row: BentoRowProps }) {
 
   if (layout === 'big-left') {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
-        <div className="w-full aspect-[4/5]">
-          <MediaCard asset={assets[0]} className="w-full h-full" />
+      <FadeUp className="w-full">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
+          <div className="w-full aspect-[4/5]">
+            <MediaCard asset={assets[0]} className="w-full h-full" skipFadeUp />
+          </div>
+          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
+            <MediaCard asset={assets[1]} className="w-full h-full" skipFadeUp />
+            <MediaCard asset={assets[2]} className="w-full h-full" skipFadeUp />
+          </div>
         </div>
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
-          <MediaCard asset={assets[1]} className="w-full h-full" />
-          <MediaCard asset={assets[2]} className="w-full h-full" />
-        </div>
-      </div>
+      </FadeUp>
     );
   }
 
   if (layout === 'big-right') {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
-        <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
-          <MediaCard asset={assets[0]} className="w-full h-full" />
-          <MediaCard asset={assets[1]} className="w-full h-full" />
+      <FadeUp className="w-full">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5 items-start">
+          <div className="w-full aspect-[4/5] grid grid-rows-2 gap-3 sm:gap-4 md:gap-5">
+            <MediaCard asset={assets[0]} className="w-full h-full" skipFadeUp />
+            <MediaCard asset={assets[1]} className="w-full h-full" skipFadeUp />
+          </div>
+          <div className="w-full aspect-[4/5]">
+            <MediaCard asset={assets[2]} className="w-full h-full" skipFadeUp />
+          </div>
         </div>
-        <div className="w-full aspect-[4/5]">
-          <MediaCard asset={assets[2]} className="w-full h-full" />
-        </div>
-      </div>
+      </FadeUp>
     );
   }
 
@@ -279,62 +283,80 @@ function AutoFitText({
   );
 }
 
-function MediaCard({ asset, className }: { asset: BentoAsset; className?: string }) {
+function MediaCard({
+  asset,
+  className,
+  skipFadeUp = false,
+}: {
+  asset: BentoAsset;
+  className?: string;
+  skipFadeUp?: boolean;
+}) {
+  if (!asset) return null;
+
   const isText = asset.type === 'text';
   const customHeightStyle = !isText && asset.height
     ? ({ '--card-h': `${asset.height}px` } as React.CSSProperties)
     : undefined;
 
+  const cardNode = (
+    <div 
+      style={customHeightStyle}
+      className={`group relative overflow-hidden transition-all duration-500 ${className} ${
+        !isText && asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''
+      } ${
+        isText 
+          ? 'bg-transparent border-none w-full h-auto' 
+          : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl h-full'
+      }`}
+    >
+      {asset.type === 'image' && (
+        <img 
+          src={asset.src} 
+          alt="" 
+          draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
+          className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
+        />
+      )}
+      
+      {asset.type === 'video' && (
+        <video 
+          src={asset.src} 
+          autoPlay muted loop playsInline 
+          draggable="false"
+          onContextMenu={(e) => e.preventDefault()}
+          className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
+        />
+      )}
+
+      {/* Transparent Protective Shield over media */}
+      {!isText && (
+        <div 
+          className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
+          onContextMenu={(e) => e.preventDefault()}
+          draggable="false"
+        />
+      )}
+
+      {asset.type === 'text' && (
+        <AutoFitText
+          title={asset.title}
+          content={asset.content}
+          customFontSize={asset.fontSize}
+          customHeight={asset.height}
+        />
+      )}
+    </div>
+  );
+
+  if (skipFadeUp) {
+    return cardNode;
+  }
+
   return (
     <FadeUp className={isText ? 'w-full h-auto' : 'h-full'}>
-      <div 
-        style={customHeightStyle}
-        className={`group relative overflow-hidden transition-all duration-500 ${className} ${
-          !isText && asset.height ? 'md:[height:var(--card-h)] md:[min-height:var(--card-h)]' : ''
-        } ${
-          isText 
-            ? 'bg-transparent border-none w-full h-auto' 
-            : 'bg-zinc-900/40 border border-white/5 rounded-lg md:rounded-2xl h-full'
-        }`}
-      >
-        {asset.type === 'image' && (
-          <img 
-            src={asset.src} 
-            alt="" 
-            draggable="false"
-            onContextMenu={(e) => e.preventDefault()}
-            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
-          />
-        )}
-        
-        {asset.type === 'video' && (
-          <video 
-            src={asset.src} 
-            autoPlay muted loop playsInline 
-            draggable="false"
-            onContextMenu={(e) => e.preventDefault()}
-            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
-          />
-        )}
-
-        {/* Transparent Protective Shield over media */}
-        {!isText && (
-          <div 
-            className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
-            onContextMenu={(e) => e.preventDefault()}
-            draggable="false"
-          />
-        )}
-
-        {asset.type === 'text' && (
-          <AutoFitText
-            title={asset.title}
-            content={asset.content}
-            customFontSize={asset.fontSize}
-            customHeight={asset.height}
-          />
-        )}
-      </div>
+      {cardNode}
     </FadeUp>
   );
 }

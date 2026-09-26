@@ -1624,6 +1624,7 @@ function HeroImageEditor({
 function AdminDashboard() {
   const [projects, setProjects] = useState<ProjectEntry[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [projectsError, setProjectsError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
 
@@ -1691,15 +1692,31 @@ function AdminDashboard() {
   }, []);
 
   // ── Load all projects on mount ─────────────────────────────────────────────
-  useEffect(() => {
+  const fetchProjects = useCallback(() => {
+    setLoadingProjects(true);
+    setProjectsError(null);
     fetch('/api/admin/projects')
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => null);
+          throw new Error(body?.error || `Server returned status ${r.status}`);
+        }
+        return r.json();
+      })
       .then((json) => {
         setProjects(json.projects || []);
         setLoadingProjects(false);
       })
-      .catch(() => setLoadingProjects(false));
+      .catch((err) => {
+        console.error('Failed to load projects:', err);
+        setProjectsError(err.message || 'Failed to load projects');
+        setLoadingProjects(false);
+      });
   }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   // ── Reset scroll to top when filter or search changes ─────────────────────
   useEffect(() => {
@@ -1976,6 +1993,19 @@ function AdminDashboard() {
           <div ref={listScrollRef} className="flex-1 overflow-y-auto">
             {loadingProjects ? (
               <div className="p-4 text-white/20 text-xs text-center mt-4">Loading…</div>
+            ) : projectsError ? (
+              <div className="p-3 mx-3 my-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-center">
+                <div className="text-rose-400 font-medium text-xs mb-1">Failed to load projects</div>
+                <div className="text-rose-300/60 text-[10px] mb-3 leading-relaxed break-words">
+                  {projectsError}
+                </div>
+                <button
+                  onClick={fetchProjects}
+                  className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded-lg text-xs transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
             ) : filteredProjects.length === 0 ? (
               <div className="p-4 text-white/20 text-xs text-center mt-4">No projects found</div>
             ) : (

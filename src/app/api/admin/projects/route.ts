@@ -5,10 +5,14 @@ const TABLES = ['works_brands', 'works_socials', 'works_church', 'works_publishi
 type TableName = (typeof TABLES)[number];
 
 function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    throw new Error('Supabase URL or Key is missing. Ensure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY are set.');
+  }
+
+  return createClient(url, key);
 }
 
 // GET /api/admin/projects
@@ -16,10 +20,11 @@ function getSupabaseAdmin() {
 // GET /api/admin/projects?slug=xxx&table=works_brands
 //   → returns single project's full case_study_data
 export async function GET(request: NextRequest) {
-  const supabase = getSupabaseAdmin();
-  const { searchParams } = new URL(request.url);
-  const slug = searchParams.get('slug');
-  const table = searchParams.get('table') as TableName | null;
+  try {
+    const supabase = getSupabaseAdmin();
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+    const table = searchParams.get('table') as TableName | null;
 
   // ── Single project fetch (for loading into the builder) ──────────────────
   if (slug && table) {
@@ -77,5 +82,12 @@ export async function GET(request: NextRequest) {
     return r.value;
   });
 
-  return NextResponse.json({ projects });
+    return NextResponse.json({ projects });
+  } catch (err: any) {
+    console.error('[admin/projects] Error:', err);
+    return NextResponse.json(
+      { error: err?.message || 'Failed to fetch projects', projects: [] },
+      { status: 500 }
+    );
+  }
 }
