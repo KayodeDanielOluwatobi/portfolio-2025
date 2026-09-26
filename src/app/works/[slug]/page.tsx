@@ -243,11 +243,13 @@ export default function CaseStudyPage() {
       )}
 
       {/* ── 3. BENTO RENDERER GRID (Follows hero section with comfortable top spacing) ── */}
-      <section className="pt-8 sm:pt-10 md:pt-12 pb-32 px-3 sm:px-4 md:px-6 lg:px-8">
-        <div className="container mx-auto max-w-6xl">
-          <BentoRenderer rows={bentoRows} />
-        </div>
-      </section>
+      {bentoRows.length > 0 && (
+        <section className="pt-8 sm:pt-10 md:pt-12 pb-32 px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="container mx-auto max-w-6xl">
+            <BentoRenderer rows={bentoRows} />
+          </div>
+        </section>
+      )}
 
       <RelatedProjects
         currentSlug={slug}
