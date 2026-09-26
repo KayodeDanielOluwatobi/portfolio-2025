@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, Fragment } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -154,10 +154,40 @@ function LayoutPreviewBox({ layout }: { layout: LayoutType }) {
   );
 }
 
+function InsertRowDivider({
+  onInsert,
+  label,
+}: {
+  onInsert: () => void;
+  label?: string;
+}) {
+  return (
+    <div className="relative group/insert py-2 -my-1 flex items-center justify-center transition-all z-20">
+      {/* Dashed guide line on hover */}
+      <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 h-[1px] border-t border-dashed border-white/10 group-hover/insert:border-cyan-400/40 transition-colors pointer-events-none" />
+
+      {/* Insert Button */}
+      <button
+        type="button"
+        onClick={onInsert}
+        className="relative z-10 opacity-30 hover:opacity-100 sm:opacity-0 sm:group-hover/insert:opacity-100 hover:scale-105 transition-all duration-200 px-3 py-1 rounded-full bg-zinc-900 border border-white/15 hover:border-cyan-400/60 text-white/50 hover:text-cyan-300 text-xs font-mono flex items-center gap-1.5 shadow-lg shadow-black/80 cursor-pointer"
+        title={label || 'Insert row here'}
+      >
+        <span className="text-cyan-400 text-sm font-bold leading-none">+</span>
+        <span>Insert row</span>
+      </button>
+    </div>
+  );
+}
+
 function LayoutPickerModal({
+  targetIndex,
+  totalRows,
   onSelect,
   onClose,
 }: {
+  targetIndex?: number | null;
+  totalRows?: number;
   onSelect: (l: LayoutType) => void;
   onClose: () => void;
 }) {
@@ -169,6 +199,13 @@ function LayoutPickerModal({
     { type: 'big-right', label: 'Big Right' },
   ];
 
+  const isInsertingBetween =
+    targetIndex !== null &&
+    targetIndex !== undefined &&
+    totalRows !== undefined &&
+    totalRows > 0 &&
+    targetIndex < totalRows;
+
   return (
     <div
       className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
@@ -179,9 +216,16 @@ function LayoutPickerModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-white font-light text-base tracking-wide">
-            Choose Row Layout
-          </h3>
+          <div>
+            <h3 className="text-white font-light text-base tracking-wide">
+              Choose Row Layout
+            </h3>
+            {isInsertingBetween && (
+              <p className="text-cyan-400 text-xs font-mono mt-0.5">
+                ↳ Inserting as Row {targetIndex + 1} of {totalRows + 1}
+              </p>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="text-white/30 hover:text-white/70 transition-colors w-7 h-7 flex items-center justify-center"
@@ -1252,6 +1296,7 @@ function SortableRowCard({
   table,
   slug,
   onDelete,
+  onInsertBelow,
   onUpdateAsset,
 }: {
   row: BentoRow;
@@ -1259,6 +1304,7 @@ function SortableRowCard({
   table: TableName;
   slug: string;
   onDelete: () => void;
+  onInsertBelow?: () => void;
   onUpdateAsset: (assetIndex: number, asset: BentoAsset) => void;
 }) {
   const {
@@ -1303,12 +1349,25 @@ function SortableRowCard({
           {SLOT_COUNTS[row.layout]} slot{SLOT_COUNTS[row.layout] > 1 ? 's' : ''}
         </span>
 
-        <button
-          onClick={onDelete}
-          className="ml-auto px-3 py-1 text-xs text-red-400/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
-        >
-          Delete row
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {onInsertBelow && (
+            <button
+              type="button"
+              onClick={onInsertBelow}
+              className="px-2.5 py-1 text-xs text-cyan-400/80 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg border border-cyan-500/20 hover:border-cyan-500/40 transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Insert a new row directly below this row"
+            >
+              <span className="text-cyan-400 font-bold leading-none">+</span>
+              <span>Insert below</span>
+            </button>
+          )}
+          <button
+            onClick={onDelete}
+            className="px-3 py-1 text-xs text-red-400/50 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+          >
+            Delete row
+          </button>
+        </div>
       </div>
 
       {/* Asset slots — horizontal layout */}
@@ -1797,6 +1856,12 @@ function AdminDashboard() {
   const listScrollRef = useRef<HTMLDivElement>(null);
 
   const [isLayoutPickerOpen, setIsLayoutPickerOpen] = useState(false);
+  const [targetInsertIndex, setTargetInsertIndex] = useState<number | null>(null);
+
+  const openLayoutPicker = (atIndex: number | null = null) => {
+    setTargetInsertIndex(atIndex);
+    setIsLayoutPickerOpen(true);
+  };
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState('');
   const [lastSaved, setLastSaved] = useState<string>('');
@@ -1961,9 +2026,22 @@ function AdminDashboard() {
     }
   };
 
-  // ── Add row ───────────────────────────────────────────────────────────────
+  // ── Add / Insert row ────────────────────────────────────────────────────────
   const handleAddRow = (layout: LayoutType) => {
-    setRows((prev) => [...prev, createEmptyRow(layout)]);
+    const newRow = createEmptyRow(layout);
+    setRows((prev) => {
+      if (
+        targetInsertIndex !== null &&
+        targetInsertIndex >= 0 &&
+        targetInsertIndex <= prev.length
+      ) {
+        const next = [...prev];
+        next.splice(targetInsertIndex, 0, newRow);
+        return next;
+      }
+      return [...prev, newRow];
+    });
+    setTargetInsertIndex(null);
     setIsDirty(true);
     setSaveStatus('idle');
   };
@@ -2416,17 +2494,35 @@ function AdminDashboard() {
                       strategy={verticalListSortingStrategy}
                     >
                       {rows.map((row, rowIndex) => (
-                        <SortableRowCard
-                          key={row.id}
-                          row={row}
-                          rowIndex={rowIndex}
-                          table={selectedProject.table}
-                          slug={selectedProject.slug}
-                          onDelete={() => handleDeleteRow(row.id)}
-                          onUpdateAsset={(assetIndex, asset) =>
-                            handleUpdateAsset(row.id, assetIndex, asset)
-                          }
-                        />
+                        <Fragment key={row.id}>
+                          {/* Insert row divider before the first row */}
+                          {rowIndex === 0 && (
+                            <InsertRowDivider
+                              onInsert={() => openLayoutPicker(0)}
+                              label="Insert row at the top"
+                            />
+                          )}
+
+                          <SortableRowCard
+                            row={row}
+                            rowIndex={rowIndex}
+                            table={selectedProject.table}
+                            slug={selectedProject.slug}
+                            onDelete={() => handleDeleteRow(row.id)}
+                            onInsertBelow={() => openLayoutPicker(rowIndex + 1)}
+                            onUpdateAsset={(assetIndex, asset) =>
+                              handleUpdateAsset(row.id, assetIndex, asset)
+                            }
+                          />
+
+                          {/* Insert row divider between rows */}
+                          {rowIndex < rows.length - 1 && (
+                            <InsertRowDivider
+                              onInsert={() => openLayoutPicker(rowIndex + 1)}
+                              label={`Insert row between Row ${rowIndex + 1} and Row ${rowIndex + 2}`}
+                            />
+                          )}
+                        </Fragment>
                       ))}
                     </SortableContext>
                   </DndContext>
@@ -2442,8 +2538,8 @@ function AdminDashboard() {
 
                   {/* Add row button */}
                   <button
-                    onClick={() => setIsLayoutPickerOpen(true)}
-                    className="border border-dashed border-white/15 hover:border-white/35 rounded-2xl py-4 text-white/35 hover:text-white/60 text-sm transition-all flex items-center justify-center gap-2"
+                    onClick={() => openLayoutPicker(rows.length)}
+                    className="border border-dashed border-white/15 hover:border-white/35 rounded-2xl py-4 text-white/35 hover:text-white/60 text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span className="text-lg leading-none">+</span>
                     <span>Add Row</span>
@@ -2466,8 +2562,13 @@ function AdminDashboard() {
       {/* Layout picker modal */}
       {isLayoutPickerOpen && (
         <LayoutPickerModal
+          targetIndex={targetInsertIndex}
+          totalRows={rows.length}
           onSelect={handleAddRow}
-          onClose={() => setIsLayoutPickerOpen(false)}
+          onClose={() => {
+            setIsLayoutPickerOpen(false);
+            setTargetInsertIndex(null);
+          }}
         />
       )}
     </div>
