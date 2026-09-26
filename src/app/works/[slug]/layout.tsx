@@ -26,23 +26,23 @@ export async function generateMetadata({
   const protocol = host?.includes('localhost') ? 'http' : 'https';
   const currentUrl = `${protocol}://${host}/works/${slug}`;
 
-  // Use the first image from your media array
-  const ogImage = Array.isArray(project.media) ? project.media[0] : project.media;
+  const ogImageUrl = `${currentUrl}/opengraph-image`;
 
   return {
     title: `${project.title} — Case Study`,
-    description: project.tagline,
+    description: project.tagline || project.description || 'Explore this case study by Everdann',
     openGraph: {
-      title: project.title,
-      description: project.tagline,
+      title: `${project.title} — Case Study`,
+      description: project.tagline || project.description || 'Explore this case study by Everdann',
       url: currentUrl,
       siteName: 'Everdann Portfolio',
       images: [
         {
-          url: ogImage,
+          url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: project.title,
+          alt: `${project.title} — Case Study`,
+          type: 'image/png',
         },
       ],
       locale: 'en_US',
@@ -50,9 +50,9 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: project.title,
-      description: project.tagline,
-      images: [ogImage],
+      title: `${project.title} — Case Study`,
+      description: project.tagline || project.description || 'Explore this case study by Everdann',
+      images: [ogImageUrl],
     },
   };
 }
