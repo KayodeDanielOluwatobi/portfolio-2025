@@ -72,7 +72,10 @@ export default function CaseStudyPage() {
       <section
         data-case-study-hero="true"
         className="group relative w-full overflow-hidden h-[55vh] md:h-[65vh] min-h-[380px] max-h-[720px] flex flex-col justify-end"
-        style={{ backgroundColor }}
+        style={{
+          backgroundColor,
+          color: '#ffffff',
+        }}
       >
         {/* Background Image with Shared Layout Animation & Zoom on Hover */}
         <motion.div
@@ -174,14 +177,15 @@ export default function CaseStudyPage() {
                       }
                     }
                   }}
-                  className="w-8 h-8 flex items-center justify-center p-0 rounded-full bg-transparent border-0 text-white/80 hover:text-white transition-all cursor-pointer group"
+                  style={{ color: '#ffffff' }}
+                  className="w-8 h-8 flex items-center justify-center p-0 rounded-full bg-transparent border-0 opacity-80 hover:opacity-100 transition-opacity cursor-pointer group"
                   title="Share Case Study"
                   aria-label="Share Case Study"
                 >
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="currentColor"
+                    stroke="#ffffff"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -398,14 +402,16 @@ function ViewCounterBadge({
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="flex items-center justify-center gap-2 h-8 px-0 bg-transparent border-0 text-white/80 hover:text-white transition-colors duration-200 cursor-pointer select-none group"
+      style={{ color: '#ffffff' }}
+      className="flex items-center justify-center gap-2 h-8 px-0 bg-transparent border-0 opacity-80 hover:opacity-100 transition-opacity duration-200 cursor-pointer select-none group"
       title={`${views} Views`}
     >
       {/* 3-Bar Static Graph (styled matching the share icon, center-aligned) */}
       <div className="flex items-end justify-center gap-[2.5px] w-3.5 h-[14px] flex-shrink-0">
         {/* Bar 1 (Left - 7px static) */}
         <motion.span
-          className="w-[2.5px] rounded-full origin-bottom bg-white/80 group-hover:bg-white transition-colors duration-200"
+          style={{ backgroundColor: '#ffffff' }}
+          className="w-[2.5px] rounded-full origin-bottom"
           initial={{ height: 0 }}
           animate={
             isHovered
@@ -422,7 +428,8 @@ function ViewCounterBadge({
 
         {/* Bar 2 (Center - 14px static, reduced from 18px) */}
         <motion.span
-          className="w-[2.5px] rounded-full origin-bottom bg-white/80 group-hover:bg-white transition-colors duration-200"
+          style={{ backgroundColor: '#ffffff' }}
+          className="w-[2.5px] rounded-full origin-bottom"
           initial={{ height: 0 }}
           animate={
             isHovered
@@ -439,7 +446,8 @@ function ViewCounterBadge({
 
         {/* Bar 3 (Right - 10px static) */}
         <motion.span
-          className="w-[2.5px] rounded-full origin-bottom bg-white/80 group-hover:bg-white transition-colors duration-200"
+          style={{ backgroundColor: '#ffffff' }}
+          className="w-[2.5px] rounded-full origin-bottom"
           initial={{ height: 0 }}
           animate={
             isHovered
@@ -457,7 +465,8 @@ function ViewCounterBadge({
 
       {/* View count text matching the share icon color */}
       <span
-        className="font-space text-xs sm:text-sm tracking-tight leading-none text-white/80 group-hover:text-white transition-colors duration-200 select-none flex items-center translate-y-[1.5px]"
+        style={{ color: '#ffffff' }}
+        className="font-space text-xs sm:text-sm tracking-tight leading-none select-none flex items-center translate-y-[1.5px]"
       >
         {views}
       </span>

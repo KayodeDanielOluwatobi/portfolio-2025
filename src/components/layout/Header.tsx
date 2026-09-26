@@ -284,9 +284,17 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
   return (
     <motion.header 
       className="fixed top-0 left-0 right-0 z-50 bg-transparent"
+      data-in-hero={isInHeroSection && isCaseStudyPage ? 'true' : undefined}
       variants={headerVariants}
       initial="visible"
       animate={shouldShowHeader ? 'visible' : 'hidden'}
+      style={
+        isInHeroSection && isCaseStudyPage
+          ? {
+              color: '#ffffff',
+            }
+          : undefined
+      }
     >
       <div className="container max-w-none mx-auto px-8 py-8 h-20 flex items-center justify-between">
         {/* Logo with smooth fade (reduced size on case study pages) */}
@@ -332,7 +340,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   >
                     <Link
                       href="/works"
-                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                      style={{ color: '#ffffff' }}
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider whitespace-nowrap leading-none flex items-center h-8"
                     >
                       WORKS
                     </Link>
@@ -349,7 +358,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   >
                     <Link
                       href="/lab"
-                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                      style={{ color: '#ffffff' }}
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider whitespace-nowrap leading-none flex items-center h-8"
                     >
                       LAB
                     </Link>
@@ -366,7 +376,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   >
                     <Link
                       href="/about"
-                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                      style={{ color: '#ffffff' }}
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider whitespace-nowrap leading-none flex items-center h-8"
                     >
                       ABOUT
                     </Link>
@@ -383,7 +394,8 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                   >
                     <Link
                       href="/contact"
-                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider text-white whitespace-nowrap leading-none flex items-center h-8"
+                      style={{ color: '#ffffff' }}
+                      className="hover:opacity-80 transition-opacity duration-200 font-space text-[0.8rem] tracking-wider whitespace-nowrap leading-none flex items-center h-8"
                     >
                       CONTACT
                     </Link>
@@ -402,6 +414,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                       href="https://github.com/KayodeDanielOluwatobi/portfolio-2025"
                       target="_blank"
                       rel="noopener noreferrer"
+                      style={{ color: '#ffffff' }}
                       className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all text-white"
                       aria-label="View Github Repository"
                     >
@@ -421,6 +434,7 @@ export default function Header({ currentBrand = 'default', onMobileMenuToggle }:
                     >
                       <button
                         onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        style={{ color: '#ffffff' }}
                         className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all text-white"
                         aria-label="Toggle theme"
                       >

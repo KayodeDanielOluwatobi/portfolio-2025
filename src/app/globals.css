@@ -182,6 +182,27 @@ html.light .logo-invert,
   transition: filter 0.4s ease;
 }
 
+/* Force all text and icons in the case study hero region to stay pure white irrespective of theme */
+[data-case-study-hero],
+header[data-in-hero='true'] {
+  --white-val: #ffffff !important;
+  --color-white: #ffffff !important;
+  --foreground: #ffffff !important;
+  color: #ffffff !important;
+}
+
+[data-case-study-hero] *,
+header[data-in-hero='true'] * {
+  --white-val: #ffffff !important;
+  --color-white: #ffffff !important;
+}
+
+/* Ensure logo and menu icons in the hero region are never inverted in light mode */
+header[data-in-hero='true'] .logo-invert,
+header[data-in-hero='true'] .menu-icon-invert {
+  filter: none !important;
+}
+
 /* * {
   cursor: none !important;
 } */
