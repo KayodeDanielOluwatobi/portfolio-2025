@@ -349,7 +349,7 @@ function MediaCard({
             title="Embedded Media"
             allow="autoplay; fullscreen"
             sandbox="allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-popups-to-escape-sandbox"
-            className="w-full h-full border-0 pointer-events-auto bg-transparent"
+            className="w-full h-full border-0 pointer-events-none bg-transparent"
             loading="lazy"
           />
         ) : (
@@ -365,9 +365,7 @@ function MediaCard({
 
       {/* Transparent Protective Shield over media */}
       <div 
-        className={`absolute inset-0 z-10 bg-transparent select-none cursor-default ${
-          asset.type === 'video' && isEmbedMediaUrl(asset.src) ? 'pointer-events-none' : ''
-        }`}
+        className="absolute inset-0 z-10 bg-transparent select-none cursor-default pointer-events-auto"
         onContextMenu={(e) => e.preventDefault()}
         draggable="false"
       />
