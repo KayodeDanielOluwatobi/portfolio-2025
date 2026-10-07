@@ -19,6 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
+import { isEmbedMediaUrl, formatEmbedUrl, extractMediaUrl } from '@/utils/mediaEmbed';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -1195,6 +1196,12 @@ function AssetSlotEditor({
                       alt=""
                       className="w-full h-full object-cover"
                     />
+                  ) : isEmbedMediaUrl(asset.src) ? (
+                    <iframe
+                      src={formatEmbedUrl(asset.src)}
+                      title="Preview"
+                      className="w-full h-full border-0 pointer-events-none"
+                    />
                   ) : (
                     <video
                       src={asset.src}
@@ -1251,11 +1258,11 @@ function AssetSlotEditor({
             {/* Manual URL input fallback */}
             <div className="mt-2">
               <input
-                type="url"
-                placeholder="Or paste URL directly…"
+                type="text"
+                placeholder={asset.type === 'video' ? 'Paste video URL, Lottie link, or <iframe> embed code…' : 'Or paste URL directly…'}
                 value={asset.src || ''}
-                onChange={(e) => onChange({ ...asset, src: e.target.value })}
-                className="w-full bg-white/5 border border-white/8 rounded-lg px-2.5 py-1.5 text-white text-xs placeholder:text-white/15 focus:outline-none focus:border-white/25"
+                onChange={(e) => onChange({ ...asset, src: extractMediaUrl(e.target.value) })}
+                className="w-full bg-white/5 border border-white/8 rounded-lg px-2.5 py-1.5 text-white text-xs placeholder:text-white/20 focus:outline-none focus:border-white/25"
               />
             </div>
 

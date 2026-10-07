@@ -8,6 +8,7 @@ import { Squircle } from '@squircle-js/react';
 import { useSquircleRadius } from '@/hooks/useSquircleRadius';
 import FadeUp from '@/components/animations/FadeUp';
 import { renderFormattedText, isBulletLine, cleanBulletLine } from '@/utils/textFormatter';
+import { isEmbedMediaUrl, formatEmbedUrl } from '@/utils/mediaEmbed';
 
 interface BentoAsset {
   type: 'image' | 'video' | 'text';
@@ -342,18 +343,31 @@ function MediaCard({
       )}
       
       {asset.type === 'video' && (
-        <video 
-          src={asset.src} 
-          autoPlay muted loop playsInline 
-          draggable="false"
-          onContextMenu={(e) => e.preventDefault()}
-          className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
-        />
+        isEmbedMediaUrl(asset.src) ? (
+          <iframe 
+            src={formatEmbedUrl(asset.src)} 
+            title="Embedded Media"
+            allow="autoplay; fullscreen"
+            sandbox="allow-same-origin allow-scripts allow-pointer-lock allow-forms allow-popups allow-popups-to-escape-sandbox"
+            className="w-full h-full border-0 pointer-events-auto bg-transparent"
+            loading="lazy"
+          />
+        ) : (
+          <video 
+            src={asset.src} 
+            autoPlay muted loop playsInline 
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
+            className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105 pointer-events-none select-none" 
+          />
+        )
       )}
 
       {/* Transparent Protective Shield over media */}
       <div 
-        className="absolute inset-0 z-10 bg-transparent select-none cursor-default"
+        className={`absolute inset-0 z-10 bg-transparent select-none cursor-default ${
+          asset.type === 'video' && isEmbedMediaUrl(asset.src) ? 'pointer-events-none' : ''
+        }`}
         onContextMenu={(e) => e.preventDefault()}
         draggable="false"
       />
